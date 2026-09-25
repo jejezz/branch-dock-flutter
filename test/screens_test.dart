@@ -224,4 +224,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('전환'), findsOneWidget);
   });
+
+  testWidgets('create PR sheet: any branch, base selection, publish first', (tester) async {
+    await tester.runAsync(() async {
+      // 원격 브랜치 main, develop이 있는 것처럼 추적 참조를 만든다.
+      await git(repo.root, ['update-ref', 'refs/remotes/origin/main', 'HEAD']);
+      await git(repo.root, ['update-ref', 'refs/remotes/origin/develop', 'HEAD']);
+      await repo.refresh();
+    });
+    const head = 'feature/a-rather-long-branch-name-for-narrow-windows';
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => showCreatePrSheetWith(context, repo, head: head, commits: const []),
+        child: const Text('open'),
+      );
+    }));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    // 원격에 없는 브랜치는 먼저 게시한다 (현재 브랜치가 아니어도).
+    expect(find.textContaining('git push -u origin $head'), findsOneWidget);
+    expect(find.textContaining('--base main --head $head'), findsOneWidget);
+    expect(find.text('게시하고 PR 만들기'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('develop').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('--base develop --head $head'), findsOneWidget);
+    expect(find.textContaining('기본 브랜치(main)가 아닌 곳'), findsOneWidget);
+  });
 }

@@ -2569,6 +2569,24 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{branch}(으)로 전환'**
   String bannerSwitchTo(String branch);
+
+  /// No description provided for @bannerCreatePr.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}을(를) 올렸지만 아직 PR이 없습니다'**
+  String bannerCreatePr(String branch);
+
+  /// No description provided for @prBaseLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'기준 브랜치'**
+  String get prBaseLabel;
+
+  /// No description provided for @prBaseNotDefault.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 브랜치({base})가 아닌 곳으로 합칩니다. 다른 기능 브랜치 위에 쌓는 PR일 때 씁니다.'**
+  String prBaseNotDefault(String base);
 }
 
 class _AppLocalizationsDelegate

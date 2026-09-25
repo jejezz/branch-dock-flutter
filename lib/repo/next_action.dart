@@ -2,7 +2,7 @@ import '../git/remotes.dart';
 import '../git/status.dart';
 
 /// 추천 행동 배너 (UI_UX.md §3 C). 우선순위 순서대로 하나만 고른다.
-enum NextActionKind { resolveConflicts, pull, switchToDefault, publish, push, publishToGitHub }
+enum NextActionKind { resolveConflicts, pull, switchToDefault, publish, push, createPr, publishToGitHub }
 
 class NextAction {
   const NextAction(this.kind, [this.count = 0]);
@@ -24,6 +24,7 @@ NextAction? suggestNextAction({
   required RepoStatus status,
   required List<Remote> remotes,
   bool headMergedAndGone = false,
+  bool suggestPr = false,
 }) {
   final conflicts = status.conflicts.length;
   if (conflicts > 0) return NextAction(NextActionKind.resolveConflicts, conflicts);
@@ -37,5 +38,7 @@ NextAction? suggestNextAction({
     return const NextAction(NextActionKind.publish);
   }
   if (status.ahead > 0) return NextAction(NextActionKind.push, status.ahead);
+  // 올릴 것을 다 올렸는데 PR이 없는 작업 브랜치 (UI_UX.md §3 C 6번).
+  if (suggestPr) return const NextAction(NextActionKind.createPr);
   return null;
 }

@@ -330,34 +330,56 @@ class _PrCardState extends State<PrCard> {
   }
 }
 
-/// PR 만들기 (PLAN.md 3.9): 기준 브랜치, 제목(마지막 커밋), 본문, 초안.
+/// PR 만들기 (PLAN.md 3.9): 기준 브랜치 선택, 제목(마지막 커밋), 본문, 초안.
+/// [head]를 주지 않으면 현재 브랜치 — 브랜치 메뉴에서는 그 브랜치를 준다.
 Future<void> showCreatePrSheet(
   BuildContext context,
   RepoController repo, {
+  String? head,
   VoidCallback? onCreated,
 }) async {
+  final branch = head ?? repo.status.head!;
+  final remote = repo.githubRemote?.name ?? repo.defaultRemote ?? 'origin';
   final base = repo.defaultBranch ?? 'main';
-  final head = repo.status.head!;
-  final log = await repo.read(
-    GitCommands.incoming(head, base: '${repo.defaultRemote ?? 'origin'}/$base'),
-  );
+  final commits = await loadPrCommits(repo, branch, base, remote);
   if (!context.mounted) return;
-  final commits = log.ok ? Commit.parse(log.stdout) : const <Commit>[];
-  await showActionSheet<void>(
+  await showCreatePrSheetWith(context, repo, head: branch, commits: commits, onCreated: onCreated);
+}
+
+/// 커밋을 이미 읽었을 때 시트만 연다 (테스트에서도 쓴다).
+Future<void> showCreatePrSheetWith(
+  BuildContext context,
+  RepoController repo, {
+  required String head,
+  required List<Commit> commits,
+  VoidCallback? onCreated,
+}) {
+  final remote = repo.githubRemote?.name ?? repo.defaultRemote ?? 'origin';
+  final base = repo.defaultBranch ?? 'main';
+  final branch = head;
+  return showActionSheet<void>(
     context,
     (context) => _CreatePrSheet(
       repo: repo,
+      remote: remote,
       base: base,
-      head: head,
+      head: branch,
       commits: commits,
       onCreated: onCreated,
     ),
   );
 }
 
+/// [base]에 없는 [head]의 커밋 — 제목·본문 기본값에 쓴다.
+Future<List<Commit>> loadPrCommits(RepoController repo, String head, String base, String remote) async {
+  final log = await repo.read(GitCommands.incoming(head, base: '$remote/$base'));
+  return log.ok ? Commit.parse(log.stdout) : const <Commit>[];
+}
+
 class _CreatePrSheet extends StatefulWidget {
   const _CreatePrSheet({
     required this.repo,
+    required this.remote,
     required this.base,
     required this.head,
     required this.commits,
@@ -365,6 +387,7 @@ class _CreatePrSheet extends StatefulWidget {
   });
 
   final RepoController repo;
+  final String remote;
   final String base;
   final String head;
   final List<Commit> commits;
@@ -383,6 +406,7 @@ class _CreatePrSheetState extends State<_CreatePrSheet> {
         ? widget.commits.map((c) => '- ${c.subject}').join('\n')
         : '',
   );
+  late String _base = widget.base;
   bool _draft = false;
 
   @override
@@ -398,39 +422,39 @@ class _CreatePrSheetState extends State<_CreatePrSheet> {
     super.dispose();
   }
 
+  /// 기준으로 고를 수 있는 브랜치: GitHub 원격의 브랜치 (head 제외, 기본 브랜치 먼저).
+  List<String> get _bases {
+    final names = widget.repo.remoteBranches
+        .where((b) => b.remoteName == widget.remote && b.shortName != widget.head)
+        .map((b) => b.shortName)
+        .toList();
+    if (!names.contains(widget.base)) names.insert(0, widget.base);
+    names.sort((a, b) => a == widget.base ? -1 : (b == widget.base ? 1 : a.compareTo(b)));
+    return names;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final repo = widget.repo;
     final title = _title.text.trim();
-    final publish = repo.needsPublish;
-    final commands = [
-      if (publish) repo.pushCommand,
-      GhCommands.prCreate(
-        base: widget.base,
-        head: widget.head,
-        title: title.isEmpty ? '<title>' : title,
-        draft: _draft,
-      ),
-    ];
+    // 이 브랜치가 원격에 없으면 먼저 게시한다 (현재 브랜치가 아니어도).
+    final branch = repo.localBranches.where((b) => b.name == widget.head).firstOrNull;
+    final publish = branch != null && (branch.upstream == null || branch.upstreamGone);
+    final publishCommand = GitCommands.publish(widget.remote, widget.head);
+    List<String> create(String t) => GhCommands.prCreate(base: _base, head: widget.head, title: t, draft: _draft);
+    final commands = [if (publish) publishCommand, create(title.isEmpty ? '<title>' : title)];
 
     Future<void> submit() async {
       if (title.isEmpty) return;
       Navigator.pop(context);
-      await RepoActions.report(context, () async {
+      final ok = await RepoActions.report(context, () async {
         CommandResult r = const CommandResult(0, '', '');
-        if (publish) r = await repo.push();
+        if (publish) r = await repo.execute(publishCommand);
         if (!r.ok) return r;
-        return repo.execute(
-          GhCommands.prCreate(
-            base: widget.base,
-            head: widget.head,
-            title: title,
-            draft: _draft,
-          ),
-          stdin: _body.text,
-        );
+        return repo.execute(create(title), stdin: _body.text);
       }(), done: l10n.donePrCreated);
+      if (ok) await repo.loadHeadPr(force: true);
       widget.onCreated?.call();
     }
 
@@ -440,10 +464,35 @@ class _CreatePrSheetState extends State<_CreatePrSheet> {
       confirmLabel: publish ? l10n.prPublishAndCreate : l10n.prCreate,
       onConfirm: title.isEmpty ? null : submit,
       children: [
-        Text(
-          '${widget.head} → ${widget.base}',
-          style: AppFonts.mono.copyWith(fontSize: 12),
-        ),
+        Row(children: [
+          Flexible(
+            child: Text(
+              widget.head,
+              overflow: TextOverflow.ellipsis,
+              style: AppFonts.mono.copyWith(fontSize: 12),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Icon(Icons.arrow_forward_rounded, size: 14),
+          ),
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              initialValue: _base,
+              isExpanded: true,
+              decoration: InputDecoration(isDense: true, labelText: l10n.prBaseLabel),
+              items: [
+                for (final b in _bases)
+                  DropdownMenuItem(value: b, child: Text(b, style: AppFonts.mono.copyWith(fontSize: 12))),
+              ],
+              onChanged: (v) => setState(() => _base = v ?? widget.base),
+            ),
+          ),
+        ]),
+        if (_base != widget.base) ...[
+          const SizedBox(height: 4),
+          Text(l10n.prBaseNotDefault(widget.base), style: Theme.of(context).textTheme.bodySmall),
+        ],
         const SizedBox(height: AppSpacing.md),
         TextField(
           controller: _title,

@@ -9,6 +9,7 @@ import '../git/refs.dart';
 import '../git/remotes.dart';
 import '../git/status.dart';
 import '../git/tags.dart';
+import '../github/models.dart';
 
 /// 병합·rebase가 끝나지 않은 상태.
 enum RepoOperation { none, merging, rebasing }
@@ -42,6 +43,17 @@ class RepoController extends ChangeNotifier {
   /// 들어 있다 — PR이 병합되고 브랜치가 지워진 경우. 이때 게시하면 지운
   /// 브랜치가 다시 생기므로 게시 대신 기본 브랜치로 전환을 권한다.
   bool headMergedAndGone = false;
+
+  /// gh 설치·로그인 여부. 앱이 환경 점검 결과로 넣는다.
+  bool ghReady = false;
+
+  /// 현재 브랜치의 PR. [headPrKnown]이 false면 아직 모른다(또는 알 수 없다).
+  /// 추천 배너의 "PR 만들기"에 쓴다 (UI_UX.md §3 C 6번).
+  PullRequest? headPr;
+  bool headPrKnown = false;
+  String? _headPrFor;
+  DateTime? _headPrAt;
+  bool _loadingHeadPr = false;
   RepoOperation operation = RepoOperation.none;
   bool loaded = false;
 
@@ -132,6 +144,7 @@ class RepoController extends ChangeNotifier {
       loaded = true;
       notifyListeners();
     } while (_refreshAgain && !_disposed);
+    unawaited(loadHeadPr());
   }
 
   List<Tag> _withPushed(List<Tag> list) {
@@ -174,6 +187,50 @@ class RepoController extends ChangeNotifier {
     final r = await runner.run(GitCommands.isAncestor('HEAD', '$remote/$base'), workingDirectory: root, quiet: true);
     return r.ok;
   }
+
+  /// 현재 브랜치의 PR을 읽는다. 네트워크를 쓰므로 같은 브랜치는 1분에 한 번만
+  /// 읽고, 브랜치가 바뀌거나 [force]면 다시 읽는다.
+  Future<void> loadHeadPr({bool force = false}) async {
+    final head = status.head;
+    if (!ghReady || githubRemote == null || head == null || head == defaultBranch || !status.hasUpstream) {
+      if (headPrKnown || headPr != null) {
+        headPrKnown = false;
+        headPr = null;
+        if (!_disposed) notifyListeners();
+      }
+      return;
+    }
+    final fresh = _headPrFor == head && _headPrAt != null && DateTime.now().difference(_headPrAt!).inSeconds < 60;
+    if ((!force && fresh) || _loadingHeadPr) return;
+    _loadingHeadPr = true;
+    try {
+      final r = await runner.run(GhCommands.prView(head, PullRequest.jsonFields), workingDirectory: root, quiet: true);
+      if (_disposed || status.head != head) return;
+      if (r.ok) {
+        headPr = PullRequest.parse(r.stdout);
+      } else if (r.combined.toLowerCase().contains('no pull requests found')) {
+        headPr = null;
+      } else {
+        return; // 네트워크·인증 오류: 모르는 상태로 둔다.
+      }
+      headPrKnown = true;
+      _headPrFor = head;
+      _headPrAt = DateTime.now();
+      notifyListeners();
+    } finally {
+      _loadingHeadPr = false;
+    }
+  }
+
+  /// 푸시까지 끝났는데 PR이 없는 작업 브랜치 — "PR 만들기"를 권한다.
+  bool get shouldSuggestPr =>
+      headPrKnown &&
+      headPr == null &&
+      !headMergedAndGone &&
+      status.hasUpstream &&
+      status.ahead == 0 &&
+      status.head != null &&
+      status.head != defaultBranch;
 
   /// 기본 브랜치로 전환한다. 로컬에 없으면 원격 브랜치를 추적해 만든다.
   Future<CommandResult> switchToDefault() {

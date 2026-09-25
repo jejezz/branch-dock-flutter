@@ -1446,4 +1446,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String bannerSwitchTo(String branch) {
     return '$branch(으)로 전환';
   }
+
+  @override
+  String bannerCreatePr(String branch) {
+    return '$branch을(를) 올렸지만 아직 PR이 없습니다';
+  }
+
+  @override
+  String get prBaseLabel => '기준 브랜치';
+
+  @override
+  String prBaseNotDefault(String base) {
+    return '기본 브랜치($base)가 아닌 곳으로 합칩니다. 다른 기능 브랜치 위에 쌓는 PR일 때 씁니다.';
+  }
 }

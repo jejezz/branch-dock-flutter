@@ -411,5 +411,8 @@
   "headerMergedAndGone": "Merged · deleted on remote",
   "headerMergedAndGoneTooltip": "This branch is already merged into the default branch and was deleted on the remote. Publishing it again would bring the deleted branch back.",
   "bannerMergedAndGone": "This branch was merged and deleted on the remote. Go back to {branch}",
-  "bannerSwitchTo": "Switch to {branch}"
+  "bannerSwitchTo": "Switch to {branch}",
+  "bannerCreatePr": "{branch} is pushed but has no pull request yet",
+  "prBaseLabel": "Base branch",
+  "prBaseNotDefault": "Merges into a branch other than the default ({base}) — for a PR stacked on another feature branch."
 }

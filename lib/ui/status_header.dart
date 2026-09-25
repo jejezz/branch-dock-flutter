@@ -11,6 +11,7 @@ import 'help/concepts.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
+import 'tabs/pr_tab.dart';
 import 'widgets.dart';
 
 /// 상태 헤더 (UI_UX.md §3 B): 브랜치 → 추적 브랜치, 상태 pill, Fetch/Pull/Push.
@@ -290,6 +291,11 @@ class NextActionBanner extends StatelessWidget {
         ),
       NextActionKind.publish => (l10n.bannerPublish, l10n.headerPublish, () => RepoActions.push(context, repo)),
       NextActionKind.push => (l10n.bannerPush(action.count), l10n.headerPush, () => RepoActions.push(context, repo)),
+      NextActionKind.createPr => (
+          l10n.bannerCreatePr(repo.status.head ?? ''),
+          l10n.prCreate,
+          () => showCreatePrSheet(context, repo),
+        ),
       NextActionKind.publishToGitHub => (l10n.bannerNoRemote, l10n.bannerShow, onShowRemotes),
     };
     return Container(

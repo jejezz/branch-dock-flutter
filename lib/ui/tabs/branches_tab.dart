@@ -9,6 +9,7 @@ import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
 import '../merge_sheet.dart';
+import 'pr_tab.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
@@ -116,6 +117,7 @@ enum _BranchMenu {
   switchTo,
   mergeIntoCurrent,
   publish,
+  createPr,
   rename,
   delete,
   deleteRemote,
@@ -169,6 +171,12 @@ class _BranchRowState extends State<_BranchRow> {
           value: _BranchMenu.publish,
           child: Text(l10n.headerPublish),
         ),
+      // PR 만들기 (UI_UX.md §4.2): GitHub 원격과 gh가 있고 기본 브랜치가 아닐 때.
+      if (!branch.remote &&
+          branch.name != repo.defaultBranch &&
+          repo.githubRemote != null &&
+          RepoScope.environmentOf(context).ghReady)
+        PopupMenuItem(value: _BranchMenu.createPr, child: Text(l10n.prCreate)),
       if (!branch.remote)
         PopupMenuItem(
           value: _BranchMenu.rename,
@@ -216,6 +224,8 @@ class _BranchRowState extends State<_BranchRow> {
           repo.execute(GitCommands.publish(remote, branch.name)),
           done: l10n.donePublish(branch.name),
         );
+      case _BranchMenu.createPr:
+        await showCreatePrSheet(context, repo, head: branch.name);
       case _BranchMenu.rename:
         await showRenameBranchSheet(context, repo, branch);
       case _BranchMenu.delete:
