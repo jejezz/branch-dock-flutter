@@ -10,6 +10,7 @@ import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
 import '../help/concepts.dart';
+import '../markdown_editor.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
@@ -127,12 +128,16 @@ class PrCard extends StatefulWidget {
     required this.repo,
     required this.onChanged,
     this.showMerge = true,
+    this.activity,
   });
 
   final PullRequest pr;
   final RepoController repo;
   final VoidCallback onChanged;
   final bool showMerge;
+
+  /// 미리 읽은 리뷰·코멘트 (테스트용). 없으면 카드가 gh로 읽는다.
+  final List<PrActivity>? activity;
 
   @override
   State<PrCard> createState() => _PrCardState();
@@ -256,7 +261,9 @@ class _PrCardState extends State<PrCard> {
                     ),
                 ],
               ),
-              if (pr.open && widget.showMerge) ...[
+              // 리뷰와 코멘트 (PLAN.md 3.9 P2). 릴리스 마법사 안에서는 병합에만 집중한다.
+        if (widget.showMerge) PrReviewSection(pr: pr, repo: repo, initialActivity: widget.activity),
+        if (pr.open && widget.showMerge) ...[
                 const SizedBox(height: AppSpacing.md),
                 if (blocker != null)
                   Text(
@@ -656,7 +663,8 @@ Future<void> showPrSheet(BuildContext context, RepoController repo, int number, 
   await showPrSheetWith(context, repo, pr, onChanged: onChanged);
 }
 
-Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequest pr, {VoidCallback? onChanged}) {
+Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequest pr,
+    {VoidCallback? onChanged, List<PrActivity>? activity}) {
   return showActionSheet<void>(context, (context) {
     final l10n = AppLocalizations.of(context);
     final current = repo.status.head == pr.headRef;
@@ -668,6 +676,7 @@ Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequ
           PrCard(
             pr: pr,
             repo: repo,
+            activity: activity,
             onChanged: () {
               Navigator.pop(context);
               onChanged?.call();
@@ -704,4 +713,192 @@ Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequ
       ),
     );
   });
+}
+
+
+/// 리뷰·코멘트 (PLAN.md 3.9 P2): 최근 활동 몇 건과 승인 / 변경 요청 / 코멘트.
+/// 내가 만든 PR은 GitHub가 스스로 승인·변경 요청을 막으므로 코멘트만 보인다.
+class PrReviewSection extends StatefulWidget {
+  const PrReviewSection({super.key, required this.pr, required this.repo, this.initialActivity});
+
+  final PullRequest pr;
+  final RepoController repo;
+
+  /// 미리 읽은 활동 (테스트용). 없으면 gh로 읽는다.
+  final List<PrActivity>? initialActivity;
+
+  @override
+  State<PrReviewSection> createState() => _PrReviewSectionState();
+}
+
+class _PrReviewSectionState extends State<PrReviewSection> {
+  late List<PrActivity>? _activity = widget.initialActivity;
+  bool _showAll = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_activity == null) _load();
+  }
+
+  Future<void> _load() async {
+    final r = await widget.repo.read(GhCommands.prView('${widget.pr.number}', PullRequest.activityFields));
+    if (!mounted) return;
+    setState(() => _activity = r.ok ? PrActivity.parse(r.stdout) : const []);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final pr = widget.pr;
+    final me = RepoScope.environmentOf(context).ghLogins['github.com'];
+    final mine = me != null && me == pr.author;
+    final activity = _activity ?? const <PrActivity>[];
+    final shown = _showAll ? activity : activity.take(3).toList();
+
+    Future<void> review(PrReviewKind? kind) async {
+      final ok = await showReviewSheet(context, widget.repo, pr, kind);
+      if (ok) await _load();
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const SizedBox(height: AppSpacing.md),
+      Row(children: [
+        Text(l10n.prReviewTitle, style: theme.textTheme.labelMedium),
+        const SizedBox(width: 6),
+        if (_activity != null) Text('${activity.length}', style: theme.textTheme.labelSmall),
+      ]),
+      for (final a in shown)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(
+              switch (a.kind) {
+                PrActivityKind.approved => Icons.check_circle_rounded,
+                PrActivityKind.changesRequested => Icons.change_circle_outlined,
+                PrActivityKind.reviewed => Icons.rate_review_outlined,
+                PrActivityKind.comment => Icons.chat_bubble_outline_rounded,
+              },
+              size: 15,
+              color: switch (a.kind) {
+                PrActivityKind.approved => toneColor(context, Tone.success),
+                PrActivityKind.changesRequested => toneColor(context, Tone.warning),
+                _ => theme.colorScheme.onSurfaceVariant,
+              },
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${a.author} · ${relativeTime(l10n, a.date)}', style: theme.textTheme.labelSmall),
+                if (a.body.trim().isNotEmpty)
+                  Text(a.body.trim(),
+                      maxLines: _showAll ? null : 3,
+                      overflow: _showAll ? null : TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.merge(AppFonts.userContent)),
+              ]),
+            ),
+          ]),
+        ),
+      if (activity.length > 3)
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () => setState(() => _showAll = !_showAll),
+            child: Text(_showAll ? l10n.prReviewShowLess : l10n.prReviewShowAll(activity.length)),
+          ),
+        ),
+      if (pr.open)
+        Wrap(spacing: AppSpacing.sm, runSpacing: 4, children: [
+          if (!mine) ...[
+            OutlinedButton.icon(
+              onPressed: widget.repo.busy ? null : () => review(PrReviewKind.approve),
+              icon: Icon(Icons.check_rounded, size: 16, color: toneColor(context, Tone.success)),
+              label: Text(l10n.prReviewApprove),
+            ),
+            OutlinedButton(
+              onPressed: widget.repo.busy ? null : () => review(PrReviewKind.requestChanges),
+              child: Text(l10n.prReviewRequestChanges),
+            ),
+          ],
+          OutlinedButton.icon(
+            onPressed: widget.repo.busy ? null : () => review(null),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
+            label: Text(l10n.prReviewComment),
+          ),
+        ]),
+      if (mine && pr.open)
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(l10n.prReviewOwnPr, style: theme.textTheme.bodySmall),
+        ),
+    ]);
+  }
+}
+
+/// 리뷰(승인·변경 요청) 또는 일반 코멘트([kind]가 null) 양식. 보냈으면 true.
+Future<bool> showReviewSheet(BuildContext context, RepoController repo, PullRequest pr, PrReviewKind? kind) async {
+  final sent = await showActionSheet<bool>(context, (context) => _ReviewSheet(repo: repo, pr: pr, kind: kind));
+  return sent ?? false;
+}
+
+class _ReviewSheet extends StatefulWidget {
+  const _ReviewSheet({required this.repo, required this.pr, required this.kind});
+
+  final RepoController repo;
+  final PullRequest pr;
+  final PrReviewKind? kind;
+
+  @override
+  State<_ReviewSheet> createState() => _ReviewSheetState();
+}
+
+class _ReviewSheetState extends State<_ReviewSheet> {
+  final _body = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _body.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _body.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final kind = widget.kind;
+    final command = kind == null ? GhCommands.prComment(widget.pr.number) : GhCommands.prReview(widget.pr.number, kind);
+    // 승인은 본문 없이도 되고, 변경 요청과 코멘트는 무엇을 말하는지 적어야 한다.
+    final needsBody = kind != PrReviewKind.approve;
+    final title = switch (kind) {
+      PrReviewKind.approve => l10n.prReviewApprove,
+      PrReviewKind.requestChanges => l10n.prReviewRequestChanges,
+      _ => l10n.prReviewComment,
+    };
+    return ActionSheetBody(
+      title: '#${widget.pr.number} · $title',
+      commands: [command],
+      confirmLabel: l10n.prReviewSend,
+      onConfirm: needsBody && _body.text.trim().isEmpty
+          ? null
+          : () async {
+              final ok = await RepoActions.report(
+                context,
+                widget.repo.execute(command, stdin: _body.text),
+                done: l10n.donePrReview(widget.pr.number),
+              );
+              if (context.mounted) Navigator.pop(context, ok);
+            },
+      children: [
+        Text(widget.pr.title, style: Theme.of(context).textTheme.bodySmall?.merge(AppFonts.userContent)),
+        const SizedBox(height: AppSpacing.md),
+        MarkdownEditor(controller: _body, label: needsBody ? l10n.prReviewBody : l10n.prReviewBodyOptional, minLines: 4),
+      ],
+    );
+  }
 }

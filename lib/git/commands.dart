@@ -228,6 +228,8 @@ enum PrMergeMethod { merge, squash, rebase }
 /// PR 목록 필터 (PLAN.md 3.9): 내가 만든 것 / 리뷰 요청받은 것 / 열린 것 전부.
 enum PrFilter { mine, reviewRequested, open }
 
+enum PrReviewKind { approve, requestChanges, comment }
+
 abstract final class GhCommands {
   static const version = ['gh', '--version'];
   static const authStatus = ['gh', 'auth', 'status', '--json', 'hosts'];
@@ -274,6 +276,18 @@ abstract final class GhCommands {
         },
         '--json', fields, '-L', '$limit',
       ];
+
+  /// 리뷰 (PLAN.md 3.9 P2). 본문은 stdin으로 넘긴다.
+  static List<String> prReview(int number, PrReviewKind kind) => [
+        'gh', 'pr', 'review', '$number',
+        switch (kind) {
+          PrReviewKind.approve => '--approve',
+          PrReviewKind.requestChanges => '--request-changes',
+          PrReviewKind.comment => '--comment',
+        },
+        '--body-file', '-',
+      ];
+  static List<String> prComment(int number) => ['gh', 'pr', 'comment', '$number', '--body-file', '-'];
 
   /// PR 브랜치를 로컬로 가져와 전환한다.
   static List<String> prCheckout(int number) => ['gh', 'pr', 'checkout', '$number'];
@@ -347,6 +361,18 @@ abstract final class GhCommands {
   static List<String> releaseSetPrerelease(String tag, bool prerelease) =>
       ['gh', 'release', 'edit', tag, '--prerelease=$prerelease'];
   static List<String> releasePublishDraft(String tag) => ['gh', 'release', 'edit', tag, '--draft=false'];
+
+  // --- 산출물 (3.8.6 P2) ---------------------------------------------------
+
+  /// 이미 같은 이름의 파일이 있으면 받지 않는다 (--clobber를 쓰지 않음).
+  static List<String> releaseDownload(String tag, String asset, String dir) =>
+      ['gh', 'release', 'download', tag, '--pattern', asset, '--dir', dir];
+
+  /// 같은 이름의 산출물이 있으면 [replace]일 때만 덮어쓴다.
+  static List<String> releaseUpload(String tag, List<String> paths, {bool replace = false}) =>
+      ['gh', 'release', 'upload', tag, ...paths, if (replace) '--clobber'];
+  static List<String> releaseDeleteAsset(String tag, String asset) =>
+      ['gh', 'release', 'delete-asset', tag, asset, '--yes'];
 
   /// [cleanupTag]면 태그도 함께 지운다 (로컬 태그는 남는다).
   static List<String> releaseDelete(String tag, {bool cleanupTag = false}) =>

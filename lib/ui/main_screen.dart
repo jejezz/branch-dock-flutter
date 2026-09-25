@@ -544,6 +544,55 @@ class _RepoView extends StatelessWidget {
     final notGitHub = host != null && repo.githubRemote == null;
     final notGitHubKey = 'host:${repo.root}';
 
+    // 840px 이상이면 탭 막대 대신 왼쪽 섹션 레일 (UI_UX.md §2 넓은 창).
+    final width = MediaQuery.sizeOf(context).width;
+    final wide = width >= wideLayoutWidth;
+    final labels = [
+      l10n.tabChanges,
+      l10n.tabBranches,
+      l10n.tabTags,
+      l10n.tabRemotes,
+      l10n.tabRelease,
+      l10n.tabPr,
+      l10n.tabCi,
+      l10n.tabHistory,
+    ];
+    Widget icon(int i) => switch (i) {
+          0 => Badge(
+              isLabelVisible: repo.status.changedCount > 0,
+              label: Text('${repo.status.changedCount}'),
+              child: const Icon(Icons.edit_note_rounded, size: 20),
+            ),
+          1 => const Icon(Icons.call_split_rounded, size: 20),
+          2 => const Icon(Icons.sell_outlined, size: 20),
+          3 => const Icon(Icons.cloud_outlined, size: 20),
+          4 => ListenableBuilder(
+              listenable: state._flow!,
+              builder: (context, _) {
+                final flow = state._flow!;
+                // 진행 중인 릴리스가 있으면 점으로 알린다 (UI_UX.md §3 D).
+                final active = flow.step != ReleaseStep.check && flow.step != ReleaseStep.done;
+                return Badge(isLabelVisible: active, smallSize: 8, child: const Icon(Icons.rocket_launch_outlined, size: 20));
+              },
+            ),
+          5 => const Icon(Icons.merge_rounded, size: 20),
+          6 => const Icon(Icons.bolt_rounded, size: 20),
+          _ => const Icon(Icons.history_rounded, size: 20),
+        };
+    final content = TabBarView(
+      controller: state._tabs,
+      children: [
+        ChangesTab(commitFocus: state._commitFocus),
+        const BranchesTab(),
+        TagsTab(onOpenReleaseWizard: state._openReleaseWizard),
+        const RemotesTab(),
+        ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
+        const PrTab(),
+        const ActionsTab(),
+        const HistoryTab(),
+      ],
+    );
+
     return Column(children: [
       StatusHeader(onBranchTap: () => state._tabs.animateTo(_MainScreenState._tabBranches)),
       _DelayedProgress(visible: repo.busy),
@@ -559,62 +608,69 @@ class _RepoView extends StatelessWidget {
           onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges),
           onShowRemotes: () => state._tabs.animateTo(_MainScreenState._tabRemotes),
         ),
-      TabBar(
-        controller: state._tabs,
-        // 380–439px에서는 탭을 가로로 스크롤한다 (UI_UX.md §2).
-        // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
-        isScrollable: MediaQuery.sizeOf(context).width < 560,
-        tabAlignment: MediaQuery.sizeOf(context).width < 560 ? TabAlignment.start : TabAlignment.fill,
-        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-        labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
-        unselectedLabelStyle: theme.textTheme.labelMedium,
-        tabs: [
-          Tab(
-            height: 48,
-            icon: Badge(
-              isLabelVisible: repo.status.changedCount > 0,
-              label: Text('${repo.status.changedCount}'),
-              child: const Icon(Icons.edit_note_rounded, size: 20),
-            ),
-            text: l10n.tabChanges,
-          ),
-          Tab(height: 48, icon: const Icon(Icons.call_split_rounded, size: 20), text: l10n.tabBranches),
-          Tab(height: 48, icon: const Icon(Icons.sell_outlined, size: 20), text: l10n.tabTags),
-          Tab(height: 48, icon: const Icon(Icons.cloud_outlined, size: 20), text: l10n.tabRemotes),
-          Tab(
-            height: 48,
-            icon: ListenableBuilder(
-              listenable: state._flow!,
-              builder: (context, _) {
-                final flow = state._flow!;
-                // 진행 중인 릴리스가 있으면 점으로 알린다 (UI_UX.md §3 D).
-                final active = flow.step != ReleaseStep.check && flow.step != ReleaseStep.done;
-                return Badge(isLabelVisible: active, smallSize: 8, child: const Icon(Icons.rocket_launch_outlined, size: 20));
-              },
-            ),
-            text: l10n.tabRelease,
-          ),
-          Tab(height: 48, icon: const Icon(Icons.merge_rounded, size: 20), text: l10n.tabPr),
-          Tab(height: 48, icon: const Icon(Icons.bolt_rounded, size: 20), text: l10n.tabCi),
-          Tab(height: 48, icon: const Icon(Icons.history_rounded, size: 20), text: l10n.tabHistory),
-        ],
-      ),
-      Expanded(
-        child: TabBarView(
+      if (!wide)
+        TabBar(
           controller: state._tabs,
-          children: [
-            ChangesTab(commitFocus: state._commitFocus),
-            const BranchesTab(),
-            TagsTab(onOpenReleaseWizard: state._openReleaseWizard),
-            const RemotesTab(),
-            ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
-            const PrTab(),
-            const ActionsTab(),
-            const HistoryTab(),
+          // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
+          isScrollable: width < 560,
+          tabAlignment: width < 560 ? TabAlignment.start : TabAlignment.fill,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+          labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: theme.textTheme.labelMedium,
+          tabs: [
+            for (var i = 0; i < labels.length; i++) Tab(height: 48, icon: icon(i), text: labels[i]),
           ],
         ),
+      Expanded(
+        child: wide
+            ? Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                _SectionRail(tabs: state._tabs, labels: labels, icon: icon),
+                const VerticalDivider(width: 1),
+                Expanded(child: content),
+              ])
+            : content,
       ),
     ]);
+  }
+}
+
+/// 이 너비 이상이면 넓은 창 배치 (왼쪽 레일 + 오른쪽 내용).
+const wideLayoutWidth = 840.0;
+
+/// 넓은 창의 왼쪽 섹션 레일. 탭 컨트롤러를 그대로 따르므로 단축키·마지막 탭 기억이 같다.
+/// 창이 낮으면 레일만 세로로 스크롤한다.
+class _SectionRail extends StatelessWidget {
+  const _SectionRail({required this.tabs, required this.labels, required this.icon});
+
+  final TabController tabs;
+  final List<String> labels;
+  final Widget Function(int) icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: IntrinsicHeight(
+            child: ListenableBuilder(
+              listenable: tabs,
+              builder: (context, _) => NavigationRail(
+                selectedIndex: tabs.index,
+                onDestinationSelected: tabs.animateTo,
+                labelType: NavigationRailLabelType.all,
+                minWidth: 76,
+                groupAlignment: -1,
+                destinations: [
+                  for (var i = 0; i < labels.length; i++)
+                    NavigationRailDestination(icon: icon(i), label: Text(labels[i])),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

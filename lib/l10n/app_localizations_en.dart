@@ -2502,4 +2502,118 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagsPushAnyway => 'Push anyway';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get prReviewTitle => 'Reviews and comments';
+
+  @override
+  String prReviewShowAll(int count) {
+    return 'Show all ($count)';
+  }
+
+  @override
+  String get prReviewShowLess => 'Show less';
+
+  @override
+  String get prReviewApprove => 'Approve';
+
+  @override
+  String get prReviewRequestChanges => 'Request changes';
+
+  @override
+  String get prReviewComment => 'Comment';
+
+  @override
+  String get prReviewOwnPr =>
+      'You can\'t approve or request changes on your own PR, but you can comment.';
+
+  @override
+  String get prReviewSend => 'Send';
+
+  @override
+  String get prReviewBody => 'Message (Markdown)';
+
+  @override
+  String get prReviewBodyOptional => 'Message (optional, Markdown)';
+
+  @override
+  String donePrReview(int number) {
+    return 'Review posted on #$number';
+  }
+
+  @override
+  String assetTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count assets',
+      one: '1 asset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get assetEmpty =>
+      'No assets. Build outputs uploaded by CI appear here.';
+
+  @override
+  String assetMeta(String size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count downloads',
+      one: '1 download',
+    );
+    return '$size · $_temp0';
+  }
+
+  @override
+  String get assetUpload => 'Upload files';
+
+  @override
+  String get assetDownload => 'Download';
+
+  @override
+  String get assetReplace => 'Replace';
+
+  @override
+  String get assetReplaceTitle => 'Replace files with the same name?';
+
+  @override
+  String assetReplaceMessage(String names) {
+    return '$names — anyone who already downloaded them will have a different file. Prefer releasing a new version.';
+  }
+
+  @override
+  String assetDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get assetDeleteMessage =>
+      'Removes this file from the release page. This can\'t be undone, and download links to it will break.';
+
+  @override
+  String doneAssetDownloaded(String name) {
+    return 'Downloaded $name';
+  }
+
+  @override
+  String doneAssetUploaded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Uploaded $count files',
+      one: 'Uploaded 1 file',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String doneAssetDeleted(String name) {
+    return 'Deleted $name';
+  }
 }

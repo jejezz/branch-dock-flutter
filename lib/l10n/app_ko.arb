@@ -1743,5 +1743,96 @@
       }
     }
   },
-  "tagsPushAnyway": "그래도 push"
+  "tagsPushAnyway": "그래도 push",
+  "commonDelete": "삭제",
+  "prReviewTitle": "리뷰와 코멘트",
+  "prReviewShowAll": "모두 보기 ({count})",
+  "@prReviewShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prReviewShowLess": "접기",
+  "prReviewApprove": "승인",
+  "prReviewRequestChanges": "변경 요청",
+  "prReviewComment": "코멘트",
+  "prReviewOwnPr": "내가 만든 PR은 스스로 승인하거나 변경을 요청할 수 없습니다. 코멘트는 남길 수 있습니다.",
+  "prReviewSend": "보내기",
+  "prReviewBody": "내용 (Markdown)",
+  "prReviewBodyOptional": "내용 (선택, Markdown)",
+  "donePrReview": "#{number}에 리뷰를 남겼습니다",
+  "@donePrReview": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "assetTitle": "첨부 파일 {count}개",
+  "@assetTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetEmpty": "첨부 파일이 없습니다. CI가 올린 빌드 결과물이 여기에 보입니다.",
+  "assetMeta": "{size} · 받은 횟수 {count}",
+  "@assetMeta": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetUpload": "파일 올리기",
+  "assetDownload": "받기",
+  "assetReplace": "덮어쓰기",
+  "assetReplaceTitle": "같은 이름의 파일을 덮어쓸까요?",
+  "assetReplaceMessage": "{names} — 이미 받아 간 사람이 있다면 내용이 서로 달라집니다. 가능하면 새 버전으로 릴리스하세요.",
+  "@assetReplaceMessage": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDeleteTitle": "{name}을(를) 삭제할까요?",
+  "@assetDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDeleteMessage": "릴리스 페이지에서 이 파일을 지웁니다. 되돌릴 수 없고, 이 파일로 연결된 다운로드 주소도 끊깁니다.",
+  "doneAssetDownloaded": "{name}을(를) 받았습니다",
+  "@doneAssetDownloaded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doneAssetUploaded": "파일 {count}개를 올렸습니다",
+  "@doneAssetUploaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doneAssetDeleted": "{name}을(를) 삭제했습니다",
+  "@doneAssetDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }
