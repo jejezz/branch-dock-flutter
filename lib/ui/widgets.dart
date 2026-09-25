@@ -65,12 +65,10 @@ class SectionHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
       child: Row(children: [
-        Flexible(
-          child: Text(title, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleLarge),
-        ),
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
         if (help != null) HelpButton(concept: help!),
-        const Spacer(),
-        if (trailing != null) Flexible(flex: 3, child: trailing!),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(child: Align(alignment: Alignment.centerRight, child: trailing)),
       ]),
     );
   }
