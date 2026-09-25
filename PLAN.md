@@ -66,7 +66,8 @@ GitLab 웹이나 GitLab 전용 도구(`glab`)를 써야 한다. 이 앱은 `glab
 - **판별**: 원격 URL의 호스트로 판단한다 (`https://`, `git@host:`, `ssh://`
   형식 모두). `github.com`이면 GitHub, 그 밖은 "GitHub 아님"으로 본다.
   GitHub Enterprise Server는 `gh auth status`에 로그인된 호스트일 때만
-  GitHub로 보며, 시험하지 않은 환경으로 표시한다 (P2).
+  GitHub로 보며, 시험하지 않은 환경으로 표시한다 (P2, v0.8.0). 이때 "내 PR"
+  판단 같은 로그인 이름 비교도 `github.com`이 아니라 원격의 호스트 기준으로 한다.
 - **원격이 여러 개일 때**: `gh`가 필요한 동작은 GitHub 원격을 대상으로 한다.
   예: `origin`은 GitLab, `github`은 GitHub이면 PR·릴리스는 `github` 원격으로
   한다 (`gh repo set-default`). GitHub 원격이 하나도 없으면 막는다.
@@ -258,7 +259,7 @@ push할 커밋을 만들 수 있어야 나머지 흐름이 이어지므로 최�
 - **태그 전 수동 빌드 권장 범위 넓히기**: 언어별 빌드 영향 파일 —
   `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `go.sum`, `*.gradle*`,
   `*.csproj`, `Podfile.lock`, `Dockerfile`.
-- `P2` 모노레포(하위 폴더의 여러 패키지를 각각 릴리스)는 범위 밖으로 둔다.
+- 모노레포(하위 폴더의 여러 패키지를 각각 릴리스)는 범위 밖으로 둔다 (§4).
 
 #### 3.8.3 PR 경유 릴리스와 태그 (P0)
 
@@ -443,6 +444,31 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 - [Pro Git — 태그](https://git-scm.com/book/ko/v2/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%ED%83%9C%EA%B7%B8)
 - [Learn Git Branching](https://learngitbranching.js.org/?locale=ko) — 브라우저에서 그래프를 직접 움직여 보는 연습 (도움말 목록 맨 아래 "연습하기"로)
 
+### 3.14 실행 환경과 설정 (v0.8.0)
+
+v1.0 전에 macOS가 아닌 환경과 설치 방식이 다른 환경에서도 같은 명령이 같은
+결과를 내도록 한다. §5에 약속했지만 빠져 있던 것을 채운다.
+
+- `P1` **Windows에서 셸 없이 실행**: 지금은 Windows에서 `runInShell`로
+  `cmd.exe`를 거쳐, 인자 안의 `%VAR%`·`"`·`^` 가 바뀌거나 깨질 수 있다
+  (예: 태그 메시지·PR 제목). PATH에서 `git.exe`/`gh.exe`의 전체 경로를 찾아
+  셸 없이 직접 실행한다. `.cmd`/`.bat`만 있으면 실행하지 않고 진단에 알린다.
+- `P1` **Windows 설치 위치 보완**: `Program Files\Git\cmd`, `GitHub CLI`,
+  WinGet 링크에 더해 scoop(`%USERPROFILE%\scoop\shims`), 사용자 설치 Git
+  (`%LOCALAPPDATA%\Programs\Git\cmd`), Chocolatey(`%ProgramData%\chocolatey\bin`).
+- `P1` **git / gh 경로 직접 지정**: 설정에서 실행 파일을 고른다. 지정하면
+  PATH 탐색보다 먼저 쓰고, 버전을 바로 확인해 보여 준다.
+- `P1` **환경 진단**: 찾은 `git`/`gh` 경로와 버전, 앱이 쓰는 PATH,
+  `gh`에 로그인된 호스트와 계정, OS·앱 버전을 한 화면에 보여 주고 한 번에
+  복사한다 (문제 제보용). 최소 버전(§5)보다 낮으면 경고.
+- `P2` **GitHub Enterprise 표시** (§2.1): 로그인된 호스트의 원격을 GitHub로
+  보고 "시험하지 않은 환경" 표시.
+- `P2` **편집기 고르기** (§7): 기본값은 OS 기본 앱으로 열기. PATH에서
+  `code`, `cursor`, `zed`, `idea`, `subl`을 찾아 설정에서 고를 수 있게 하고,
+  직접 입력도 그대로 둔다.
+- `P2` **Linux 알림 대체**: `notify-send`가 없으면 앱 안 알림(스낵바)으로
+  대신 알린다.
+
 ## 4. 범위 밖
 
 - 대화형 rebase, 서브모듈, Git LFS, blame, 코드 리뷰 코멘트 작성, 3-way 병합 편집기
@@ -450,11 +476,14 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 - GitLab, Bitbucket 등 GitHub가 아닌 호스팅의 PR/MR·릴리스·CI (`glab` 등
   다른 도구 지원 없음, §2.1). git 동작은 호스팅과 관계없이 쓸 수 있다.
 - 여러 GitHub 계정 전환, GitHub Enterprise Server 공식 지원 (gh 설정에 맡김)
+- 모노레포 릴리스(하위 폴더의 패키지마다 `pkg/v1.2.0` 같은 태그와 버전 파일,
+  CI 트리거) — 릴리스 마법사의 태그·버전·CI 단계를 모두 바꿔야 해서 v1.0 이후에
+  따로 검토한다 (2026-09-25 결정).
 
 ## 5. 기술 사항
 
 - **실행**: `Process.start`로 `git`, `gh`를 저장소 폴더에서 실행한다.
-  인자는 목록으로 넘기고 셸을 거치지 않는다. 오래 걸리는 작업은 출력을
+  인자는 목록으로 넘기고 셸을 거치지 않는다 (Windows 포함, v0.8.0에서 바로잡음 — §3.14). 오래 걸리는 작업은 출력을
   스트리밍하고 취소할 수 있게 한다.
 - **대화형 프롬프트 막기**: `GIT_TERMINAL_PROMPT=0`, `GH_PROMPT_DISABLED=1`,
   `GIT_EDITOR=true`. 입력이 필요한 작업은 앱이 먼저 값을 받아 인자로 넘긴다.
@@ -485,7 +514,8 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 | v0.5.0 | 시작·원격·릴리스 P1 — 3.1 git init·clone·gh 로그인(SSH 안내), 3.6 fork upstream·set-default·browse, 3.8.2 bump-version.sh·**3.8.2a 버전 파일 보완**(lock 파일, 감지 넓히기, pyproject 표, 버전 파일 지정, 빌드 영향 파일), 3.8.3 바로 커밋 방식, 3.8.7 되돌리기, 화면 가장자리에 붙이기 |
 | v0.6.0 | P2 일부 — 3.2 diff 보기(변경 파일, 기록의 커밋), 3.11 revert·cherry-pick(다른 브랜치 기록 보기, 진행 중 상태 계속/건너뛰기/중단), 3.12 명령 팔레트(⌘K), 개념 카드(revert·cherry-pick) |
 | v0.7.0 | P2 일부 — 3.9 PR 리뷰(승인·변경 요청·코멘트, 최근 활동), 3.8 릴리스 산출물(올리기·받기·삭제), 넓은 창(840px 이상) 왼쪽 섹션 레일 |
-| 이후 | P2 나머지 — 모노레포 |
+| v0.8.0 | 1.0 준비 — 3.14 실행 환경: Windows 셸 없이 실행·설치 위치 보완, git/gh 경로 지정, 환경 진단, GitHub Enterprise 표시, 편집기 고르기, Linux 알림 대체 |
+| 이후 | v1.0.0 — 새 기능 없이 v0.8.0을 Windows·Linux에서 확인한 뒤 정식 릴리스. 모노레포는 §4 |
 
 첫 정식 릴리스 전에 README의 기능·동작 방식·스크린샷·데모 GIF를 채운다.
 
@@ -496,8 +526,9 @@ Branch Dock만으로 낸다 — 기능 브랜치 → PR → 병합 → 버전 �
 
 ## 7. 정할 것
 
-- 기본 편집기 연결 방식: OS 기본 앱으로 열기 vs `code`/`idea` 같은 명령 지정 (둘 다 지원 예정, 기본값 결정 필요)
-- Windows에서 `gh`/`git` 경로 탐색 (Git for Windows, winget, scoop 설치 위치)
+- ~~기본 편집기 연결 방식~~ → 기본값은 OS 기본 앱, 명령 지정은 설정에서 고르기 (§3.14, v0.8.0)
+- ~~Windows에서 `gh`/`git` 경로 탐색~~ → §3.14 (v0.8.0). Windows 실제 동작은
+  CI 빌드 결과물로 사람이 확인한다.
 - ~~앱 이름~~ → **Branch Dock**으로 확정 (2026-09-25). 처음 이름 "GitHub CLI"는
   공식 도구 이름과 같고, "Git Dock"은 Git 상표 정책(git-scm.com/about/trademark
   §2.3: "Git"을 음절·합성어로 쓰는 제품명 금지)에 걸려 제외했다. "Git"과
