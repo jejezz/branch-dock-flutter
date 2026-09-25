@@ -3373,6 +3373,414 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.'**
   String get helpForceWhy;
+
+  /// No description provided for @menuBrowse.
+  ///
+  /// In ko, this message translates to:
+  /// **'브라우저에서 저장소 열기'**
+  String get menuBrowse;
+
+  /// No description provided for @menuSnapRight.
+  ///
+  /// In ko, this message translates to:
+  /// **'화면 오른쪽에 붙이기'**
+  String get menuSnapRight;
+
+  /// No description provided for @menuSnapLeft.
+  ///
+  /// In ko, this message translates to:
+  /// **'화면 왼쪽에 붙이기'**
+  String get menuSnapLeft;
+
+  /// No description provided for @startInitRepository.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 폴더를 git 저장소로 만들기'**
+  String get startInitRepository;
+
+  /// No description provided for @cloneTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub에서 복제'**
+  String get cloneTitle;
+
+  /// No description provided for @cloneSearch.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 저장소 찾기'**
+  String get cloneSearch;
+
+  /// No description provided for @cloneEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장소가 없습니다'**
+  String get cloneEmpty;
+
+  /// No description provided for @cloneNoFolder.
+  ///
+  /// In ko, this message translates to:
+  /// **'복제할 위치를 고르세요'**
+  String get cloneNoFolder;
+
+  /// No description provided for @cloneChooseFolder.
+  ///
+  /// In ko, this message translates to:
+  /// **'위치 고르기'**
+  String get cloneChooseFolder;
+
+  /// No description provided for @cloneExists.
+  ///
+  /// In ko, this message translates to:
+  /// **'이미 있는 폴더입니다: {path}'**
+  String cloneExists(String path);
+
+  /// No description provided for @cloneConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'복제하고 열기'**
+  String get cloneConfirm;
+
+  /// No description provided for @cloneRunning.
+  ///
+  /// In ko, this message translates to:
+  /// **'복제하는 중…'**
+  String get cloneRunning;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 로그인'**
+  String get loginTitle;
+
+  /// No description provided for @loginSsh.
+  ///
+  /// In ko, this message translates to:
+  /// **'SSH'**
+  String get loginSsh;
+
+  /// No description provided for @loginHttps.
+  ///
+  /// In ko, this message translates to:
+  /// **'HTTPS'**
+  String get loginHttps;
+
+  /// No description provided for @loginSshRecommended.
+  ///
+  /// In ko, this message translates to:
+  /// **'SSH 권장'**
+  String get loginSshRecommended;
+
+  /// No description provided for @loginSshWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'SSH 주소의 원격이나 SSH로 접속한 환경에서는 HTTPS로 로그인하면 push 때 인증이 따로 놀 수 있습니다.'**
+  String get loginSshWhy;
+
+  /// No description provided for @loginStepKey.
+  ///
+  /// In ko, this message translates to:
+  /// **'SSH 키 확인'**
+  String get loginStepKey;
+
+  /// No description provided for @loginStepKeyFound.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 키를 GitHub에 올립니다'**
+  String get loginStepKeyFound;
+
+  /// No description provided for @loginStepKeyMissing.
+  ///
+  /// In ko, this message translates to:
+  /// **'키가 없습니다. 터미널에서 아래 명령으로 만드세요 (암호 문구 권장). 앱은 키와 암호 문구를 받지 않습니다.'**
+  String get loginStepKeyMissing;
+
+  /// No description provided for @loginStepLogin.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인'**
+  String get loginStepLogin;
+
+  /// No description provided for @loginStepLoginWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'브라우저에서 GitHub에 로그인하고 일회용 코드를 넣습니다.'**
+  String get loginStepLoginWhy;
+
+  /// No description provided for @loginLoggedIn.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인되어 있습니다'**
+  String get loginLoggedIn;
+
+  /// No description provided for @loginStart.
+  ///
+  /// In ko, this message translates to:
+  /// **'브라우저로 로그인'**
+  String get loginStart;
+
+  /// No description provided for @loginDeviceHowTo.
+  ///
+  /// In ko, this message translates to:
+  /// **'브라우저가 열리지 않거나 원격 서버라면, 다른 기기의 브라우저에서 아래 주소를 열고 이 코드를 넣으세요.'**
+  String get loginDeviceHowTo;
+
+  /// No description provided for @loginStepUpload.
+  ///
+  /// In ko, this message translates to:
+  /// **'공개 키 올리기'**
+  String get loginStepUpload;
+
+  /// No description provided for @loginStepUploadWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'골라 둔 공개 키를 내 GitHub 계정에 등록합니다. 이미 등록돼 있으면 건너뜁니다.'**
+  String get loginStepUploadWhy;
+
+  /// No description provided for @loginUploadKey.
+  ///
+  /// In ko, this message translates to:
+  /// **'공개 키 올리기'**
+  String get loginUploadKey;
+
+  /// No description provided for @loginNeedsKeyScope.
+  ///
+  /// In ko, this message translates to:
+  /// **'키를 올릴 권한이 없습니다. 터미널에서 아래 명령으로 권한을 더한 뒤 다시 시도하세요.'**
+  String get loginNeedsKeyScope;
+
+  /// No description provided for @loginStepTest.
+  ///
+  /// In ko, this message translates to:
+  /// **'연결 확인'**
+  String get loginStepTest;
+
+  /// No description provided for @loginStepTestWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub에 SSH로 접속해 봅니다. 처음이면 github.com 호스트 키를 known_hosts에 더합니다.'**
+  String get loginStepTestWhy;
+
+  /// No description provided for @loginSshFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'연결하지 못했습니다. 키가 등록됐는지, ssh-agent에 키가 올라가 있는지 확인하세요.'**
+  String get loginSshFailed;
+
+  /// No description provided for @loginTest.
+  ///
+  /// In ko, this message translates to:
+  /// **'연결 확인'**
+  String get loginTest;
+
+  /// No description provided for @loginChecking.
+  ///
+  /// In ko, this message translates to:
+  /// **'확인하는 중…'**
+  String get loginChecking;
+
+  /// No description provided for @loginStepProtocol.
+  ///
+  /// In ko, this message translates to:
+  /// **'git 프로토콜을 SSH로'**
+  String get loginStepProtocol;
+
+  /// No description provided for @loginStepProtocolWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh가 앞으로 만드는 원격 주소를 SSH로 씁니다. 이미 있는 HTTPS 원격은 원격 탭의 URL 바꾸기에서 SSH로 바꿀 수 있습니다.'**
+  String get loginStepProtocolWhy;
+
+  /// No description provided for @loginUseSshProtocol.
+  ///
+  /// In ko, this message translates to:
+  /// **'SSH로 설정'**
+  String get loginUseSshProtocol;
+
+  /// No description provided for @loginAgentTip.
+  ///
+  /// In ko, this message translates to:
+  /// **'암호 문구를 매번 묻지 않게 하려면 macOS는 ssh-add --apple-use-keychain, 그 밖에는 ssh-agent를 쓰세요.'**
+  String get loginAgentTip;
+
+  /// No description provided for @doneProtocolSsh.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh의 git 프로토콜을 SSH로 바꿨습니다'**
+  String get doneProtocolSsh;
+
+  /// No description provided for @forkTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{parent}의 fork입니다'**
+  String forkTitle(String parent);
+
+  /// No description provided for @forkAddWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'원본 저장소를 upstream 원격으로 추가하면 원본의 새 커밋을 가져올 수 있습니다.'**
+  String get forkAddWhy;
+
+  /// No description provided for @forkSyncWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'원본(upstream)의 새 커밋을 가져와 현재 브랜치로 병합합니다.'**
+  String get forkSyncWhy;
+
+  /// No description provided for @forkAddUpstream.
+  ///
+  /// In ko, this message translates to:
+  /// **'upstream 추가'**
+  String get forkAddUpstream;
+
+  /// No description provided for @forkSync.
+  ///
+  /// In ko, this message translates to:
+  /// **'upstream에서 가져오기'**
+  String get forkSync;
+
+  /// No description provided for @remotesGhDefault.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh가 쓰는 저장소 (PR·릴리스·CI)'**
+  String get remotesGhDefault;
+
+  /// No description provided for @remotesGhDefaultNone.
+  ///
+  /// In ko, this message translates to:
+  /// **'정해지지 않음'**
+  String get remotesGhDefaultNone;
+
+  /// No description provided for @doneGhDefault.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh가 {repo}을(를) 쓰도록 정했습니다'**
+  String doneGhDefault(String repo);
+
+  /// No description provided for @releaseNeedsRemote.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격이 없어 릴리스할 수 없습니다. 원격 탭에서 먼저 올리세요.'**
+  String get releaseNeedsRemote;
+
+  /// No description provided for @releaseDirectOnlyNotGitHub.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 저장소가 아니라서 바로 커밋 방식(점검 → 버전 → 태그)으로 진행합니다. PR·릴리스 노트·CI는 호스팅 웹에서 하세요.'**
+  String get releaseDirectOnlyNotGitHub;
+
+  /// No description provided for @releaseDirectOnly.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh를 쓸 수 없어 바로 커밋 방식만 됩니다.'**
+  String get releaseDirectOnly;
+
+  /// No description provided for @releaseDirectMode.
+  ///
+  /// In ko, this message translates to:
+  /// **'바로 커밋 방식'**
+  String get releaseDirectMode;
+
+  /// No description provided for @releaseDirectModeWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR 없이 {branch}에 버전 올림을 커밋하고 커밋과 태그를 함께 push합니다. 혼자 쓰는 저장소에서만 쓰세요 — 보호된 브랜치면 push가 거부됩니다.'**
+  String releaseDirectModeWhy(String branch);
+
+  /// No description provided for @tagCheckSyncedDirect.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}에 있고 원격에 내게 없는 커밋이 없다'**
+  String tagCheckSyncedDirect(String branch);
+
+  /// No description provided for @versionUsesScript.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장소의 scripts/bump-version.sh로 버전을 올립니다 (lock 파일 포함, 규약과 같은 결과).'**
+  String get versionUsesScript;
+
+  /// No description provided for @versionLockFiles.
+  ///
+  /// In ko, this message translates to:
+  /// **'함께 맞출 lock 파일: {files}'**
+  String versionLockFiles(String files);
+
+  /// No description provided for @versionFileChoose.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 파일 바꾸기'**
+  String get versionFileChoose;
+
+  /// No description provided for @versionFileCustom.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 파일: {path} (직접 지정)'**
+  String versionFileCustom(String path);
+
+  /// No description provided for @versionFileTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 파일 지정'**
+  String get versionFileTitle;
+
+  /// No description provided for @versionFileWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'자동으로 찾지 못하거나 다른 파일을 쓸 때 정합니다. 정규식의 첫 번째 괄호가 버전입니다. 이 저장소에만 적용됩니다.'**
+  String get versionFileWhy;
+
+  /// No description provided for @versionFilePath.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 (저장소 기준 경로)'**
+  String get versionFilePath;
+
+  /// No description provided for @versionFilePattern.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 줄 정규식'**
+  String get versionFilePattern;
+
+  /// No description provided for @versionFileFound.
+  ///
+  /// In ko, this message translates to:
+  /// **'찾았습니다: {version}'**
+  String versionFileFound(String version);
+
+  /// No description provided for @versionFileNotFound.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일이 없거나 패턴에 맞는 버전이 없습니다'**
+  String get versionFileNotFound;
+
+  /// No description provided for @versionFileAuto.
+  ///
+  /// In ko, this message translates to:
+  /// **'자동 감지로 되돌리기'**
+  String get versionFileAuto;
+
+  /// No description provided for @rollbackTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 되돌리기'**
+  String get rollbackTitle;
+
+  /// No description provided for @rollbackConfirmTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 릴리스를 되돌릴까요?'**
+  String rollbackConfirmTitle(String tag);
+
+  /// No description provided for @rollbackMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 릴리스, 원격 태그, 로컬 태그를 지웁니다. 이미 받아 간 사람이 있을 수 있으니 같은 번호를 다시 쓰지 말고 다음 번호({next})로 새로 릴리스하세요.'**
+  String rollbackMessage(String next);
+
+  /// No description provided for @doneRollback.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}을(를) 되돌렸습니다'**
+  String doneRollback(String tag);
 }
 
 class _AppLocalizationsDelegate

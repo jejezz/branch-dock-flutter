@@ -71,6 +71,9 @@ abstract final class GitCommands {
   static List<String> remoteRemove(String name) => ['git', 'remote', 'remove', name];
   static List<String> remoteSetUrl(String name, String url) => ['git', 'remote', 'set-url', name, url];
 
+  /// 원격의 기본 브랜치를 알아내 `<remote>/HEAD`로 기록한다 (upstream에서 가져올 때).
+  static List<String> remoteSetHeadAuto(String remote) => ['git', 'remote', 'set-head', remote, '--auto'];
+
   static const mergeAbort = ['git', 'merge', '--abort'];
   static const mergeContinue = ['git', 'commit', '--no-edit'];
   static const rebaseAbort = ['git', 'rebase', '--abort'];
@@ -275,6 +278,31 @@ abstract final class GhCommands {
   static List<String> releaseCreate(String tag, {required String title, bool prerelease = false}) =>
       ['gh', 'release', 'create', tag, '--title', title, '--notes-file', '-', '--verify-tag', if (prerelease) '--prerelease'];
   static List<String> releaseEditNotes(String tag) => ['gh', 'release', 'edit', tag, '--notes-file', '-'];
+
+  // --- 시작 (3.1 P1) ------------------------------------------------------
+
+  /// 브라우저 기기 인증으로 로그인. 일회용 코드는 출력에 나온다 ([parseDeviceCode]).
+  static List<String> authLogin({required bool ssh}) => [
+        'gh', 'auth', 'login', '--hostname', 'github.com', '--web',
+        '--git-protocol', ssh ? 'ssh' : 'https',
+        // 공개 키 올리기는 SSH 안내의 별도 단계에서 한다 (사용자가 고른 키로).
+        '--skip-ssh-key',
+      ];
+  static const authSetupGit = ['gh', 'auth', 'setup-git'];
+  static List<String> sshKeyAdd(String publicKeyPath, String title) =>
+      ['gh', 'ssh-key', 'add', publicKeyPath, '--title', title];
+  static const setGitProtocolSsh = ['gh', 'config', 'set', 'git_protocol', 'ssh', '--host', 'github.com'];
+  static List<String> repoList({int limit = 100}) =>
+      ['gh', 'repo', 'list', '--json', 'nameWithOwner,description,isPrivate,isFork,updatedAt', '-L', '$limit'];
+  static List<String> repoClone(String nameWithOwner, String directory) =>
+      ['gh', 'repo', 'clone', nameWithOwner, directory];
+
+  // --- 원격 (3.6 P1) ------------------------------------------------------
+
+  static const repoViewFork = ['gh', 'repo', 'view', '--json', 'nameWithOwner,isFork,parent'];
+  static const setDefaultView = ['gh', 'repo', 'set-default', '--view'];
+  static List<String> setDefault(String nameWithOwner) => ['gh', 'repo', 'set-default', nameWithOwner];
+  static const browse = ['gh', 'browse'];
 
   // --- 릴리스 관리 (3.8.6) ------------------------------------------------
 

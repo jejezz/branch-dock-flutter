@@ -2069,4 +2069,248 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helpForceWhy =>
       'Only on a work branch you use alone, after tidying its history. Never on shared branches, especially main. This app doesn\'t offer plain --force, and blocks force push on the default branch.';
+
+  @override
+  String get menuBrowse => 'Open repository in browser';
+
+  @override
+  String get menuSnapRight => 'Snap to right edge';
+
+  @override
+  String get menuSnapLeft => 'Snap to left edge';
+
+  @override
+  String get startInitRepository => 'Make this folder a git repository';
+
+  @override
+  String get cloneTitle => 'Clone from GitHub';
+
+  @override
+  String get cloneSearch => 'Find one of your repositories';
+
+  @override
+  String get cloneEmpty => 'No repositories';
+
+  @override
+  String get cloneNoFolder => 'Choose where to clone';
+
+  @override
+  String get cloneChooseFolder => 'Choose folder';
+
+  @override
+  String cloneExists(String path) {
+    return 'That folder already exists: $path';
+  }
+
+  @override
+  String get cloneConfirm => 'Clone and open';
+
+  @override
+  String get cloneRunning => 'Cloning…';
+
+  @override
+  String get loginTitle => 'Log in to GitHub';
+
+  @override
+  String get loginSsh => 'SSH';
+
+  @override
+  String get loginHttps => 'HTTPS';
+
+  @override
+  String get loginSshRecommended => 'SSH recommended';
+
+  @override
+  String get loginSshWhy =>
+      'With an SSH remote or an SSH session, logging in over HTTPS can leave git push authenticating separately.';
+
+  @override
+  String get loginStepKey => 'Check for an SSH key';
+
+  @override
+  String get loginStepKeyFound => 'This key will be added to GitHub';
+
+  @override
+  String get loginStepKeyMissing =>
+      'No key found. Create one in a terminal with the command below (a passphrase is recommended). The app never handles keys or passphrases.';
+
+  @override
+  String get loginStepLogin => 'Log in';
+
+  @override
+  String get loginStepLoginWhy =>
+      'Log in to GitHub in the browser and enter a one-time code.';
+
+  @override
+  String get loginLoggedIn => 'You\'re logged in';
+
+  @override
+  String get loginStart => 'Log in with browser';
+
+  @override
+  String get loginDeviceHowTo =>
+      'If no browser opens, or you\'re on a remote server, open this address on any device and enter the code.';
+
+  @override
+  String get loginStepUpload => 'Add the public key';
+
+  @override
+  String get loginStepUploadWhy =>
+      'Registers the chosen public key with your GitHub account. Skipped if it\'s already there.';
+
+  @override
+  String get loginUploadKey => 'Add key';
+
+  @override
+  String get loginNeedsKeyScope =>
+      'Missing permission to add keys. Add it with the command below in a terminal, then try again.';
+
+  @override
+  String get loginStepTest => 'Test the connection';
+
+  @override
+  String get loginStepTestWhy =>
+      'Connects to GitHub over SSH. The first time, github.com\'s host key is added to known_hosts.';
+
+  @override
+  String get loginSshFailed =>
+      'Couldn\'t connect. Check that the key is added to GitHub and loaded in ssh-agent.';
+
+  @override
+  String get loginTest => 'Test';
+
+  @override
+  String get loginChecking => 'Checking…';
+
+  @override
+  String get loginStepProtocol => 'Use SSH for git';
+
+  @override
+  String get loginStepProtocolWhy =>
+      'gh will use SSH addresses from now on. Switch existing HTTPS remotes in Remotes → Change URL.';
+
+  @override
+  String get loginUseSshProtocol => 'Use SSH';
+
+  @override
+  String get loginAgentTip =>
+      'To avoid typing the passphrase every time, use ssh-add --apple-use-keychain on macOS, or ssh-agent elsewhere.';
+
+  @override
+  String get doneProtocolSsh => 'gh now uses SSH for git';
+
+  @override
+  String forkTitle(String parent) {
+    return 'Fork of $parent';
+  }
+
+  @override
+  String get forkAddWhy =>
+      'Add the original repository as the upstream remote to bring in its new commits.';
+
+  @override
+  String get forkSyncWhy =>
+      'Fetches new commits from the original (upstream) and merges them into your current branch.';
+
+  @override
+  String get forkAddUpstream => 'Add upstream';
+
+  @override
+  String get forkSync => 'Sync from upstream';
+
+  @override
+  String get remotesGhDefault => 'Repository gh uses (PRs, releases, CI)';
+
+  @override
+  String get remotesGhDefaultNone => 'Not set';
+
+  @override
+  String doneGhDefault(String repo) {
+    return 'gh now uses $repo';
+  }
+
+  @override
+  String get releaseNeedsRemote =>
+      'No remote to release to. Publish it from Remotes first.';
+
+  @override
+  String get releaseDirectOnlyNotGitHub =>
+      'Not a GitHub repository, so this uses direct commit (check → version → tag). Do PRs, release notes and CI on your host\'s website.';
+
+  @override
+  String get releaseDirectOnly =>
+      'Without gh, only direct commit is available.';
+
+  @override
+  String get releaseDirectMode => 'Direct commit';
+
+  @override
+  String releaseDirectModeWhy(String branch) {
+    return 'Commits the version bump straight to $branch and pushes it with the tag, no PR. Only for repositories you work on alone — protected branches reject the push.';
+  }
+
+  @override
+  String tagCheckSyncedDirect(String branch) {
+    return 'On $branch with no remote commits you\'re missing';
+  }
+
+  @override
+  String get versionUsesScript =>
+      'Uses the repository\'s scripts/bump-version.sh (lock files included, same result as the conventions).';
+
+  @override
+  String versionLockFiles(String files) {
+    return 'Lock files updated too: $files';
+  }
+
+  @override
+  String get versionFileChoose => 'Change version file';
+
+  @override
+  String versionFileCustom(String path) {
+    return 'Version file: $path (custom)';
+  }
+
+  @override
+  String get versionFileTitle => 'Version file';
+
+  @override
+  String get versionFileWhy =>
+      'For when the version file isn\'t found or is the wrong one. The first group in the pattern is the version. Applies to this repository only.';
+
+  @override
+  String get versionFilePath => 'File (path in the repository)';
+
+  @override
+  String get versionFilePattern => 'Version line pattern';
+
+  @override
+  String versionFileFound(String version) {
+    return 'Found: $version';
+  }
+
+  @override
+  String get versionFileNotFound =>
+      'File missing, or no version matches the pattern';
+
+  @override
+  String get versionFileAuto => 'Back to auto-detect';
+
+  @override
+  String get rollbackTitle => 'Roll back release';
+
+  @override
+  String rollbackConfirmTitle(String tag) {
+    return 'Roll back $tag?';
+  }
+
+  @override
+  String rollbackMessage(String next) {
+    return 'Deletes the GitHub release, the remote tag and the local tag. People may already have it, so don\'t reuse the number — release the next one ($next) instead.';
+  }
+
+  @override
+  String doneRollback(String tag) {
+    return 'Rolled back $tag';
+  }
 }

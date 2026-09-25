@@ -1939,4 +1939,242 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get helpForceWhy =>
       '혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.';
+
+  @override
+  String get menuBrowse => '브라우저에서 저장소 열기';
+
+  @override
+  String get menuSnapRight => '화면 오른쪽에 붙이기';
+
+  @override
+  String get menuSnapLeft => '화면 왼쪽에 붙이기';
+
+  @override
+  String get startInitRepository => '이 폴더를 git 저장소로 만들기';
+
+  @override
+  String get cloneTitle => 'GitHub에서 복제';
+
+  @override
+  String get cloneSearch => '내 저장소 찾기';
+
+  @override
+  String get cloneEmpty => '저장소가 없습니다';
+
+  @override
+  String get cloneNoFolder => '복제할 위치를 고르세요';
+
+  @override
+  String get cloneChooseFolder => '위치 고르기';
+
+  @override
+  String cloneExists(String path) {
+    return '이미 있는 폴더입니다: $path';
+  }
+
+  @override
+  String get cloneConfirm => '복제하고 열기';
+
+  @override
+  String get cloneRunning => '복제하는 중…';
+
+  @override
+  String get loginTitle => 'GitHub 로그인';
+
+  @override
+  String get loginSsh => 'SSH';
+
+  @override
+  String get loginHttps => 'HTTPS';
+
+  @override
+  String get loginSshRecommended => 'SSH 권장';
+
+  @override
+  String get loginSshWhy =>
+      'SSH 주소의 원격이나 SSH로 접속한 환경에서는 HTTPS로 로그인하면 push 때 인증이 따로 놀 수 있습니다.';
+
+  @override
+  String get loginStepKey => 'SSH 키 확인';
+
+  @override
+  String get loginStepKeyFound => '이 키를 GitHub에 올립니다';
+
+  @override
+  String get loginStepKeyMissing =>
+      '키가 없습니다. 터미널에서 아래 명령으로 만드세요 (암호 문구 권장). 앱은 키와 암호 문구를 받지 않습니다.';
+
+  @override
+  String get loginStepLogin => '로그인';
+
+  @override
+  String get loginStepLoginWhy => '브라우저에서 GitHub에 로그인하고 일회용 코드를 넣습니다.';
+
+  @override
+  String get loginLoggedIn => '로그인되어 있습니다';
+
+  @override
+  String get loginStart => '브라우저로 로그인';
+
+  @override
+  String get loginDeviceHowTo =>
+      '브라우저가 열리지 않거나 원격 서버라면, 다른 기기의 브라우저에서 아래 주소를 열고 이 코드를 넣으세요.';
+
+  @override
+  String get loginStepUpload => '공개 키 올리기';
+
+  @override
+  String get loginStepUploadWhy =>
+      '골라 둔 공개 키를 내 GitHub 계정에 등록합니다. 이미 등록돼 있으면 건너뜁니다.';
+
+  @override
+  String get loginUploadKey => '공개 키 올리기';
+
+  @override
+  String get loginNeedsKeyScope =>
+      '키를 올릴 권한이 없습니다. 터미널에서 아래 명령으로 권한을 더한 뒤 다시 시도하세요.';
+
+  @override
+  String get loginStepTest => '연결 확인';
+
+  @override
+  String get loginStepTestWhy =>
+      'GitHub에 SSH로 접속해 봅니다. 처음이면 github.com 호스트 키를 known_hosts에 더합니다.';
+
+  @override
+  String get loginSshFailed =>
+      '연결하지 못했습니다. 키가 등록됐는지, ssh-agent에 키가 올라가 있는지 확인하세요.';
+
+  @override
+  String get loginTest => '연결 확인';
+
+  @override
+  String get loginChecking => '확인하는 중…';
+
+  @override
+  String get loginStepProtocol => 'git 프로토콜을 SSH로';
+
+  @override
+  String get loginStepProtocolWhy =>
+      'gh가 앞으로 만드는 원격 주소를 SSH로 씁니다. 이미 있는 HTTPS 원격은 원격 탭의 URL 바꾸기에서 SSH로 바꿀 수 있습니다.';
+
+  @override
+  String get loginUseSshProtocol => 'SSH로 설정';
+
+  @override
+  String get loginAgentTip =>
+      '암호 문구를 매번 묻지 않게 하려면 macOS는 ssh-add --apple-use-keychain, 그 밖에는 ssh-agent를 쓰세요.';
+
+  @override
+  String get doneProtocolSsh => 'gh의 git 프로토콜을 SSH로 바꿨습니다';
+
+  @override
+  String forkTitle(String parent) {
+    return '$parent의 fork입니다';
+  }
+
+  @override
+  String get forkAddWhy => '원본 저장소를 upstream 원격으로 추가하면 원본의 새 커밋을 가져올 수 있습니다.';
+
+  @override
+  String get forkSyncWhy => '원본(upstream)의 새 커밋을 가져와 현재 브랜치로 병합합니다.';
+
+  @override
+  String get forkAddUpstream => 'upstream 추가';
+
+  @override
+  String get forkSync => 'upstream에서 가져오기';
+
+  @override
+  String get remotesGhDefault => 'gh가 쓰는 저장소 (PR·릴리스·CI)';
+
+  @override
+  String get remotesGhDefaultNone => '정해지지 않음';
+
+  @override
+  String doneGhDefault(String repo) {
+    return 'gh가 $repo을(를) 쓰도록 정했습니다';
+  }
+
+  @override
+  String get releaseNeedsRemote => '원격이 없어 릴리스할 수 없습니다. 원격 탭에서 먼저 올리세요.';
+
+  @override
+  String get releaseDirectOnlyNotGitHub =>
+      'GitHub 저장소가 아니라서 바로 커밋 방식(점검 → 버전 → 태그)으로 진행합니다. PR·릴리스 노트·CI는 호스팅 웹에서 하세요.';
+
+  @override
+  String get releaseDirectOnly => 'gh를 쓸 수 없어 바로 커밋 방식만 됩니다.';
+
+  @override
+  String get releaseDirectMode => '바로 커밋 방식';
+
+  @override
+  String releaseDirectModeWhy(String branch) {
+    return 'PR 없이 $branch에 버전 올림을 커밋하고 커밋과 태그를 함께 push합니다. 혼자 쓰는 저장소에서만 쓰세요 — 보호된 브랜치면 push가 거부됩니다.';
+  }
+
+  @override
+  String tagCheckSyncedDirect(String branch) {
+    return '$branch에 있고 원격에 내게 없는 커밋이 없다';
+  }
+
+  @override
+  String get versionUsesScript =>
+      '저장소의 scripts/bump-version.sh로 버전을 올립니다 (lock 파일 포함, 규약과 같은 결과).';
+
+  @override
+  String versionLockFiles(String files) {
+    return '함께 맞출 lock 파일: $files';
+  }
+
+  @override
+  String get versionFileChoose => '버전 파일 바꾸기';
+
+  @override
+  String versionFileCustom(String path) {
+    return '버전 파일: $path (직접 지정)';
+  }
+
+  @override
+  String get versionFileTitle => '버전 파일 지정';
+
+  @override
+  String get versionFileWhy =>
+      '자동으로 찾지 못하거나 다른 파일을 쓸 때 정합니다. 정규식의 첫 번째 괄호가 버전입니다. 이 저장소에만 적용됩니다.';
+
+  @override
+  String get versionFilePath => '파일 (저장소 기준 경로)';
+
+  @override
+  String get versionFilePattern => '버전 줄 정규식';
+
+  @override
+  String versionFileFound(String version) {
+    return '찾았습니다: $version';
+  }
+
+  @override
+  String get versionFileNotFound => '파일이 없거나 패턴에 맞는 버전이 없습니다';
+
+  @override
+  String get versionFileAuto => '자동 감지로 되돌리기';
+
+  @override
+  String get rollbackTitle => '릴리스 되돌리기';
+
+  @override
+  String rollbackConfirmTitle(String tag) {
+    return '$tag 릴리스를 되돌릴까요?';
+  }
+
+  @override
+  String rollbackMessage(String next) {
+    return 'GitHub 릴리스, 원격 태그, 로컬 태그를 지웁니다. 이미 받아 간 사람이 있을 수 있으니 같은 번호를 다시 쓰지 말고 다음 번호($next)로 새로 릴리스하세요.';
+  }
+
+  @override
+  String doneRollback(String tag) {
+    return '$tag을(를) 되돌렸습니다';
+  }
 }
