@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/command_log.dart';
 import '../../git/commands.dart';
 import '../../git/error_hints.dart';
 import '../../git/refs.dart';
@@ -47,7 +48,9 @@ class _BranchesTabState extends State<BranchesTab> {
 
     // 현재 브랜치를 맨 위에 둔다.
     final local = repo.localBranches.where(match).toList()
-      ..sort((a, b) => a.current ? -1 : (b.current ? 1 : a.name.compareTo(b.name)));
+      ..sort(
+        (a, b) => a.current ? -1 : (b.current ? 1 : a.name.compareTo(b.name)),
+      );
     final remote = repo.remoteBranches.where(match).toList();
 
     return ListView(
@@ -56,13 +59,23 @@ class _BranchesTabState extends State<BranchesTab> {
         SectionHeader(
           title: l10n.branchesTitle,
           trailing: FilledButton.tonalIcon(
-            onPressed: repo.busy || repo.status.unborn ? null : () => showCreateBranchSheet(context, repo),
+            onPressed: repo.busy || repo.status.unborn
+                ? null
+                : () => showCreateBranchSheet(context, repo),
             icon: const Icon(Icons.add_rounded, size: 16),
-            label: Text('${l10n.branchesNew}  ${shortcutLabel('B')}', overflow: TextOverflow.ellipsis),
+            label: Text(
+              '${l10n.branchesNew}  ${shortcutLabel('B')}',
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            AppSpacing.sm,
+          ),
           child: TextField(
             controller: _filter,
             decoration: InputDecoration(
@@ -73,66 +86,121 @@ class _BranchesTabState extends State<BranchesTab> {
           ),
         ),
         if (repo.status.unborn)
-          EmptyState(icon: Icons.call_split_rounded, title: l10n.branchesUnbornTitle, message: l10n.branchesUnbornMessage),
+          EmptyState(
+            icon: Icons.call_split_rounded,
+            title: l10n.branchesUnbornTitle,
+            message: l10n.branchesUnbornMessage,
+          ),
         GroupHeader(
           title: l10n.branchesLocal,
           count: local.length,
           expanded: _localOpen,
           onToggle: () => setState(() => _localOpen = !_localOpen),
         ),
-        if (_localOpen) for (final b in local) _BranchRow(branch: b, repo: repo),
+        if (_localOpen)
+          for (final b in local) _BranchRow(branch: b, repo: repo),
         GroupHeader(
           title: l10n.branchesRemote,
           count: remote.length,
           expanded: _remoteOpen,
           onToggle: () => setState(() => _remoteOpen = !_remoteOpen),
         ),
-        if (_remoteOpen) for (final b in remote) _BranchRow(branch: b, repo: repo),
+        if (_remoteOpen)
+          for (final b in remote) _BranchRow(branch: b, repo: repo),
       ],
     );
   }
 }
 
-enum _BranchMenu { switchTo, mergeIntoCurrent, publish, rename, delete, deleteRemote }
+enum _BranchMenu {
+  switchTo,
+  mergeIntoCurrent,
+  publish,
+  rename,
+  delete,
+  deleteRemote,
+}
 
-class _BranchRow extends StatelessWidget {
+class _BranchRow extends StatefulWidget {
   const _BranchRow({required this.branch, required this.repo});
 
   final Branch branch;
   final RepoController repo;
 
+  @override
+  State<_BranchRow> createState() => _BranchRowState();
+}
+
+class _BranchRowState extends State<_BranchRow> {
+  /// 마우스를 올리면 시간 대신 [전환] 버튼을 보여 준다. 더블클릭과 메뉴만으로는
+  /// 전환 방법이 보이지 않았다 (v0.2.0 릴리스에서 발견).
+  bool _hover = false;
+
+  Branch get branch => widget.branch;
+  RepoController get repo => widget.repo;
+
   Future<void> _switch(BuildContext context) async {
     if (branch.current || repo.busy) return;
     final l10n = AppLocalizations.of(context);
-    await RepoActions.report(context, repo.switchTo(branch), done: l10n.doneSwitch(branch.shortName));
+    await RepoActions.report(
+      context,
+      repo.switchTo(branch),
+      done: l10n.doneSwitch(branch.shortName),
+    );
   }
 
   Future<void> _menu(BuildContext context, Offset? position) async {
     final l10n = AppLocalizations.of(context);
     final items = <PopupMenuEntry<_BranchMenu>>[
-      if (!branch.current) PopupMenuItem(value: _BranchMenu.switchTo, child: Text(l10n.branchesSwitch)),
+      if (!branch.current)
+        PopupMenuItem(
+          value: _BranchMenu.switchTo,
+          child: Text(l10n.branchesSwitch),
+        ),
       if (!branch.current && !repo.status.detached)
         PopupMenuItem(
           value: _BranchMenu.mergeIntoCurrent,
           child: Text(l10n.branchesMergeInto(repo.status.head ?? '')),
         ),
-      if (!branch.remote && (branch.upstream == null || branch.upstreamGone) && repo.remotes.isNotEmpty)
-        PopupMenuItem(value: _BranchMenu.publish, child: Text(l10n.headerPublish)),
-      if (!branch.remote) PopupMenuItem(value: _BranchMenu.rename, child: Text(l10n.branchesRename)),
+      if (!branch.remote &&
+          (branch.upstream == null || branch.upstreamGone) &&
+          repo.remotes.isNotEmpty)
+        PopupMenuItem(
+          value: _BranchMenu.publish,
+          child: Text(l10n.headerPublish),
+        ),
+      if (!branch.remote)
+        PopupMenuItem(
+          value: _BranchMenu.rename,
+          child: Text(l10n.branchesRename),
+        ),
       if (!branch.remote && !branch.current)
-        PopupMenuItem(value: _BranchMenu.delete, child: Text(l10n.branchesDelete)),
+        PopupMenuItem(
+          value: _BranchMenu.delete,
+          child: Text(l10n.branchesDelete),
+        ),
       if (branch.remote)
         PopupMenuItem(
           value: _BranchMenu.deleteRemote,
-          child: Text(l10n.branchesDeleteRemote, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+          child: Text(
+            l10n.branchesDeleteRemote,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
     ];
     if (items.isEmpty) return;
     final box = context.findRenderObject() as RenderBox;
-    final origin = position ?? box.localToGlobal(Offset(box.size.width - 40, box.size.height));
+    final origin =
+        position ??
+        box.localToGlobal(Offset(box.size.width - 40, box.size.height));
     final choice = await showMenu<_BranchMenu>(
       context: context,
-      position: RelativeRect.fromLTRB(origin.dx, origin.dy, origin.dx, origin.dy),
+      position: RelativeRect.fromLTRB(
+        origin.dx,
+        origin.dy,
+        origin.dx,
+        origin.dy,
+      ),
       items: items,
     );
     if (choice == null || !context.mounted) return;
@@ -143,8 +211,11 @@ class _BranchRow extends StatelessWidget {
         await showMergeSheet(context, repo, branch);
       case _BranchMenu.publish:
         final remote = repo.defaultRemote!;
-        await RepoActions.report(context, repo.execute(GitCommands.publish(remote, branch.name)),
-            done: l10n.donePublish(branch.name));
+        await RepoActions.report(
+          context,
+          repo.execute(GitCommands.publish(remote, branch.name)),
+          done: l10n.donePublish(branch.name),
+        );
       case _BranchMenu.rename:
         await showRenameBranchSheet(context, repo, branch);
       case _BranchMenu.delete:
@@ -173,7 +244,11 @@ class _BranchRow extends StatelessWidget {
         commands: [force],
       );
       if (ok && context.mounted) {
-        await RepoActions.report(context, repo.execute(force), done: l10n.doneDeleteBranch(branch.name));
+        await RepoActions.report(
+          context,
+          repo.execute(force),
+          done: l10n.doneDeleteBranch(branch.name),
+        );
       }
       return;
     }
@@ -184,7 +259,13 @@ class _BranchRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final remote = branch.remoteName!;
     final command = GitCommands.deleteRemoteBranch(remote, branch.shortName);
-    final target = repo.remotes.where((r) => r.name == remote).firstOrNull?.location?.webUrl ?? remote;
+    final target =
+        repo.remotes
+            .where((r) => r.name == remote)
+            .firstOrNull
+            ?.location
+            ?.webUrl ??
+        remote;
     final ok = await confirmDanger(
       context,
       title: l10n.branchesDeleteRemoteTitle,
@@ -193,7 +274,11 @@ class _BranchRow extends StatelessWidget {
       commands: [command],
     );
     if (ok && context.mounted) {
-      await RepoActions.report(context, repo.execute(command), done: l10n.doneDeleteBranch(branch.name));
+      await RepoActions.report(
+        context,
+        repo.execute(command),
+        done: l10n.doneDeleteBranch(branch.name),
+      );
     }
   }
 
@@ -202,60 +287,107 @@ class _BranchRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final b = branch;
-    return GestureDetector(
-      onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
-      child: InkWell(
-        splashFactory: NoSplash.splashFactory,
-        onDoubleTap: () => _switch(context),
-        onTap: () {},
-        child: SizedBox(
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.lg, right: 4),
-            child: Row(children: [
-              SizedBox(
-                width: 14,
-                child: b.current
-                    ? Icon(Icons.circle, size: 8, color: theme.colorScheme.primary)
-                    : null,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(
-                    b.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppFonts.userContent.copyWith(
-                      fontSize: 13,
-                      fontWeight: b.current ? FontWeight.w700 : FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                      decoration: b.upstreamGone ? TextDecoration.lineThrough : null,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
+        child: InkWell(
+          splashFactory: NoSplash.splashFactory,
+          onDoubleTap: () => _switch(context),
+          onTap: () {},
+          child: SizedBox(
+            height: 40,
+            child: Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.lg, right: 4),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 14,
+                    child: b.current
+                        ? Icon(
+                            Icons.circle,
+                            size: 8,
+                            color: theme.colorScheme.primary,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          b.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppFonts.userContent.copyWith(
+                            fontSize: 13,
+                            fontWeight: b.current
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: theme.colorScheme.onSurface,
+                            decoration: b.upstreamGone
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        if (b.subject.isNotEmpty)
+                          Text(
+                            b.subject,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.merge(
+                              AppFonts.userContent,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  if (b.subject.isNotEmpty)
-                    Text(b.subject,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.merge(AppFonts.userContent)),
-                ]),
+                  const SizedBox(width: 6),
+                  if (b.upstreamGone)
+                    StatusPill(
+                      label: l10n.branchesUpstreamGone,
+                      tone: Tone.warning,
+                    ),
+                  if (b.ahead > 0) ...[
+                    const SizedBox(width: 4),
+                    StatusPill(label: '↑${b.ahead}', tone: Tone.primary),
+                  ],
+                  if (b.behind > 0) ...[
+                    const SizedBox(width: 4),
+                    StatusPill(label: '↓${b.behind}', tone: Tone.warning),
+                  ],
+                  const SizedBox(width: 6),
+                  if (_hover && !b.current)
+                    SizedBox(
+                      height: 28,
+                      child: Tooltip(
+                        message: formatCommandLine(repo.switchCommand(b)),
+                        child: TextButton(
+                          onPressed: repo.busy ? null : () => _switch(context),
+                          child: Text(l10n.branchesSwitch),
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      relativeTime(l10n, b.lastCommit),
+                      style: theme.textTheme.labelSmall,
+                    ),
+                  Builder(
+                    builder: (context) => IconButton(
+                      tooltip: l10n.commonMore,
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 18,
+                      icon: const Icon(Icons.more_horiz_rounded),
+                      onPressed: repo.busy ? null : () => _menu(context, null),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 6),
-              if (b.upstreamGone) StatusPill(label: l10n.branchesUpstreamGone, tone: Tone.warning),
-              if (b.ahead > 0) ...[const SizedBox(width: 4), StatusPill(label: '↑${b.ahead}', tone: Tone.primary)],
-              if (b.behind > 0) ...[const SizedBox(width: 4), StatusPill(label: '↓${b.behind}', tone: Tone.warning)],
-              const SizedBox(width: 6),
-              Text(relativeTime(l10n, b.lastCommit), style: theme.textTheme.labelSmall),
-              Builder(
-                builder: (context) => IconButton(
-                  tooltip: l10n.commonMore,
-                  visualDensity: VisualDensity.compact,
-                  iconSize: 18,
-                  icon: const Icon(Icons.more_horiz_rounded),
-                  onPressed: repo.busy ? null : () => _menu(context, null),
-                ),
-              ),
-            ]),
+            ),
           ),
         ),
       ),
@@ -265,7 +397,10 @@ class _BranchRow extends StatelessWidget {
 
 /// 새 브랜치 (PLAN.md 3.4): 이름 검사, 접두어 제안, 기준, 만든 뒤 전환.
 Future<void> showCreateBranchSheet(BuildContext context, RepoController repo) {
-  return showActionSheet<void>(context, (context) => _CreateBranchSheet(repo: repo));
+  return showActionSheet<void>(
+    context,
+    (context) => _CreateBranchSheet(repo: repo),
+  );
 }
 
 class _CreateBranchSheet extends StatefulWidget {
@@ -304,11 +439,15 @@ class _CreateBranchSheetState extends State<_CreateBranchSheet> {
     final error = name.isEmpty
         ? null
         : exists
-            ? l10n.branchNameExists
-            : problem == null
-                ? null
-                : branchNameProblemText(l10n, problem);
-    final command = GitCommands.createBranch(name.isEmpty ? '<name>' : name, base: _base, switchAfter: _switchAfter);
+        ? l10n.branchNameExists
+        : problem == null
+        ? null
+        : branchNameProblemText(l10n, problem);
+    final command = GitCommands.createBranch(
+      name.isEmpty ? '<name>' : name,
+      base: _base,
+      switchAfter: _switchAfter,
+    );
     final valid = name.isNotEmpty && problem == null && !exists;
 
     Future<void> submit() async {
@@ -316,7 +455,13 @@ class _CreateBranchSheetState extends State<_CreateBranchSheet> {
       Navigator.pop(context);
       await RepoActions.report(
         context,
-        repo.execute(GitCommands.createBranch(name, base: _base, switchAfter: _switchAfter)),
+        repo.execute(
+          GitCommands.createBranch(
+            name,
+            base: _base,
+            switchAfter: _switchAfter,
+          ),
+        ),
         done: l10n.doneCreateBranch(name),
       );
     }
@@ -331,30 +476,47 @@ class _CreateBranchSheetState extends State<_CreateBranchSheet> {
           controller: _name,
           autofocus: true,
           style: AppFonts.userContent.copyWith(fontSize: 13),
-          decoration: InputDecoration(labelText: l10n.branchNameLabel, errorText: error),
+          decoration: InputDecoration(
+            labelText: l10n.branchNameLabel,
+            errorText: error,
+          ),
           onSubmitted: (_) => submit(),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(spacing: 6, children: [
-          for (final p in ['feature/', 'fix/', 'docs/', 'chore/'])
-            SmallChip(
-              label: p,
-              onPressed: () {
-                final rest = _name.text.replaceFirst(RegExp(r'^(feature|fix|docs|chore)/'), '');
-                _name.text = '$p$rest';
-                _name.selection = TextSelection.collapsed(offset: _name.text.length);
-              },
-            ),
-        ]),
+        Wrap(
+          spacing: 6,
+          children: [
+            for (final p in ['feature/', 'fix/', 'docs/', 'chore/'])
+              SmallChip(
+                label: p,
+                onPressed: () {
+                  final rest = _name.text.replaceFirst(
+                    RegExp(r'^(feature|fix|docs|chore)/'),
+                    '',
+                  );
+                  _name.text = '$p$rest';
+                  _name.selection = TextSelection.collapsed(
+                    offset: _name.text.length,
+                  );
+                },
+              ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.lg),
         DropdownButtonFormField<String?>(
           initialValue: _base,
           isExpanded: true,
           decoration: InputDecoration(labelText: l10n.branchBaseLabel),
           items: [
-            DropdownMenuItem(value: null, child: Text(l10n.branchBaseCurrent(repo.status.head ?? 'HEAD'))),
+            DropdownMenuItem(
+              value: null,
+              child: Text(l10n.branchBaseCurrent(repo.status.head ?? 'HEAD')),
+            ),
             for (final b in repo.branches.where((b) => !b.current))
-              DropdownMenuItem(value: b.name, child: Text(b.name, style: AppFonts.userContent)),
+              DropdownMenuItem(
+                value: b.name,
+                child: Text(b.name, style: AppFonts.userContent),
+              ),
           ],
           onChanged: (v) => setState(() => _base = v),
         ),
@@ -371,7 +533,8 @@ class _CreateBranchSheetState extends State<_CreateBranchSheet> {
   }
 }
 
-String branchNameProblemText(AppLocalizations l10n, BranchNameProblem p) => switch (p) {
+String branchNameProblemText(AppLocalizations l10n, BranchNameProblem p) =>
+    switch (p) {
       BranchNameProblem.empty => l10n.branchNameEmpty,
       BranchNameProblem.invalidCharacter => l10n.branchNameInvalidCharacter,
       BranchNameProblem.startsWithDash => l10n.branchNameStartsWithDash,
@@ -379,8 +542,15 @@ String branchNameProblemText(AppLocalizations l10n, BranchNameProblem p) => swit
       BranchNameProblem.invalidEdge => l10n.branchNameInvalidEdge,
     };
 
-Future<void> showRenameBranchSheet(BuildContext context, RepoController repo, Branch branch) {
-  return showActionSheet<void>(context, (context) => _RenameBranchSheet(repo: repo, branch: branch));
+Future<void> showRenameBranchSheet(
+  BuildContext context,
+  RepoController repo,
+  Branch branch,
+) {
+  return showActionSheet<void>(
+    context,
+    (context) => _RenameBranchSheet(repo: repo, branch: branch),
+  );
 }
 
 class _RenameBranchSheet extends StatefulWidget {
@@ -413,14 +583,20 @@ class _RenameBranchSheetState extends State<_RenameBranchSheet> {
     final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
     final problem = validateBranchName(name);
-    final exists = name != widget.branch.name && widget.repo.localBranches.any((b) => b.name == name);
+    final exists =
+        name != widget.branch.name &&
+        widget.repo.localBranches.any((b) => b.name == name);
     final valid = problem == null && !exists && name != widget.branch.name;
     final command = GitCommands.renameBranch(widget.branch.name, name);
 
     Future<void> submit() async {
       if (!valid) return;
       Navigator.pop(context);
-      await RepoActions.report(context, widget.repo.execute(command), done: l10n.doneRenameBranch(name));
+      await RepoActions.report(
+        context,
+        widget.repo.execute(command),
+        done: l10n.doneRenameBranch(name),
+      );
     }
 
     return ActionSheetBody(
@@ -435,13 +611,20 @@ class _RenameBranchSheetState extends State<_RenameBranchSheet> {
           style: AppFonts.userContent.copyWith(fontSize: 13),
           decoration: InputDecoration(
             labelText: l10n.branchNameLabel,
-            errorText: exists ? l10n.branchNameExists : (problem == null ? null : branchNameProblemText(l10n, problem)),
+            errorText: exists
+                ? l10n.branchNameExists
+                : (problem == null
+                      ? null
+                      : branchNameProblemText(l10n, problem)),
           ),
           onSubmitted: (_) => submit(),
         ),
         if (widget.branch.upstream != null) ...[
           const SizedBox(height: AppSpacing.sm),
-          Text(l10n.branchRenameUpstreamNote(widget.branch.upstream!), style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            l10n.branchRenameUpstreamNote(widget.branch.upstream!),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ],
       ],
     );

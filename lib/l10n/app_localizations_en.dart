@@ -1537,4 +1537,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helpTagWhy =>
       'Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don\'t move or delete a pushed tag; if it\'s wrong, tag the next number.';
+
+  @override
+  String get headerMergedAndGone => 'Merged · deleted on remote';
+
+  @override
+  String get headerMergedAndGoneTooltip =>
+      'This branch is already merged into the default branch and was deleted on the remote. Publishing it again would bring the deleted branch back.';
+
+  @override
+  String bannerMergedAndGone(String branch) {
+    return 'This branch was merged and deleted on the remote. Go back to $branch';
+  }
+
+  @override
+  String bannerSwitchTo(String branch) {
+    return 'Switch to $branch';
+  }
 }

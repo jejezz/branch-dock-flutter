@@ -1429,4 +1429,21 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get helpTagWhy =>
       '릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.';
+
+  @override
+  String get headerMergedAndGone => '병합됨 · 원격 삭제됨';
+
+  @override
+  String get headerMergedAndGoneTooltip =>
+      '이 브랜치는 이미 기본 브랜치에 병합되었고 원격에서 삭제되었습니다. 다시 게시하면 지운 브랜치가 되살아납니다.';
+
+  @override
+  String bannerMergedAndGone(String branch) {
+    return '이 브랜치는 병합되어 원격에서 삭제되었습니다. $branch(으)로 돌아가세요';
+  }
+
+  @override
+  String bannerSwitchTo(String branch) {
+    return '$branch(으)로 전환';
+  }
 }

@@ -191,4 +191,57 @@ void main() {
     expect(repo.status.clean, isTrue);
     repo.dispose();
   });
+
+  // v0.2.0 릴리스 때 발견: PR이 병합되고 원격 브랜치가 지워진 뒤에도
+  // "게시"를 권했다. 게시하면 지운 브랜치가 되살아난다.
+  test('merged and deleted branch: suggest switching back, not publishing', () async {
+    final a = await clone('a');
+    File('${a.path}/x').writeAsStringSync('x\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'init']);
+    await git(a.path, ['push', '-q', '-u', 'origin', 'main']);
+    await git(a.path, ['switch', '-q', '-c', 'feat/x']);
+    File('${a.path}/y').writeAsStringSync('y\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'feat: y']);
+    await git(a.path, ['push', '-q', '-u', 'origin', 'feat/x']);
+
+    // GitHub에서 PR 병합(병합 커밋) + 브랜치 삭제를 다른 복제본으로 흉내 낸다.
+    final b = await clone('b');
+    await git(b.path, ['merge', '-q', '--no-ff', '-m', 'Merge pull request #1', 'origin/feat/x']);
+    await git(b.path, ['push', '-q', 'origin', 'main']);
+    await git(b.path, ['push', '-q', 'origin', '--delete', 'feat/x']);
+
+    final repo = await open(a);
+    await repo.fetch();
+    expect(repo.status.head, 'feat/x');
+    expect(repo.status.upstreamGone, isTrue);
+    expect(repo.headMergedAndGone, isTrue);
+    expect(repo.needsPublish, isFalse);
+
+    expect((await repo.switchToDefault()).ok, isTrue);
+    expect(repo.status.head, 'main');
+    expect(repo.headMergedAndGone, isFalse);
+    repo.dispose();
+  });
+
+  test('unmerged branch whose upstream is gone still suggests publishing', () async {
+    final a = await clone('a');
+    File('${a.path}/x').writeAsStringSync('x\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'init']);
+    await git(a.path, ['push', '-q', '-u', 'origin', 'main']);
+    await git(a.path, ['switch', '-q', '-c', 'feat/z']);
+    File('${a.path}/z').writeAsStringSync('z\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'feat: z']);
+    await git(a.path, ['push', '-q', '-u', 'origin', 'feat/z']);
+    await git(a.path, ['push', '-q', 'origin', '--delete', 'feat/z']);
+    final repo = await open(a);
+    await repo.fetch();
+    expect(repo.status.upstreamGone, isTrue);
+    expect(repo.headMergedAndGone, isFalse);
+    expect(repo.needsPublish, isTrue);
+    repo.dispose();
+  });
 }

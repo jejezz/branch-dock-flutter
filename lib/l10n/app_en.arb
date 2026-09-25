@@ -407,5 +407,9 @@
   "helpTagTitle": "Tags (annotated and lightweight)",
   "helpTagWord": "A tag is a label you attach to something.",
   "helpTagInGit": "A name attached to one commit. A branch label moves forward with new commits; a tag stays on its commit. An annotated tag also stores who made it, when, and a message; a lightweight tag stores only the name.",
-  "helpTagWhy": "Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don't move or delete a pushed tag; if it's wrong, tag the next number."
+  "helpTagWhy": "Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don't move or delete a pushed tag; if it's wrong, tag the next number.",
+  "headerMergedAndGone": "Merged · deleted on remote",
+  "headerMergedAndGoneTooltip": "This branch is already merged into the default branch and was deleted on the remote. Publishing it again would bring the deleted branch back.",
+  "bannerMergedAndGone": "This branch was merged and deleted on the remote. Go back to {branch}",
+  "bannerSwitchTo": "Switch to {branch}"
 }

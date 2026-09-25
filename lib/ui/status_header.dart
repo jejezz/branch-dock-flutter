@@ -74,6 +74,8 @@ class StatusHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.merge(AppFonts.userContent)),
             )
+          else if (repo.headMergedAndGone)
+            StatusPill(label: l10n.headerMergedAndGone, tone: Tone.primary, tooltip: l10n.headerMergedAndGoneTooltip)
           else
             StatusPill(label: l10n.headerNoUpstream, tooltip: l10n.headerNoUpstreamTooltip),
           const HelpButton(concept: Concept.upstream),
@@ -108,6 +110,8 @@ class _SyncButtons extends StatelessWidget {
     final mode = prefs.pullMode(repo.root);
 
     Widget tip(String command, Widget child) => Tooltip(message: command, child: child);
+    // 병합되어 원격에서 지워진 브랜치는 게시·Push를 끄고 이유를 보여 준다.
+    final pushTooltip = repo.headMergedAndGone ? l10n.headerMergedAndGoneTooltip : formatCommandLine(repo.pushCommand);
 
     return Row(children: [
       Expanded(
@@ -154,7 +158,7 @@ class _SyncButtons extends StatelessWidget {
       const SizedBox(width: AppSpacing.sm),
       Expanded(
         child: tip(
-          formatCommandLine(repo.pushCommand),
+          pushTooltip,
           FilledButton.icon(
             onPressed: canPush ? () => RepoActions.push(context, repo) : null,
             icon: Icon(publish ? Icons.cloud_upload_rounded : Icons.north_rounded, size: 16),
@@ -278,6 +282,12 @@ class NextActionBanner extends StatelessWidget {
     final (String text, String button, VoidCallback onPressed) = switch (action.kind) {
       NextActionKind.resolveConflicts => (l10n.bannerConflicts(action.count), l10n.bannerShow, onShowChanges),
       NextActionKind.pull => (l10n.bannerPull(action.count), l10n.headerPull, () => RepoActions.pull(context, repo)),
+      NextActionKind.switchToDefault => (
+          l10n.bannerMergedAndGone(repo.defaultBranch ?? 'main'),
+          l10n.bannerSwitchTo(repo.defaultBranch ?? 'main'),
+          () => RepoActions.report(context, repo.switchToDefault(),
+              done: l10n.doneSwitch(repo.defaultBranch ?? 'main')),
+        ),
       NextActionKind.publish => (l10n.bannerPublish, l10n.headerPublish, () => RepoActions.push(context, repo)),
       NextActionKind.push => (l10n.bannerPush(action.count), l10n.headerPush, () => RepoActions.push(context, repo)),
       NextActionKind.publishToGitHub => (l10n.bannerNoRemote, l10n.bannerShow, onShowRemotes),
