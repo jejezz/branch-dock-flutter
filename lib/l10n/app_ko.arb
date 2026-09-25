@@ -480,5 +480,525 @@
   "helpRebaseTitle": "Rebase",
   "helpRebaseWord": "base는 '밑받침', rebase는 '밑받침을 다시 놓다'.",
   "helpRebaseInGit": "내 커밋들을 떼어 내서, 새로 받아온 커밋 뒤에 차례로 다시 붙입니다. 내용은 같지만 새 커밋(C', D')으로 다시 만들어지고, 기록은 한 줄이 됩니다.",
-  "helpRebaseWhy": "병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다."
+  "helpRebaseWhy": "병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다.",
+  "tabTags": "태그",
+  "tabRelease": "릴리스",
+  "tabPr": "PR",
+  "branchesMergeInto": "{head}(으)로 병합해 오기",
+  "@branchesMergeInto": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeTitle": "{source} → {into} 병합",
+  "@mergeTitle": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "into": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeNothing": "{source}에는 {into}에 없는 커밋이 없습니다",
+  "@mergeNothing": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "into": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeIncoming": "들어올 커밋 {count}개",
+  "@mergeIncoming": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mergeFastForward": "Fast-forward",
+  "mergeFastForwardWhen": "새 커밋 없이 이름표만 앞으로 옮깁니다. 기록이 한 줄로 남습니다.",
+  "mergeFastForwardDisabled": "현재 브랜치에도 새 커밋이 있어서(갈라져서) 쓸 수 없습니다.",
+  "mergeMergeCommit": "병합 커밋",
+  "mergeMergeCommitWhen": "두 기록을 그대로 두고 병합 커밋으로 합칩니다. 가장 안전합니다.",
+  "mergeSquash": "Squash",
+  "mergeSquashWhen": "브랜치의 커밋을 하나로 눌러 합칩니다. 기능 하나 = 커밋 하나.",
+  "mergeSquashNote": "squash 뒤 {source}를 계속 쓰면 같은 변경이 다시 충돌할 수 있습니다. 병합 후 브랜치를 지우는 것을 권합니다.",
+  "@mergeSquashNote": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeMessageLabel": "커밋 메시지",
+  "mergeConfirm": "병합",
+  "doneMerge": "{source}을(를) {into}(으)로 병합했습니다",
+  "@doneMerge": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "into": {
+        "type": "String"
+      }
+    }
+  },
+  "tagsTitle": "태그",
+  "tagsNew": "새 태그",
+  "tagsCreate": "만들기",
+  "tagsCreateAndPush": "만들고 push",
+  "tagsPushAll": "원격에 없는 태그 {count}개 push",
+  "@tagsPushAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tagsPushed": "원격에 있음",
+  "tagsLocalOnly": "내 컴퓨터에만 있음",
+  "tagsLightweight": "가벼운 태그",
+  "tagsAnnotated": "주석 태그",
+  "tagsPush": "Push",
+  "tagsDelete": "삭제",
+  "tagsDeleteRemote": "원격에서 삭제",
+  "tagsDeleteRemoteTitle": "원격 태그를 삭제할까요?",
+  "tagsDeleteRemoteMessage": "{target}에서 {tag} 태그를 삭제합니다. 이미 받아 간 사람이 있을 수 있으니, 같은 이름을 다시 쓰기보다 다음 번호를 쓰세요. 이 태그의 GitHub 릴리스는 그대로 남습니다.",
+  "@tagsDeleteRemoteMessage": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "tagsEmptyTitle": "아직 태그가 없습니다",
+  "tagsEmptyMessage": "태그는 특정 커밋에 붙이는 이름표입니다. 보통 v1.0.0처럼 릴리스 버전에 씁니다.",
+  "tagsPushAfter": "만든 뒤 {remote}에 push",
+  "@tagsPushAfter": {
+    "placeholders": {
+      "remote": {
+        "type": "String"
+      }
+    }
+  },
+  "tagNameLabel": "태그 이름",
+  "tagNameExists": "같은 이름의 태그가 이미 있습니다",
+  "tagNameInvalid": "공백, .., ~ ^ : ? * [ \\ 는 쓸 수 없습니다",
+  "tagNameNotSemVer": "버전 형식(v1.2.3)이 아닙니다. 만들 수는 있지만 릴리스에는 버전 형식을 권합니다.",
+  "tagNameMissingV": "릴리스 태그는 v를 붙이는 것이 관례입니다 (v1.2.3).",
+  "tagMessageLabel": "메시지",
+  "tagTargetLabel": "어느 커밋에 달까요",
+  "tagTargetHead": "현재 위치 ({name})",
+  "@tagTargetHead": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doneCreateTag": "{name} 태그를 만들었습니다",
+  "@doneCreateTag": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "donePushTags": "태그 {count}개를 push했습니다",
+  "@donePushTags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doneDeleteTag": "{name} 태그를 삭제했습니다",
+  "@doneDeleteTag": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doneDeleteRemoteTag": "원격에서 {name} 태그를 삭제했습니다",
+  "@doneDeleteRemoteTag": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "prTitle": "Pull Request",
+  "prCreate": "PR 만들기",
+  "prPublishAndCreate": "게시하고 PR 만들기",
+  "prTitleLabel": "제목",
+  "prBodyLabel": "본문",
+  "prBodyChanges": "변경 내용",
+  "prDraft": "초안으로 만들기",
+  "prNotGitHubTitle": "GitHub 저장소가 아닙니다",
+  "prNotGitHubMessage": "Pull Request는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.",
+  "prGhRequiredTitle": "gh가 필요합니다",
+  "prDetached": "브랜치에 있지 않습니다",
+  "prOnDefaultTitle": "기본 브랜치에 있습니다",
+  "prOnDefaultMessage": "PR은 작업 브랜치에서 만듭니다. 브랜치 탭에서 새 브랜치를 만드세요.",
+  "prNoneTitle": "{head}에는 아직 PR이 없습니다",
+  "@prNoneTitle": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      }
+    }
+  },
+  "prNoneMessage": "{base}(으)로 합칠 PR을 만들면 GitHub에서 검토와 검사를 거쳐 병합합니다.",
+  "@prNoneMessage": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "prOpenOnGitHub": "GitHub에서 보기",
+  "prStateOpen": "열림",
+  "prStateDraft": "초안",
+  "prStateMerged": "병합됨",
+  "prStateClosed": "닫힘",
+  "prNoChecks": "검사 없음",
+  "prChecksPassed": "통과 {n}",
+  "@prChecksPassed": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "prChecksFailed": "실패 {n}",
+  "@prChecksFailed": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "prChecksPending": "진행 중 {n}",
+  "@prChecksPending": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "prApproved": "승인됨",
+  "prReviewRequired": "리뷰 필요",
+  "prBlockedDraft": "초안 PR은 병합할 수 없습니다. GitHub에서 '검토 준비 완료'로 바꾸세요.",
+  "prBlockedConflict": "기준 브랜치와 충돌이 있습니다. 기준 브랜치를 병합해 와서 충돌을 해결하세요.",
+  "prBlockedChecks": "실패한 검사가 있습니다: {names}",
+  "@prBlockedChecks": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "prBlockedPending": "검사 {count}개가 아직 진행 중입니다.",
+  "@prBlockedPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prBlockedReview": "리뷰 승인이 필요할 수 있습니다. 병합이 거부되면 GitHub에서 확인하세요.",
+  "prMethodMerge": "병합 커밋 (merge)",
+  "prMethodSquash": "Squash 후 병합",
+  "prMethodRebase": "Rebase 후 병합",
+  "prDeleteBranch": "병합 후 브랜치 삭제",
+  "prMerge": "병합하기",
+  "donePrCreated": "PR을 만들었습니다",
+  "donePrMerged": "PR #{number}을(를) 병합했습니다",
+  "@donePrMerged": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "releaseTitle": "릴리스",
+  "releaseLatest": "마지막 릴리스 {tag}",
+  "@releaseLatest": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "releaseNoTags": "아직 릴리스가 없습니다",
+  "releaseIntro": "버전 올리기 → PR → 병합 → 태그 → CI 확인을 차례로 안내합니다.",
+  "releaseNeedsGitHub": "릴리스 마법사는 GitHub 저장소에서 쓸 수 있습니다. 태그는 태그 탭에서 만들 수 있습니다.",
+  "releaseStart": "새 릴리스",
+  "releaseNew": "새 릴리스",
+  "releaseNewVersion": "새 릴리스 {tag}",
+  "@releaseNewVersion": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "releaseCancel": "그만두기",
+  "releaseCancelTitle": "릴리스를 그만둘까요?",
+  "releaseCancelMessage": "지금까지 만든 {branch} 브랜치와 PR은 그대로 남습니다. 필요 없으면 직접 지우세요.",
+  "@releaseCancelMessage": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "releaseCancelAfterTag": "태그는 이미 push되었습니다. 마법사만 닫고, CI와 릴리스는 GitHub에서 확인하세요.",
+  "releaseDone": "{tag} 릴리스를 마쳤습니다",
+  "@releaseDone": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "releasePrerelease": "프리릴리스",
+  "releasePushAndPr": "push하고 PR 만들기",
+  "stepCheck": "점검",
+  "stepVersion": "버전",
+  "stepPr": "PR",
+  "stepMerge": "병합",
+  "stepTag": "태그",
+  "stepNotes": "릴리스 노트",
+  "stepNotesCi": "노트 (CI 릴리스 후)",
+  "stepNotesCiSummary": "CI가 릴리스를 만듭니다",
+  "stepCi": "CI 확인",
+  "stepNext": "다음",
+  "stepCheckDone": "모두 통과",
+  "stepMergeDone": "PR #{number} 병합됨",
+  "@stepMergeDone": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "checkCleanTree": "커밋하지 않은 변경이 없다",
+  "checkShowChanges": "변경 보기",
+  "checkOnDefault": "기본 브랜치({branch})에 있다",
+  "@checkOnDefault": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "checkSynced": "원격과 같다",
+  "checkGitHub": "GitHub 원격과 gh 로그인",
+  "checkChangesSince": "{tag} 이후 커밋 {count}개",
+  "@checkChangesSince": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "checkFirstRelease": "첫 릴리스입니다",
+  "checkNoWorkflow": "태그로 도는 워크플로가 없습니다. 앱이 GitHub 릴리스를 만듭니다.",
+  "checkWorkflowCi": "{file}이(가) 태그 push로 릴리스를 만듭니다. 앱은 태그까지 달고 CI를 지켜봅니다.",
+  "@checkWorkflowCi": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "checkWorkflowOther": "{file}이(가) 태그 push로 돕니다.",
+  "@checkWorkflowOther": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "manualBuildTitle": "태그 전 수동 빌드 (권장)",
+  "manualBuildWhy": "지난 릴리스 이후 빌드에 영향을 주는 파일이 바뀌었습니다. 태그 전에 모든 플랫폼이 빌드되는지 확인하세요. 수동 실행은 릴리스를 만들지 않습니다.",
+  "manualBuildStart": "빌드만 확인",
+  "manualBuildShort": "수동 빌드 {state}",
+  "@manualBuildShort": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "doneManualBuildStarted": "수동 빌드를 시작했습니다",
+  "versionCurrent": "현재 {version} ({source})",
+  "@versionCurrent": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "versionFromTag": "마지막 태그",
+  "versionRecommended": "추천",
+  "versionReason": "새 기능 {feats} · 버그 수정 {fixes} · 호환 깨짐 {breaking}",
+  "@versionReason": {
+    "placeholders": {
+      "feats": {
+        "type": "int"
+      },
+      "fixes": {
+        "type": "int"
+      },
+      "breaking": {
+        "type": "int"
+      }
+    }
+  },
+  "versionCustom": "직접 입력",
+  "versionFiles": "바뀌는 파일",
+  "versionNoFiles": "버전 파일이 없어서 태그만 만듭니다.",
+  "versionCommit": "릴리스 브랜치 만들고 커밋",
+  "bumpFinal": "정식",
+  "bumpPrerelease": "프리릴리스",
+  "doneReleaseCommit": "{tag} 버전 올림을 커밋했습니다",
+  "@doneReleaseCommit": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeWaiting": "PR #{number} 병합을 기다리는 중 — GitHub에서 병합해도 알아챕니다",
+  "@mergeWaiting": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "tagCheckPrMerged": "PR #{number}이(가) 병합됐다",
+  "@tagCheckPrMerged": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "tagCheckSynced": "{branch}에 있고 원격과 같다",
+  "@tagCheckSynced": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "tagCheckVersion": "버전 파일이 {tag}와 같다",
+  "@tagCheckVersion": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagCheckVersionWrong": "지금 버전은 {version}입니다. 버전 올림 PR이 아직 병합되지 않았을 수 있습니다.",
+  "@tagCheckVersionWrong": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "tagCheckFree": "{tag} 태그가 아직 없다",
+  "@tagCheckFree": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagConfirmTitle": "{tag} 태그를 push할까요?",
+  "@tagConfirmTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagConfirmMessage": "{branch}의 병합 커밋에 {tag}를 답니다. push하면 릴리스가 공개되고, 태그는 옮기거나 지우지 않는 것이 규칙입니다.",
+  "@tagConfirmMessage": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "tagConfirmPush": "태그 달고 push",
+  "doneTagPushed": "{tag} 태그를 push했습니다",
+  "@doneTagPushed": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "notesLabel": "릴리스 노트 (마크다운)",
+  "notesFeatures": "새 기능",
+  "notesFixes": "버그 수정",
+  "notesOther": "기타",
+  "notesCreateRelease": "GitHub 릴리스 만들기",
+  "notesEdit": "노트 고치기",
+  "doneReleaseCreated": "GitHub 릴리스를 만들었습니다",
+  "doneNotesSaved": "릴리스 노트를 저장했습니다",
+  "ciWaitingForRun": "{tag}(으)로 시작된 워크플로를 찾는 중",
+  "@ciWaitingForRun": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "ciOpenInBrowser": "브라우저에서 보기",
+  "ciRerunFailed": "실패한 잡 다시 실행",
+  "doneRerun": "실패한 잡을 다시 실행했습니다",
+  "runQueued": "대기 중",
+  "runRunning": "진행 중",
+  "runSuccess": "성공",
+  "runFailure": "실패",
+  "runCancelled": "취소됨",
+  "runSkipped": "건너뜀",
+  "helpCaptionAfterSquash": "squash 병합 후 — main에 새 커밋 S 하나",
+  "helpCaptionTag": "v1.0.0과 v1.1.0은 옮겨지지 않는 이름표, main은 앞으로 나아가는 이름표",
+  "helpLinkGitHubMergeMethods": "GitHub — 병합 방법 정보",
+  "helpLinkTagging": "Pro Git — 태그",
+  "helpSquashTitle": "Squash (눌러 합치기)",
+  "helpSquashWord": "눌러서 납작하게 만들다, 찌그러뜨리다.",
+  "helpSquashInGit": "브랜치의 여러 커밋을 눌러 커밋 하나로 합친 뒤 대상 브랜치에 올립니다. 변경 내용은 그대로이고 커밋 개수만 하나가 됩니다.",
+  "helpSquashWhy": "'오타 수정', '다시 시도' 같은 작업 중 커밋을 기본 브랜치 기록에 남기지 않고, 기능 하나 = 커밋 하나로 정리합니다. PR을 병합할 때 많이 씁니다. 원래 커밋들은 기본 브랜치에 남지 않으니, 병합한 브랜치를 계속 쓰지 말고 지우세요.",
+  "helpTagTitle": "태그 (주석 태그와 가벼운 태그)",
+  "helpTagWord": "tag는 '꼬리표, 이름표'.",
+  "helpTagInGit": "특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.",
+  "helpTagWhy": "릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요."
 }

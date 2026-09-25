@@ -1477,6 +1477,1074 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다.'**
   String get helpRebaseWhy;
+
+  /// No description provided for @tabTags.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그'**
+  String get tabTags;
+
+  /// No description provided for @tabRelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스'**
+  String get tabRelease;
+
+  /// No description provided for @tabPr.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR'**
+  String get tabPr;
+
+  /// No description provided for @branchesMergeInto.
+  ///
+  /// In ko, this message translates to:
+  /// **'{head}(으)로 병합해 오기'**
+  String branchesMergeInto(String head);
+
+  /// No description provided for @mergeTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{source} → {into} 병합'**
+  String mergeTitle(String source, String into);
+
+  /// No description provided for @mergeNothing.
+  ///
+  /// In ko, this message translates to:
+  /// **'{source}에는 {into}에 없는 커밋이 없습니다'**
+  String mergeNothing(String source, String into);
+
+  /// No description provided for @mergeIncoming.
+  ///
+  /// In ko, this message translates to:
+  /// **'들어올 커밋 {count}개'**
+  String mergeIncoming(int count);
+
+  /// No description provided for @mergeFastForward.
+  ///
+  /// In ko, this message translates to:
+  /// **'Fast-forward'**
+  String get mergeFastForward;
+
+  /// No description provided for @mergeFastForwardWhen.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 커밋 없이 이름표만 앞으로 옮깁니다. 기록이 한 줄로 남습니다.'**
+  String get mergeFastForwardWhen;
+
+  /// No description provided for @mergeFastForwardDisabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 브랜치에도 새 커밋이 있어서(갈라져서) 쓸 수 없습니다.'**
+  String get mergeFastForwardDisabled;
+
+  /// No description provided for @mergeMergeCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합 커밋'**
+  String get mergeMergeCommit;
+
+  /// No description provided for @mergeMergeCommitWhen.
+  ///
+  /// In ko, this message translates to:
+  /// **'두 기록을 그대로 두고 병합 커밋으로 합칩니다. 가장 안전합니다.'**
+  String get mergeMergeCommitWhen;
+
+  /// No description provided for @mergeSquash.
+  ///
+  /// In ko, this message translates to:
+  /// **'Squash'**
+  String get mergeSquash;
+
+  /// No description provided for @mergeSquashWhen.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치의 커밋을 하나로 눌러 합칩니다. 기능 하나 = 커밋 하나.'**
+  String get mergeSquashWhen;
+
+  /// No description provided for @mergeSquashNote.
+  ///
+  /// In ko, this message translates to:
+  /// **'squash 뒤 {source}를 계속 쓰면 같은 변경이 다시 충돌할 수 있습니다. 병합 후 브랜치를 지우는 것을 권합니다.'**
+  String mergeSquashNote(String source);
+
+  /// No description provided for @mergeMessageLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 메시지'**
+  String get mergeMessageLabel;
+
+  /// No description provided for @mergeConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합'**
+  String get mergeConfirm;
+
+  /// No description provided for @doneMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'{source}을(를) {into}(으)로 병합했습니다'**
+  String doneMerge(String source, String into);
+
+  /// No description provided for @tagsTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그'**
+  String get tagsTitle;
+
+  /// No description provided for @tagsNew.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 태그'**
+  String get tagsNew;
+
+  /// No description provided for @tagsCreate.
+  ///
+  /// In ko, this message translates to:
+  /// **'만들기'**
+  String get tagsCreate;
+
+  /// No description provided for @tagsCreateAndPush.
+  ///
+  /// In ko, this message translates to:
+  /// **'만들고 push'**
+  String get tagsCreateAndPush;
+
+  /// No description provided for @tagsPushAll.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에 없는 태그 {count}개 push'**
+  String tagsPushAll(int count);
+
+  /// No description provided for @tagsPushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에 있음'**
+  String get tagsPushed;
+
+  /// No description provided for @tagsLocalOnly.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 컴퓨터에만 있음'**
+  String get tagsLocalOnly;
+
+  /// No description provided for @tagsLightweight.
+  ///
+  /// In ko, this message translates to:
+  /// **'가벼운 태그'**
+  String get tagsLightweight;
+
+  /// No description provided for @tagsAnnotated.
+  ///
+  /// In ko, this message translates to:
+  /// **'주석 태그'**
+  String get tagsAnnotated;
+
+  /// No description provided for @tagsPush.
+  ///
+  /// In ko, this message translates to:
+  /// **'Push'**
+  String get tagsPush;
+
+  /// No description provided for @tagsDelete.
+  ///
+  /// In ko, this message translates to:
+  /// **'삭제'**
+  String get tagsDelete;
+
+  /// No description provided for @tagsDeleteRemote.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에서 삭제'**
+  String get tagsDeleteRemote;
+
+  /// No description provided for @tagsDeleteRemoteTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격 태그를 삭제할까요?'**
+  String get tagsDeleteRemoteTitle;
+
+  /// No description provided for @tagsDeleteRemoteMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{target}에서 {tag} 태그를 삭제합니다. 이미 받아 간 사람이 있을 수 있으니, 같은 이름을 다시 쓰기보다 다음 번호를 쓰세요. 이 태그의 GitHub 릴리스는 그대로 남습니다.'**
+  String tagsDeleteRemoteMessage(String tag, String target);
+
+  /// No description provided for @tagsEmptyTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 태그가 없습니다'**
+  String get tagsEmptyTitle;
+
+  /// No description provided for @tagsEmptyMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그는 특정 커밋에 붙이는 이름표입니다. 보통 v1.0.0처럼 릴리스 버전에 씁니다.'**
+  String get tagsEmptyMessage;
+
+  /// No description provided for @tagsPushAfter.
+  ///
+  /// In ko, this message translates to:
+  /// **'만든 뒤 {remote}에 push'**
+  String tagsPushAfter(String remote);
+
+  /// No description provided for @tagNameLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 이름'**
+  String get tagNameLabel;
+
+  /// No description provided for @tagNameExists.
+  ///
+  /// In ko, this message translates to:
+  /// **'같은 이름의 태그가 이미 있습니다'**
+  String get tagNameExists;
+
+  /// No description provided for @tagNameInvalid.
+  ///
+  /// In ko, this message translates to:
+  /// **'공백, .., ~ ^ : ? * [ \\ 는 쓸 수 없습니다'**
+  String get tagNameInvalid;
+
+  /// No description provided for @tagNameNotSemVer.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 형식(v1.2.3)이 아닙니다. 만들 수는 있지만 릴리스에는 버전 형식을 권합니다.'**
+  String get tagNameNotSemVer;
+
+  /// No description provided for @tagNameMissingV.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 태그는 v를 붙이는 것이 관례입니다 (v1.2.3).'**
+  String get tagNameMissingV;
+
+  /// No description provided for @tagMessageLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'메시지'**
+  String get tagMessageLabel;
+
+  /// No description provided for @tagTargetLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'어느 커밋에 달까요'**
+  String get tagTargetLabel;
+
+  /// No description provided for @tagTargetHead.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 위치 ({name})'**
+  String tagTargetHead(String name);
+
+  /// No description provided for @doneCreateTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 태그를 만들었습니다'**
+  String doneCreateTag(String name);
+
+  /// No description provided for @donePushTags.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 {count}개를 push했습니다'**
+  String donePushTags(int count);
+
+  /// No description provided for @doneDeleteTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 태그를 삭제했습니다'**
+  String doneDeleteTag(String name);
+
+  /// No description provided for @doneDeleteRemoteTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에서 {name} 태그를 삭제했습니다'**
+  String doneDeleteRemoteTag(String name);
+
+  /// No description provided for @prTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Pull Request'**
+  String get prTitle;
+
+  /// No description provided for @prCreate.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR 만들기'**
+  String get prCreate;
+
+  /// No description provided for @prPublishAndCreate.
+  ///
+  /// In ko, this message translates to:
+  /// **'게시하고 PR 만들기'**
+  String get prPublishAndCreate;
+
+  /// No description provided for @prTitleLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'제목'**
+  String get prTitleLabel;
+
+  /// No description provided for @prBodyLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'본문'**
+  String get prBodyLabel;
+
+  /// No description provided for @prBodyChanges.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 내용'**
+  String get prBodyChanges;
+
+  /// No description provided for @prDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'초안으로 만들기'**
+  String get prDraft;
+
+  /// No description provided for @prNotGitHubTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 저장소가 아닙니다'**
+  String get prNotGitHubTitle;
+
+  /// No description provided for @prNotGitHubMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'Pull Request는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.'**
+  String get prNotGitHubMessage;
+
+  /// No description provided for @prGhRequiredTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh가 필요합니다'**
+  String get prGhRequiredTitle;
+
+  /// No description provided for @prDetached.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치에 있지 않습니다'**
+  String get prDetached;
+
+  /// No description provided for @prOnDefaultTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 브랜치에 있습니다'**
+  String get prOnDefaultTitle;
+
+  /// No description provided for @prOnDefaultMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR은 작업 브랜치에서 만듭니다. 브랜치 탭에서 새 브랜치를 만드세요.'**
+  String get prOnDefaultMessage;
+
+  /// No description provided for @prNoneTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{head}에는 아직 PR이 없습니다'**
+  String prNoneTitle(String head);
+
+  /// No description provided for @prNoneMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{base}(으)로 합칠 PR을 만들면 GitHub에서 검토와 검사를 거쳐 병합합니다.'**
+  String prNoneMessage(String base);
+
+  /// No description provided for @prOpenOnGitHub.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub에서 보기'**
+  String get prOpenOnGitHub;
+
+  /// No description provided for @prStateOpen.
+  ///
+  /// In ko, this message translates to:
+  /// **'열림'**
+  String get prStateOpen;
+
+  /// No description provided for @prStateDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'초안'**
+  String get prStateDraft;
+
+  /// No description provided for @prStateMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합됨'**
+  String get prStateMerged;
+
+  /// No description provided for @prStateClosed.
+  ///
+  /// In ko, this message translates to:
+  /// **'닫힘'**
+  String get prStateClosed;
+
+  /// No description provided for @prNoChecks.
+  ///
+  /// In ko, this message translates to:
+  /// **'검사 없음'**
+  String get prNoChecks;
+
+  /// No description provided for @prChecksPassed.
+  ///
+  /// In ko, this message translates to:
+  /// **'통과 {n}'**
+  String prChecksPassed(int n);
+
+  /// No description provided for @prChecksFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'실패 {n}'**
+  String prChecksFailed(int n);
+
+  /// No description provided for @prChecksPending.
+  ///
+  /// In ko, this message translates to:
+  /// **'진행 중 {n}'**
+  String prChecksPending(int n);
+
+  /// No description provided for @prApproved.
+  ///
+  /// In ko, this message translates to:
+  /// **'승인됨'**
+  String get prApproved;
+
+  /// No description provided for @prReviewRequired.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰 필요'**
+  String get prReviewRequired;
+
+  /// No description provided for @prBlockedDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'초안 PR은 병합할 수 없습니다. GitHub에서 \'검토 준비 완료\'로 바꾸세요.'**
+  String get prBlockedDraft;
+
+  /// No description provided for @prBlockedConflict.
+  ///
+  /// In ko, this message translates to:
+  /// **'기준 브랜치와 충돌이 있습니다. 기준 브랜치를 병합해 와서 충돌을 해결하세요.'**
+  String get prBlockedConflict;
+
+  /// No description provided for @prBlockedChecks.
+  ///
+  /// In ko, this message translates to:
+  /// **'실패한 검사가 있습니다: {names}'**
+  String prBlockedChecks(String names);
+
+  /// No description provided for @prBlockedPending.
+  ///
+  /// In ko, this message translates to:
+  /// **'검사 {count}개가 아직 진행 중입니다.'**
+  String prBlockedPending(int count);
+
+  /// No description provided for @prBlockedReview.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰 승인이 필요할 수 있습니다. 병합이 거부되면 GitHub에서 확인하세요.'**
+  String get prBlockedReview;
+
+  /// No description provided for @prMethodMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합 커밋 (merge)'**
+  String get prMethodMerge;
+
+  /// No description provided for @prMethodSquash.
+  ///
+  /// In ko, this message translates to:
+  /// **'Squash 후 병합'**
+  String get prMethodSquash;
+
+  /// No description provided for @prMethodRebase.
+  ///
+  /// In ko, this message translates to:
+  /// **'Rebase 후 병합'**
+  String get prMethodRebase;
+
+  /// No description provided for @prDeleteBranch.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합 후 브랜치 삭제'**
+  String get prDeleteBranch;
+
+  /// No description provided for @prMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합하기'**
+  String get prMerge;
+
+  /// No description provided for @donePrCreated.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR을 만들었습니다'**
+  String get donePrCreated;
+
+  /// No description provided for @donePrMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR #{number}을(를) 병합했습니다'**
+  String donePrMerged(int number);
+
+  /// No description provided for @releaseTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스'**
+  String get releaseTitle;
+
+  /// No description provided for @releaseLatest.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 릴리스 {tag}'**
+  String releaseLatest(String tag);
+
+  /// No description provided for @releaseNoTags.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 릴리스가 없습니다'**
+  String get releaseNoTags;
+
+  /// No description provided for @releaseIntro.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 올리기 → PR → 병합 → 태그 → CI 확인을 차례로 안내합니다.'**
+  String get releaseIntro;
+
+  /// No description provided for @releaseNeedsGitHub.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 마법사는 GitHub 저장소에서 쓸 수 있습니다. 태그는 태그 탭에서 만들 수 있습니다.'**
+  String get releaseNeedsGitHub;
+
+  /// No description provided for @releaseStart.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 릴리스'**
+  String get releaseStart;
+
+  /// No description provided for @releaseNew.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 릴리스'**
+  String get releaseNew;
+
+  /// No description provided for @releaseNewVersion.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 릴리스 {tag}'**
+  String releaseNewVersion(String tag);
+
+  /// No description provided for @releaseCancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'그만두기'**
+  String get releaseCancel;
+
+  /// No description provided for @releaseCancelTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스를 그만둘까요?'**
+  String get releaseCancelTitle;
+
+  /// No description provided for @releaseCancelMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금까지 만든 {branch} 브랜치와 PR은 그대로 남습니다. 필요 없으면 직접 지우세요.'**
+  String releaseCancelMessage(String branch);
+
+  /// No description provided for @releaseCancelAfterTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그는 이미 push되었습니다. 마법사만 닫고, CI와 릴리스는 GitHub에서 확인하세요.'**
+  String get releaseCancelAfterTag;
+
+  /// No description provided for @releaseDone.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 릴리스를 마쳤습니다'**
+  String releaseDone(String tag);
+
+  /// No description provided for @releasePrerelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'프리릴리스'**
+  String get releasePrerelease;
+
+  /// No description provided for @releasePushAndPr.
+  ///
+  /// In ko, this message translates to:
+  /// **'push하고 PR 만들기'**
+  String get releasePushAndPr;
+
+  /// No description provided for @stepCheck.
+  ///
+  /// In ko, this message translates to:
+  /// **'점검'**
+  String get stepCheck;
+
+  /// No description provided for @stepVersion.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전'**
+  String get stepVersion;
+
+  /// No description provided for @stepPr.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR'**
+  String get stepPr;
+
+  /// No description provided for @stepMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합'**
+  String get stepMerge;
+
+  /// No description provided for @stepTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그'**
+  String get stepTag;
+
+  /// No description provided for @stepNotes.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 노트'**
+  String get stepNotes;
+
+  /// No description provided for @stepNotesCi.
+  ///
+  /// In ko, this message translates to:
+  /// **'노트 (CI 릴리스 후)'**
+  String get stepNotesCi;
+
+  /// No description provided for @stepNotesCiSummary.
+  ///
+  /// In ko, this message translates to:
+  /// **'CI가 릴리스를 만듭니다'**
+  String get stepNotesCiSummary;
+
+  /// No description provided for @stepCi.
+  ///
+  /// In ko, this message translates to:
+  /// **'CI 확인'**
+  String get stepCi;
+
+  /// No description provided for @stepNext.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음'**
+  String get stepNext;
+
+  /// No description provided for @stepCheckDone.
+  ///
+  /// In ko, this message translates to:
+  /// **'모두 통과'**
+  String get stepCheckDone;
+
+  /// No description provided for @stepMergeDone.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR #{number} 병합됨'**
+  String stepMergeDone(int number);
+
+  /// No description provided for @checkCleanTree.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋하지 않은 변경이 없다'**
+  String get checkCleanTree;
+
+  /// No description provided for @checkShowChanges.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 보기'**
+  String get checkShowChanges;
+
+  /// No description provided for @checkOnDefault.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 브랜치({branch})에 있다'**
+  String checkOnDefault(String branch);
+
+  /// No description provided for @checkSynced.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격과 같다'**
+  String get checkSynced;
+
+  /// No description provided for @checkGitHub.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 원격과 gh 로그인'**
+  String get checkGitHub;
+
+  /// No description provided for @checkChangesSince.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 이후 커밋 {count}개'**
+  String checkChangesSince(int count, String tag);
+
+  /// No description provided for @checkFirstRelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 릴리스입니다'**
+  String get checkFirstRelease;
+
+  /// No description provided for @checkNoWorkflow.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그로 도는 워크플로가 없습니다. 앱이 GitHub 릴리스를 만듭니다.'**
+  String get checkNoWorkflow;
+
+  /// No description provided for @checkWorkflowCi.
+  ///
+  /// In ko, this message translates to:
+  /// **'{file}이(가) 태그 push로 릴리스를 만듭니다. 앱은 태그까지 달고 CI를 지켜봅니다.'**
+  String checkWorkflowCi(String file);
+
+  /// No description provided for @checkWorkflowOther.
+  ///
+  /// In ko, this message translates to:
+  /// **'{file}이(가) 태그 push로 돕니다.'**
+  String checkWorkflowOther(String file);
+
+  /// No description provided for @manualBuildTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 전 수동 빌드 (권장)'**
+  String get manualBuildTitle;
+
+  /// No description provided for @manualBuildWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'지난 릴리스 이후 빌드에 영향을 주는 파일이 바뀌었습니다. 태그 전에 모든 플랫폼이 빌드되는지 확인하세요. 수동 실행은 릴리스를 만들지 않습니다.'**
+  String get manualBuildWhy;
+
+  /// No description provided for @manualBuildStart.
+  ///
+  /// In ko, this message translates to:
+  /// **'빌드만 확인'**
+  String get manualBuildStart;
+
+  /// No description provided for @manualBuildShort.
+  ///
+  /// In ko, this message translates to:
+  /// **'수동 빌드 {state}'**
+  String manualBuildShort(String state);
+
+  /// No description provided for @doneManualBuildStarted.
+  ///
+  /// In ko, this message translates to:
+  /// **'수동 빌드를 시작했습니다'**
+  String get doneManualBuildStarted;
+
+  /// No description provided for @versionCurrent.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 {version} ({source})'**
+  String versionCurrent(String version, String source);
+
+  /// No description provided for @versionFromTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 태그'**
+  String get versionFromTag;
+
+  /// No description provided for @versionRecommended.
+  ///
+  /// In ko, this message translates to:
+  /// **'추천'**
+  String get versionRecommended;
+
+  /// No description provided for @versionReason.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 기능 {feats} · 버그 수정 {fixes} · 호환 깨짐 {breaking}'**
+  String versionReason(int feats, int fixes, int breaking);
+
+  /// No description provided for @versionCustom.
+  ///
+  /// In ko, this message translates to:
+  /// **'직접 입력'**
+  String get versionCustom;
+
+  /// No description provided for @versionFiles.
+  ///
+  /// In ko, this message translates to:
+  /// **'바뀌는 파일'**
+  String get versionFiles;
+
+  /// No description provided for @versionNoFiles.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 파일이 없어서 태그만 만듭니다.'**
+  String get versionNoFiles;
+
+  /// No description provided for @versionCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 브랜치 만들고 커밋'**
+  String get versionCommit;
+
+  /// No description provided for @bumpFinal.
+  ///
+  /// In ko, this message translates to:
+  /// **'정식'**
+  String get bumpFinal;
+
+  /// No description provided for @bumpPrerelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'프리릴리스'**
+  String get bumpPrerelease;
+
+  /// No description provided for @doneReleaseCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 버전 올림을 커밋했습니다'**
+  String doneReleaseCommit(String tag);
+
+  /// No description provided for @mergeWaiting.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR #{number} 병합을 기다리는 중 — GitHub에서 병합해도 알아챕니다'**
+  String mergeWaiting(int number);
+
+  /// No description provided for @tagCheckPrMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR #{number}이(가) 병합됐다'**
+  String tagCheckPrMerged(int number);
+
+  /// No description provided for @tagCheckSynced.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}에 있고 원격과 같다'**
+  String tagCheckSynced(String branch);
+
+  /// No description provided for @tagCheckVersion.
+  ///
+  /// In ko, this message translates to:
+  /// **'버전 파일이 {tag}와 같다'**
+  String tagCheckVersion(String tag);
+
+  /// No description provided for @tagCheckVersionWrong.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금 버전은 {version}입니다. 버전 올림 PR이 아직 병합되지 않았을 수 있습니다.'**
+  String tagCheckVersionWrong(String version);
+
+  /// No description provided for @tagCheckFree.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 태그가 아직 없다'**
+  String tagCheckFree(String tag);
+
+  /// No description provided for @tagConfirmTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 태그를 push할까요?'**
+  String tagConfirmTitle(String tag);
+
+  /// No description provided for @tagConfirmMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}의 병합 커밋에 {tag}를 답니다. push하면 릴리스가 공개되고, 태그는 옮기거나 지우지 않는 것이 규칙입니다.'**
+  String tagConfirmMessage(String tag, String branch);
+
+  /// No description provided for @tagConfirmPush.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 달고 push'**
+  String get tagConfirmPush;
+
+  /// No description provided for @doneTagPushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 태그를 push했습니다'**
+  String doneTagPushed(String tag);
+
+  /// No description provided for @notesLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 노트 (마크다운)'**
+  String get notesLabel;
+
+  /// No description provided for @notesFeatures.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 기능'**
+  String get notesFeatures;
+
+  /// No description provided for @notesFixes.
+  ///
+  /// In ko, this message translates to:
+  /// **'버그 수정'**
+  String get notesFixes;
+
+  /// No description provided for @notesOther.
+  ///
+  /// In ko, this message translates to:
+  /// **'기타'**
+  String get notesOther;
+
+  /// No description provided for @notesCreateRelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 릴리스 만들기'**
+  String get notesCreateRelease;
+
+  /// No description provided for @notesEdit.
+  ///
+  /// In ko, this message translates to:
+  /// **'노트 고치기'**
+  String get notesEdit;
+
+  /// No description provided for @doneReleaseCreated.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 릴리스를 만들었습니다'**
+  String get doneReleaseCreated;
+
+  /// No description provided for @doneNotesSaved.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 노트를 저장했습니다'**
+  String get doneNotesSaved;
+
+  /// No description provided for @ciWaitingForRun.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}(으)로 시작된 워크플로를 찾는 중'**
+  String ciWaitingForRun(String tag);
+
+  /// No description provided for @ciOpenInBrowser.
+  ///
+  /// In ko, this message translates to:
+  /// **'브라우저에서 보기'**
+  String get ciOpenInBrowser;
+
+  /// No description provided for @ciRerunFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'실패한 잡 다시 실행'**
+  String get ciRerunFailed;
+
+  /// No description provided for @doneRerun.
+  ///
+  /// In ko, this message translates to:
+  /// **'실패한 잡을 다시 실행했습니다'**
+  String get doneRerun;
+
+  /// No description provided for @runQueued.
+  ///
+  /// In ko, this message translates to:
+  /// **'대기 중'**
+  String get runQueued;
+
+  /// No description provided for @runRunning.
+  ///
+  /// In ko, this message translates to:
+  /// **'진행 중'**
+  String get runRunning;
+
+  /// No description provided for @runSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'성공'**
+  String get runSuccess;
+
+  /// No description provided for @runFailure.
+  ///
+  /// In ko, this message translates to:
+  /// **'실패'**
+  String get runFailure;
+
+  /// No description provided for @runCancelled.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소됨'**
+  String get runCancelled;
+
+  /// No description provided for @runSkipped.
+  ///
+  /// In ko, this message translates to:
+  /// **'건너뜀'**
+  String get runSkipped;
+
+  /// No description provided for @helpCaptionAfterSquash.
+  ///
+  /// In ko, this message translates to:
+  /// **'squash 병합 후 — main에 새 커밋 S 하나'**
+  String get helpCaptionAfterSquash;
+
+  /// No description provided for @helpCaptionTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'v1.0.0과 v1.1.0은 옮겨지지 않는 이름표, main은 앞으로 나아가는 이름표'**
+  String get helpCaptionTag;
+
+  /// No description provided for @helpLinkGitHubMergeMethods.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub — 병합 방법 정보'**
+  String get helpLinkGitHubMergeMethods;
+
+  /// No description provided for @helpLinkTagging.
+  ///
+  /// In ko, this message translates to:
+  /// **'Pro Git — 태그'**
+  String get helpLinkTagging;
+
+  /// No description provided for @helpSquashTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Squash (눌러 합치기)'**
+  String get helpSquashTitle;
+
+  /// No description provided for @helpSquashWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'눌러서 납작하게 만들다, 찌그러뜨리다.'**
+  String get helpSquashWord;
+
+  /// No description provided for @helpSquashInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치의 여러 커밋을 눌러 커밋 하나로 합친 뒤 대상 브랜치에 올립니다. 변경 내용은 그대로이고 커밋 개수만 하나가 됩니다.'**
+  String get helpSquashInGit;
+
+  /// No description provided for @helpSquashWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'오타 수정\', \'다시 시도\' 같은 작업 중 커밋을 기본 브랜치 기록에 남기지 않고, 기능 하나 = 커밋 하나로 정리합니다. PR을 병합할 때 많이 씁니다. 원래 커밋들은 기본 브랜치에 남지 않으니, 병합한 브랜치를 계속 쓰지 말고 지우세요.'**
+  String get helpSquashWhy;
+
+  /// No description provided for @helpTagTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 (주석 태그와 가벼운 태그)'**
+  String get helpTagTitle;
+
+  /// No description provided for @helpTagWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'tag는 \'꼬리표, 이름표\'.'**
+  String get helpTagWord;
+
+  /// No description provided for @helpTagInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.'**
+  String get helpTagInGit;
+
+  /// No description provided for @helpTagWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.'**
+  String get helpTagWhy;
 }
 
 class _AppLocalizationsDelegate

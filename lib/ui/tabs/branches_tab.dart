@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../merge_sheet.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
@@ -92,7 +93,7 @@ class _BranchesTabState extends State<BranchesTab> {
   }
 }
 
-enum _BranchMenu { switchTo, publish, rename, delete, deleteRemote }
+enum _BranchMenu { switchTo, mergeIntoCurrent, publish, rename, delete, deleteRemote }
 
 class _BranchRow extends StatelessWidget {
   const _BranchRow({required this.branch, required this.repo});
@@ -110,6 +111,11 @@ class _BranchRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final items = <PopupMenuEntry<_BranchMenu>>[
       if (!branch.current) PopupMenuItem(value: _BranchMenu.switchTo, child: Text(l10n.branchesSwitch)),
+      if (!branch.current && !repo.status.detached)
+        PopupMenuItem(
+          value: _BranchMenu.mergeIntoCurrent,
+          child: Text(l10n.branchesMergeInto(repo.status.head ?? '')),
+        ),
       if (!branch.remote && (branch.upstream == null || branch.upstreamGone) && repo.remotes.isNotEmpty)
         PopupMenuItem(value: _BranchMenu.publish, child: Text(l10n.headerPublish)),
       if (!branch.remote) PopupMenuItem(value: _BranchMenu.rename, child: Text(l10n.branchesRename)),
@@ -133,6 +139,8 @@ class _BranchRow extends StatelessWidget {
     switch (choice) {
       case _BranchMenu.switchTo:
         await _switch(context);
+      case _BranchMenu.mergeIntoCurrent:
+        await showMergeSheet(context, repo, branch);
       case _BranchMenu.publish:
         final remote = repo.defaultRemote!;
         await RepoActions.report(context, repo.execute(GitCommands.publish(remote, branch.name)),

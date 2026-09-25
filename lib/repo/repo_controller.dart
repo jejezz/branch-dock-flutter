@@ -8,6 +8,7 @@ import '../git/commands.dart';
 import '../git/refs.dart';
 import '../git/remotes.dart';
 import '../git/status.dart';
+import '../git/tags.dart';
 
 /// 병합·rebase가 끝나지 않은 상태.
 enum RepoOperation { none, merging, rebasing }
@@ -29,6 +30,13 @@ class RepoController extends ChangeNotifier {
   RepoStatus status = const RepoStatus();
   List<Branch> branches = const [];
   List<Remote> remotes = const [];
+  List<Tag> tags = const [];
+
+  /// 기본 원격에 있는 태그 이름. 네트워크를 쓰므로 [loadRemoteTags]로만 읽는다.
+  Set<String>? remoteTagNames;
+
+  /// 원격의 기본 브랜치 (`main`). 모르면 main → master → 현재 브랜치.
+  String? defaultBranch;
   RepoOperation operation = RepoOperation.none;
   bool loaded = false;
 
@@ -106,15 +114,50 @@ class RepoController extends ChangeNotifier {
         runner.run(GitCommands.status, workingDirectory: root, quiet: true),
         runner.run(GitCommands.branches, workingDirectory: root, quiet: true),
         runner.run(GitCommands.remotes, workingDirectory: root, quiet: true),
+        runner.run(GitCommands.tags, workingDirectory: root, quiet: true),
       ]);
       if (_disposed) return;
+      if (results[3].ok) tags = _withPushed(Tag.parse(results[3].stdout));
       if (results[0].ok) status = RepoStatus.parse(results[0].stdout);
       if (results[1].ok) branches = Branch.parse(results[1].stdout);
       if (results[2].ok) remotes = Remote.parse(results[2].stdout);
       operation = _readOperation();
+      defaultBranch = await _readDefaultBranch();
       loaded = true;
       notifyListeners();
     } while (_refreshAgain && !_disposed);
+  }
+
+  List<Tag> _withPushed(List<Tag> list) {
+    final remote = remoteTagNames;
+    return remote == null ? list : [for (final t in list) t.withPushed(remote.contains(t.name))];
+  }
+
+  /// `git ls-remote --tags` — 태그 탭을 열 때, 태그를 push·삭제한 뒤에 부른다.
+  Future<void> loadRemoteTags() async {
+    final remote = defaultRemote;
+    if (remote == null) {
+      remoteTagNames = {};
+    } else {
+      final r = await runner.run(GitCommands.remoteTags(remote), workingDirectory: root, quiet: true);
+      if (!r.ok) return;
+      remoteTagNames = Tag.parseRemote(r.stdout);
+    }
+    tags = _withPushed(tags);
+    if (!_disposed) notifyListeners();
+  }
+
+  Future<String?> _readDefaultBranch() async {
+    final remote = defaultRemote;
+    if (remote != null) {
+      final r = await runner.run(GitCommands.remoteHead(remote), workingDirectory: root, quiet: true);
+      final v = r.stdout.trim();
+      if (r.ok && v.startsWith('$remote/') && v != '$remote/HEAD') return v.substring(remote.length + 1);
+    }
+    final names = localBranches.map((b) => b.name).toSet();
+    if (names.contains('main')) return 'main';
+    if (names.contains('master')) return 'master';
+    return status.head;
   }
 
   RepoOperation _readOperation() {
@@ -125,13 +168,13 @@ class RepoController extends ChangeNotifier {
   }
 
   /// 명령을 실행하고 상태를 다시 읽는다. 한 번에 하나만 실행한다.
-  Future<CommandResult> execute(List<String> args) async {
+  Future<CommandResult> execute(List<String> args, {String? stdin}) async {
     if (busy) return const CommandResult(1, '', 'busy');
     final token = CancelToken();
     _running = token;
     notifyListeners();
     try {
-      return await runner.run(args, workingDirectory: root, cancel: token);
+      return await runner.run(args, workingDirectory: root, cancel: token, stdin: stdin);
     } finally {
       _running = null;
       await refresh();
@@ -162,7 +205,14 @@ class RepoController extends ChangeNotifier {
         GitCommands.commit(message),
       ]);
 
-  Future<CommandResult> fetch({String? remote}) => execute(GitCommands.fetch(remote: remote));
+  Future<CommandResult> fetch({String? remote}) async {
+    final r = await execute(GitCommands.fetch(remote: remote));
+    if (r.ok && remoteTagNames != null) await loadRemoteTags();
+    return r;
+  }
+
+  /// 읽기 전용 명령 (로그에 남기지 않음, 바쁨 표시 없음).
+  Future<CommandResult> read(List<String> args) => runner.run(args, workingDirectory: root, quiet: true);
   Future<CommandResult> pull(PullMode mode) => execute(GitCommands.pull(mode));
 
   /// 추적 브랜치가 없으면 게시한다.
