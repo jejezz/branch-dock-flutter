@@ -49,6 +49,18 @@ class ReleaseFlow extends ChangeNotifier {
       File('${repo.root}/scripts/bump-version.sh').existsSync() &&
       files.any((f) => f.kind == VersionFileKind.pubspec);
 
+  void setDirect(bool value) {
+    direct = value;
+    notifyListeners();
+  }
+
+  /// 버전 파일을 직접 정하거나(null이면 자동 감지로) 되돌린다.
+  void setCustomVersionFile(CustomVersionFile? value) {
+    customVersionFile = value;
+    files = detectVersionFiles(repo.root, custom: value);
+    notifyListeners();
+  }
+
   /// GitHub 기능(PR·릴리스·CI)을 쓸 수 있는가.
   bool get github => ghReady && repo.githubRemote != null;
   bool loading = false;

@@ -6,9 +6,11 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../app_identity.dart';
+import '../git/commands.dart';
 import '../git/remotes.dart';
 import '../github/models.dart';
 import '../l10n/app_localizations.dart';
@@ -19,6 +21,7 @@ import '../repo/repo_controller.dart';
 import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
 import 'command_bar.dart';
+import 'onboarding.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
@@ -130,7 +133,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     _flow?.dispose();
     _repo?.dispose();
     await _services.prefs.addRecent(repo.root);
-    final flow = ReleaseFlow(repo, ghReady: _env.ghReady)..onRunFinished = _onReleaseRunFinished;
+    final flow = ReleaseFlow(repo, ghReady: _env.ghReady)
+      ..onRunFinished = _onReleaseRunFinished
+      ..customVersionFile = _services.prefs.customVersionFile(repo.root);
     repo.ghReady = _env.ghReady;
     unawaited(repo.loadHeadPr());
     setState(() {
@@ -171,6 +176,51 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   }
 
   void _dismiss(String key) => setState(() => _dismissed.add(key));
+
+  /// 저장소가 아닌 폴더를 git 저장소로 만들고 연다 (PLAN.md 3.1 P1).
+  Future<void> _initRepository(String path) async {
+    final r = await _services.runner.run(GitCommands.init, workingDirectory: path);
+    if (!mounted) return;
+    if (r.ok) {
+      await _open(path);
+    } else {
+      showCommandError(context, r);
+    }
+  }
+
+  Future<void> _clone() async {
+    final path = await showCloneSheet(context);
+    if (path != null) await _open(path);
+  }
+
+  void _showLogin() {
+    final origin = _repo?.remotes.where((r) => r.name == 'origin').firstOrNull;
+    showLoginSheet(
+      context,
+      _env,
+      onChanged: _checkEnvironment,
+      preferSsh: sshPreferred(remoteIsSsh: origin?.location?.ssh ?? false),
+    );
+  }
+
+  /// 화면 오른쪽·왼쪽 가장자리에 붙이기 (UI_UX.md §2 P1): 창이 있는 화면의
+  /// 작업 영역 높이 전체, 폭 440.
+  Future<void> _snap({required bool right}) async {
+    final bounds = await windowManager.getBounds();
+    final displays = await screenRetriever.getAllDisplays();
+    final center = bounds.center;
+    Display? display;
+    for (final d in displays) {
+      final pos = d.visiblePosition ?? Offset.zero;
+      final size = d.visibleSize ?? d.size;
+      if ((pos & size).contains(center)) display = d;
+    }
+    display ??= await screenRetriever.getPrimaryDisplay();
+    final pos = display.visiblePosition ?? Offset.zero;
+    final size = display.visibleSize ?? display.size;
+    const width = 440.0;
+    await windowManager.setBounds(Rect.fromLTWH(right ? pos.dx + size.width - width : pos.dx, pos.dy, width, size.height));
+  }
 
   void _close() {
     _flow?.dispose();
@@ -265,6 +315,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
                       setState(() {});
                     },
                     onCheckEnvironment: _checkEnvironment,
+                    onInitRepository: _initRepository,
+                    onClone: _clone,
+                    onLogin: _showLogin,
                   )
                 : RepoScope(repo: repo, environment: _env, child: _RepoView(state: this)),
           ),
@@ -341,7 +394,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
                 await _services.prefs.setAutoFetch(!_services.prefs.autoFetch);
                 setState(() {});
               case ':env':
-                if (context.mounted) await showEnvironmentSheet(context, _env, _checkEnvironment);
+                if (context.mounted) await showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin);
+              case ':browse':
+                await _services.runner.run(GhCommands.browse, workingDirectory: repo.root);
+              case ':snapRight':
+                await _snap(right: true);
+              case ':snapLeft':
+                await _snap(right: false);
               case ':close':
                 _close();
               default:
@@ -360,6 +419,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
             PopupMenuItem(value: ':editor', child: Text(l10n.menuEditor)),
             CheckedPopupMenuItem(value: ':autofetch', checked: _services.prefs.autoFetch, child: Text(l10n.menuAutoFetch)),
             PopupMenuItem(value: ':env', child: Text(l10n.menuEnvironment)),
+            if (repo.githubRemote != null && _env.ghReady)
+              PopupMenuItem(value: ':browse', child: Text(l10n.menuBrowse)),
+            if (_isDesktop) ...[
+              const PopupMenuDivider(),
+              PopupMenuItem(value: ':snapRight', child: Text(l10n.menuSnapRight)),
+              PopupMenuItem(value: ':snapLeft', child: Text(l10n.menuSnapLeft)),
+            ],
+            const PopupMenuDivider(),
             PopupMenuItem(value: ':close', child: Text(l10n.menuCloseRepo)),
           ],
           child: Padding(

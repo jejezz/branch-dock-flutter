@@ -15,6 +15,7 @@ import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../shortcut_label.dart';
 import '../widgets.dart';
+import 'release_list.dart';
 
 /// 태그 탭 (UI_UX.md §4.3, PLAN.md 3.7).
 class TagsTab extends StatefulWidget {
@@ -91,7 +92,7 @@ Future<CommandResult> _pushTags(RepoController repo, String remote, List<String>
   return r;
 }
 
-enum _TagMenu { commits, checkout, push, delete, deleteRemote }
+enum _TagMenu { commits, checkout, push, rollback, delete, deleteRemote }
 
 class _TagRow extends StatelessWidget {
   const _TagRow({required this.tag, required this.repo, required this.remoteKnown});
@@ -150,6 +151,11 @@ class _TagRow extends StatelessWidget {
               if (remote != null && !t.pushed) PopupMenuItem(value: _TagMenu.push, child: Text(l10n.tagsPush)),
               PopupMenuItem(value: _TagMenu.commits, child: Text(l10n.tagsCommitsSince)),
               PopupMenuItem(value: _TagMenu.checkout, child: Text(l10n.tagsCheckout)),
+              if (t.version != null && t.pushed)
+                PopupMenuItem(
+                  value: _TagMenu.rollback,
+                  child: Text(l10n.rollbackTitle, style: TextStyle(color: theme.colorScheme.error)),
+                ),
               PopupMenuItem(value: _TagMenu.delete, child: Text(l10n.tagsDelete)),
               if (remote != null && t.pushed)
                 PopupMenuItem(
@@ -196,6 +202,8 @@ class _TagRow extends StatelessWidget {
         if (ok == true && context.mounted) {
           await RepoActions.withStashRetry(context, repo, () => repo.execute(command), done: l10n.doneCheckoutTag(tag.name));
         }
+      case _TagMenu.rollback:
+        await showRollbackDialog(context, repo, tag.name);
       case _TagMenu.push:
         await RepoActions.report(context, _pushTags(repo, remote!, [tag.name]), done: l10n.donePushTags(1));
       case _TagMenu.delete:

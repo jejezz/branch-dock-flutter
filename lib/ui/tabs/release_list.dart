@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../git/commands.dart';
+import '../../git/tags.dart';
 import '../../github/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
@@ -77,7 +78,7 @@ class _ReleaseListState extends State<ReleaseList> {
   }
 }
 
-enum _ReleaseMenu { notes, open, togglePrerelease, publishDraft, delete }
+enum _ReleaseMenu { notes, open, togglePrerelease, publishDraft, rollback, delete }
 
 class _ReleaseRow extends StatelessWidget {
   const _ReleaseRow({required this.release, required this.repo, required this.onChanged});
@@ -109,6 +110,8 @@ class _ReleaseRow extends StatelessWidget {
         );
       case _ReleaseMenu.publishDraft:
         await _run(context, GhCommands.releasePublishDraft(r.tag), l10n.doneReleasePublished(r.tag));
+      case _ReleaseMenu.rollback:
+        if (await showRollbackDialog(context, repo, r.tag, hasRelease: true)) onChanged();
       case _ReleaseMenu.delete:
         await _delete(context);
     }
@@ -200,6 +203,10 @@ class _ReleaseRow extends StatelessWidget {
                   child: Text(r.prerelease ? l10n.releaseMakeFinal : l10n.releaseMakePrerelease),
                 ),
               PopupMenuItem(
+                value: _ReleaseMenu.rollback,
+                child: Text(l10n.rollbackTitle, style: TextStyle(color: theme.colorScheme.error)),
+              ),
+              PopupMenuItem(
                 value: _ReleaseMenu.delete,
                 child: Text(l10n.releaseDelete, style: TextStyle(color: theme.colorScheme.error)),
               ),
@@ -279,4 +286,45 @@ class _NotesSheetState extends State<_NotesSheet> {
       ],
     );
   }
+}
+
+
+/// 잘못 단 릴리스 되돌리기 (PLAN.md 3.8.7 P1): GitHub 릴리스 → 원격 태그 →
+/// 로컬 태그를 한 번에 지운다. 이미 받아 간 사람이 있을 수 있으니 같은 번호를
+/// 다시 쓰지 말고 다음 번호로 새로 릴리스하라고 권한다. 되돌렸으면 true.
+Future<bool> showRollbackDialog(BuildContext context, RepoController repo, String tag, {bool? hasRelease}) async {
+  final l10n = AppLocalizations.of(context);
+  final remote = repo.githubRemote?.name ?? repo.defaultRemote;
+  var release = hasRelease ?? false;
+  if (hasRelease == null && repo.githubRemote != null) {
+    release = (await repo.read(GhCommands.releaseView(tag))).ok;
+    if (!context.mounted) return false;
+  }
+  final pushed = repo.remoteTagNames?.contains(tag) ?? true;
+  final local = repo.tags.any((t) => t.name == tag);
+  final commands = [
+    if (release) GhCommands.releaseDelete(tag),
+    if (remote != null && pushed) GitCommands.deleteRemoteTag(remote, tag),
+    if (local) GitCommands.deleteTag(tag),
+  ];
+  if (commands.isEmpty) return false;
+  final next = SemVer.tryParse(tag);
+  final ok = await confirmDanger(
+    context,
+    title: l10n.rollbackConfirmTitle(tag),
+    message: l10n.rollbackMessage(next == null ? '' : 'v${next.major}.${next.minor}.${next.patch + 1}'),
+    confirm: l10n.rollbackTitle,
+    commands: commands,
+  );
+  if (!ok || !context.mounted) return false;
+  final done = await RepoActions.report(
+    context,
+    () async {
+      final r = await repo.executeAll(commands);
+      await repo.loadRemoteTags();
+      return r;
+    }(),
+    done: l10n.doneRollback(tag),
+  );
+  return done;
 }

@@ -3,18 +3,40 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../git/commands.dart';
 import '../../git/remotes.dart';
+import '../../github/onboarding.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repo/environment.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../merge_sheet.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
 
 /// 원격 탭 (UI_UX.md §4.4).
-class RemotesTab extends StatelessWidget {
+class RemotesTab extends StatefulWidget {
   const RemotesTab({super.key});
+
+  @override
+  State<RemotesTab> createState() => _RemotesTabState();
+}
+
+class _RemotesTabState extends State<RemotesTab> {
+  /// fork 정보와 gh 기본 저장소 (PLAN.md 3.6 P1). GitHub 원격과 gh가 있을 때만 읽는다.
+  ForkInfo? _fork;
+  String? _ghDefault;
+  String? _loadedFor;
+
+  Future<void> _load(RepoController repo) async {
+    _loadedFor = repo.root;
+    final results = await Future.wait([repo.read(GhCommands.repoViewFork), repo.read(GhCommands.setDefaultView)]);
+    if (!mounted) return;
+    setState(() {
+      _fork = results[0].ok ? ForkInfo.parse(results[0].stdout) : null;
+      _ghDefault = results[1].ok ? results[1].stdout.trim() : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +44,12 @@ class RemotesTab extends StatelessWidget {
     final env = RepoScope.environmentOf(context);
     final l10n = AppLocalizations.of(context);
     final hasGitHub = repo.githubRemote != null;
+    if (hasGitHub && env.ghReady && _loadedFor != repo.root) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _load(repo);
+      });
+    }
+    final githubRemotes = repo.remotes.where((r) => r.isGitHub).toList();
 
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
@@ -34,6 +62,14 @@ class RemotesTab extends StatelessWidget {
             label: Text(l10n.remotesAdd, overflow: TextOverflow.ellipsis),
           ),
         ),
+        if (_fork != null && _fork!.isFork) ForkCard(fork: _fork!, repo: repo),
+        if (githubRemotes.length > 1)
+          _DefaultRepoRow(
+            repo: repo,
+            current: _ghDefault,
+            options: [for (final r in githubRemotes) ?r.location?.path],
+            onChanged: () => _load(repo),
+          ),
         if (repo.remotes.isEmpty)
           EmptyState(
             icon: Icons.cloud_upload_outlined,
@@ -58,6 +94,111 @@ class RemotesTab extends StatelessWidget {
             ),
         ],
       ],
+    );
+  }
+}
+
+/// fork 저장소 (PLAN.md 3.6 P1): 원본을 upstream으로 추가하고, upstream에서
+/// 새 커밋을 가져와 현재 브랜치로 병합한다.
+class ForkCard extends StatelessWidget {
+  const ForkCard({super.key, required this.fork, required this.repo});
+
+  final ForkInfo fork;
+  final RepoController repo;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final upstream = repo.remotes.where((r) => r.name == 'upstream').firstOrNull;
+    final add = GitCommands.remoteAdd('upstream', fork.parentUrl!);
+    final fetch = [GitCommands.fetch(remote: 'upstream'), GitCommands.remoteSetHeadAuto('upstream')];
+    return Container(
+      margin: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppRadius.tile),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Icon(Icons.fork_right_rounded, size: 18, color: theme.colorScheme.primary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(child: Text(l10n.forkTitle(fork.parent!), style: theme.textTheme.titleSmall)),
+        ]),
+        const SizedBox(height: 4),
+        Text(upstream == null ? l10n.forkAddWhy : l10n.forkSyncWhy, style: theme.textTheme.bodySmall),
+        const SizedBox(height: AppSpacing.sm),
+        CommandPreview(commands: upstream == null ? [add] : fetch),
+        const SizedBox(height: AppSpacing.sm),
+        Align(
+          alignment: Alignment.centerRight,
+          child: upstream == null
+              ? FilledButton(
+                  onPressed: repo.busy
+                      ? null
+                      : () => RepoActions.report(context, repo.execute(add), done: l10n.doneAddRemote('upstream')),
+                  child: Text(l10n.forkAddUpstream),
+                )
+              : FilledButton(
+                  onPressed: repo.busy ? null : () => _sync(context),
+                  child: Text(l10n.forkSync),
+                ),
+        ),
+      ]),
+    );
+  }
+
+  /// upstream을 가져오고, upstream의 기본 브랜치를 현재 브랜치로 병합하는 시트를 연다.
+  Future<void> _sync(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await RepoActions.report(
+      context,
+      repo.executeAll([GitCommands.fetch(remote: 'upstream'), GitCommands.remoteSetHeadAuto('upstream')]),
+      done: l10n.doneFetch,
+    );
+    if (!ok || !context.mounted) return;
+    final head = await repo.read(GitCommands.remoteHead('upstream'));
+    final name = head.ok ? head.stdout.trim() : 'upstream/${repo.defaultBranch ?? 'main'}';
+    final branch = repo.remoteBranches.where((b) => b.name == name).firstOrNull;
+    if (branch == null || !context.mounted) return;
+    await showMergeSheet(context, repo, branch);
+  }
+}
+
+/// 원격이 여러 개일 때 gh가 쓸 저장소 (`gh repo set-default`).
+class _DefaultRepoRow extends StatelessWidget {
+  const _DefaultRepoRow({required this.repo, required this.current, required this.options, required this.onChanged});
+
+  final RepoController repo;
+  final String? current;
+  final List<String> options;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final value = options.contains(current) ? current : null;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.md, AppSpacing.sm),
+      child: Row(children: [
+        Expanded(child: Text(l10n.remotesGhDefault, style: theme.textTheme.bodySmall)),
+        DropdownButton<String>(
+          value: value,
+          hint: Text(l10n.remotesGhDefaultNone, style: theme.textTheme.bodySmall),
+          underline: const SizedBox.shrink(),
+          items: [for (final o in options) DropdownMenuItem(value: o, child: Text(o, style: AppFonts.mono.copyWith(fontSize: 12)))],
+          onChanged: repo.busy
+              ? null
+              : (v) async {
+                  if (v == null) return;
+                  final ok = await RepoActions.report(context, repo.execute(GhCommands.setDefault(v)), done: l10n.doneGhDefault(v));
+                  if (ok) onChanged();
+                },
+        ),
+      ]),
     );
   }
 }

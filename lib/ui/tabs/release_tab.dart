@@ -14,6 +14,8 @@ import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../shortcut_label.dart';
 import '../widgets.dart';
+import '../action_sheet.dart';
+import '../services.dart';
 import '../markdown_editor.dart';
 import 'pr_tab.dart';
 import 'release_list.dart';
@@ -62,8 +64,12 @@ class _Overview extends StatelessWidget {
     final env = RepoScope.environmentOf(context);
     final l10n = AppLocalizations.of(context);
     final latest = repo.tags.where((t) => t.version != null).firstOrNull;
-    final github = repo.githubRemote != null;
-    final reason = !github ? l10n.releaseNeedsGitHub : (!env.ghReady ? ghUnavailableText(l10n, env) : null);
+    final github = repo.githubRemote != null && env.ghReady;
+    // GitHub가 아니거나 gh가 없으면 바로 커밋 방식(점검·버전·태그)만 쓴다 (PLAN.md 3.8.3 P1).
+    final note = repo.githubRemote == null
+        ? l10n.releaseDirectOnlyNotGitHub
+        : (!env.ghReady ? '${ghUnavailableText(l10n, env)} ${l10n.releaseDirectOnly}' : null);
+    final reason = repo.remotes.isEmpty ? l10n.releaseNeedsRemote : null;
 
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
@@ -72,12 +78,13 @@ class _Overview extends StatelessWidget {
         EmptyState(
           icon: Icons.rocket_launch_outlined,
           title: latest == null ? l10n.releaseNoTags : l10n.releaseLatest(latest.name),
-          message: reason ?? l10n.releaseIntro,
+          message: reason ?? note ?? l10n.releaseIntro,
           action: FilledButton.icon(
             onPressed: reason != null || repo.busy
                 ? null
                 : () {
                     flow.ghReady = env.ghReady;
+                    if (!github) flow.direct = true;
                     flow.runChecks();
                   },
             icon: const Icon(Icons.rocket_launch_rounded, size: 16),
@@ -85,7 +92,7 @@ class _Overview extends StatelessWidget {
           ),
         ),
         // 릴리스 관리 (PLAN.md 3.8.6)
-        if (reason == null) ReleaseList(repo: repo),
+        if (github) ReleaseList(repo: repo),
       ],
     );
   }
@@ -174,7 +181,11 @@ class _Wizard extends StatelessWidget {
             state: i < index ? _StepState.done : (i == index ? _StepState.active : _StepState.pending),
             summary: i < index ? _summary(l10n, _steps[i]) : null,
             // CI가 릴리스를 만드는 저장소는 노트 단계를 CI 뒤로 미룬다.
-            skipped: _steps[i] == ReleaseStep.notes && flow.ciMode && i < index,
+            skipped: i < index &&
+                ((_steps[i] == ReleaseStep.notes && flow.ciMode) ||
+                    // 바로 커밋 방식은 PR·병합이 없고, GitHub가 아니면 노트·CI도 없다.
+                    (flow.direct && (_steps[i] == ReleaseStep.pr || _steps[i] == ReleaseStep.merge)) ||
+                    (!flow.github && (_steps[i] == ReleaseStep.notes || _steps[i] == ReleaseStep.ci))),
             child: i == index ? _content(context, _steps[i]) : null,
           ),
         if (current == ReleaseStep.done) _Done(flow: flow),
@@ -358,7 +369,18 @@ class _CheckStep extends StatelessWidget {
           child: Text(repo.status.behind > 0 ? l10n.headerPull : l10n.headerPush),
         ),
       ),
-      _CheckRow(ok: c(ReleaseCheck.github), label: l10n.checkGitHub),
+      if (!flow.direct) _CheckRow(ok: c(ReleaseCheck.github), label: l10n.checkGitHub),
+      // 바로 커밋 방식 (PLAN.md 3.8.3 P1): 혼자 쓰는 저장소, 또는 GitHub가 아닌 저장소.
+      SwitchListTile(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        value: flow.direct,
+        onChanged: flow.github
+            ? flow.setDirect
+            : null,
+        title: Text(l10n.releaseDirectMode),
+        subtitle: Text(flow.github ? l10n.releaseDirectModeWhy(flow.defaultBranch) : l10n.releaseDirectOnly),
+      ),
       _CheckRow(
         ok: c(ReleaseCheck.hasChanges),
         label: flow.lastTag == null ? l10n.checkFirstRelease : l10n.checkChangesSince(flow.releaseCommits.length, flow.lastTag!),
@@ -501,6 +523,24 @@ class _VersionStepState extends State<_VersionStep> {
         },
       ),
       const SizedBox(height: AppSpacing.md),
+      if (flow.usesBumpScript)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Text(l10n.versionUsesScript, style: theme.textTheme.bodySmall),
+        ),
+      if (flow.lockFiles.isNotEmpty && !flow.usesBumpScript)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Text(l10n.versionLockFiles(flow.lockFiles.join(', ')), style: theme.textTheme.bodySmall),
+        ),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => showVersionFileSheet(context, flow),
+          icon: const Icon(Icons.tune_rounded, size: 16),
+          label: Text(flow.customVersionFile == null ? l10n.versionFileChoose : l10n.versionFileCustom(flow.customVersionFile!.path)),
+        ),
+      ),
       if (flow.fileChanges.isNotEmpty) ...[
         Text(l10n.versionFiles, style: theme.textTheme.labelMedium),
         for (final (path, from, to) in flow.fileChanges)
@@ -633,8 +673,11 @@ class _TagStep extends StatelessWidget {
     bool? c(TagCheck k) => flow.tagChecks[k];
     final tag = flow.tag ?? '';
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      _CheckRow(ok: c(TagCheck.prMerged), label: l10n.tagCheckPrMerged(flow.pr?.number ?? 0)),
-      _CheckRow(ok: c(TagCheck.synced), label: l10n.tagCheckSynced(flow.defaultBranch)),
+      if (!flow.direct) _CheckRow(ok: c(TagCheck.prMerged), label: l10n.tagCheckPrMerged(flow.pr?.number ?? 0)),
+      _CheckRow(
+        ok: c(TagCheck.synced),
+        label: flow.direct ? l10n.tagCheckSyncedDirect(flow.defaultBranch) : l10n.tagCheckSynced(flow.defaultBranch),
+      ),
       _CheckRow(
         ok: c(TagCheck.versionMatches),
         label: l10n.tagCheckVersion(tag),
@@ -921,3 +964,70 @@ class _DoneState extends State<_Done> {
   }
 }
 
+
+
+/// 버전 파일 지정 (PLAN.md 3.8.2a): 감지가 안 되거나 틀릴 때 저장소별로 파일과
+/// 버전 줄 정규식(캡처 그룹 하나)을 정한다. 앱 설정에 저장된다.
+Future<void> showVersionFileSheet(BuildContext context, ReleaseFlow flow) {
+  final prefs = ServicesScope.of(context).prefs;
+  final path = TextEditingController(text: flow.customVersionFile?.path ?? '');
+  final pattern = TextEditingController(text: flow.customVersionFile?.pattern ?? r'version\s*=\s*"([^"]+)"');
+  return showActionSheet<void>(context, (context) {
+    return StatefulBuilder(builder: (context, setState) {
+      final l10n = AppLocalizations.of(context);
+      final theme = Theme.of(context);
+      final custom = CustomVersionFile(path.text.trim(), pattern.text);
+      final found = path.text.trim().isEmpty ? const <VersionFile>[] : detectVersionFiles(flow.repo.root, custom: custom);
+      return ActionSheetBody(
+        title: l10n.versionFileTitle,
+        commands: const [],
+        confirmLabel: l10n.commonSave,
+        onConfirm: found.isEmpty
+            ? null
+            : () async {
+                await prefs.setCustomVersionFile(flow.repo.root, custom);
+                flow.setCustomVersionFile(custom);
+                if (context.mounted) Navigator.pop(context);
+              },
+        children: [
+          Text(l10n.versionFileWhy, style: theme.textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: path,
+            style: AppFonts.mono.copyWith(fontSize: 12),
+            decoration: InputDecoration(labelText: l10n.versionFilePath, hintText: 'Makefile'),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: pattern,
+            style: AppFonts.mono.copyWith(fontSize: 12),
+            decoration: InputDecoration(labelText: l10n.versionFilePattern),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            path.text.trim().isEmpty
+                ? ''
+                : found.isEmpty
+                    ? l10n.versionFileNotFound
+                    : l10n.versionFileFound(found.first.version.toString()),
+            style: TextStyle(color: found.isEmpty ? theme.colorScheme.error : toneColor(context, Tone.success)),
+          ),
+          if (flow.customVersionFile != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () async {
+                  await prefs.setCustomVersionFile(flow.repo.root, null);
+                  flow.setCustomVersionFile(null);
+                  if (context.mounted) Navigator.pop(context);
+                },
+                child: Text(l10n.versionFileAuto),
+              ),
+            ),
+        ],
+      );
+    });
+  });
+}

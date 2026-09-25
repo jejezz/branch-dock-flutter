@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../git/commands.dart';
 import '../l10n/app_localizations.dart';
 import '../repo/environment.dart';
 import '../repo/repo_controller.dart';
@@ -20,6 +21,9 @@ class StartScreen extends StatelessWidget {
     required this.onOpenRecent,
     required this.onRemoveRecent,
     required this.onCheckEnvironment,
+    this.onInitRepository,
+    this.onClone,
+    this.onLogin,
     this.failure,
     this.failedPath,
     this.dragging = false,
@@ -31,6 +35,15 @@ class StartScreen extends StatelessWidget {
   final ValueChanged<String> onOpenRecent;
   final ValueChanged<String> onRemoveRecent;
   final VoidCallback onCheckEnvironment;
+
+  /// 저장소가 아닌 폴더를 git 저장소로 만든다 (PLAN.md 3.1 P1).
+  final ValueChanged<String>? onInitRepository;
+
+  /// GitHub에서 복제 (gh 로그인이 있을 때).
+  final VoidCallback? onClone;
+
+  /// 로그인 안내 열기.
+  final VoidCallback? onLogin;
   final OpenFailure? failure;
   final String? failedPath;
   final bool dragging;
@@ -58,21 +71,44 @@ class StartScreen extends StatelessWidget {
                   color: theme.colorScheme.error.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppRadius.button),
                 ),
-                child: Text(
-                  failure == OpenFailure.notARepository
-                      ? l10n.startNotARepository(failedPath ?? '')
-                      : l10n.startNotFound(failedPath ?? ''),
-                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    failure == OpenFailure.notARepository
+                        ? l10n.startNotARepository(failedPath ?? '')
+                        : l10n.startNotFound(failedPath ?? ''),
+                  ),
+                  if (failure == OpenFailure.notARepository && failedPath != null && onInitRepository != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Tooltip(
+                      message: GitCommands.init.join(' '),
+                      child: OutlinedButton.icon(
+                        onPressed: () => onInitRepository!(failedPath!),
+                        icon: const Icon(Icons.create_new_folder_outlined, size: 16),
+                        label: Text(l10n.startInitRepository),
+                      ),
+                    ),
+                  ],
+                ]),
               ),
             EmptyState(
               icon: Icons.folder_open_rounded,
               title: l10n.homeEmptyTitle,
               message: l10n.startDropHint,
-              action: FilledButton.icon(
-                onPressed: env.hasGit ? onOpenFolder : null,
-                icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: Text('${l10n.homeEmptyAction}  ${shortcutLabel('O')}'),
-              ),
+              action: Column(children: [
+                FilledButton.icon(
+                  onPressed: env.hasGit ? onOpenFolder : null,
+                  icon: const Icon(Icons.folder_open_rounded, size: 16),
+                  label: Text('${l10n.homeEmptyAction}  ${shortcutLabel('O')}'),
+                ),
+                if (onClone != null && env.ghReady) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  TextButton.icon(
+                    onPressed: onClone,
+                    icon: const Icon(Icons.download_rounded, size: 16),
+                    label: Text(l10n.cloneTitle),
+                  ),
+                ],
+              ]),
             ),
             if (recent.isNotEmpty) ...[
               Padding(
@@ -101,7 +137,7 @@ class StartScreen extends StatelessWidget {
             ],
             if (env.checked && !env.ghReady) ...[
               const SizedBox(height: AppSpacing.lg),
-              EnvironmentCard(environment: env, onRecheck: onCheckEnvironment),
+              EnvironmentCard(environment: env, onRecheck: onCheckEnvironment, onLogin: onLogin),
             ],
           ],
         ],
@@ -112,10 +148,13 @@ class StartScreen extends StatelessWidget {
 
 /// 환경 점검 체크리스트 (UI_UX.md §8): 항목별 ✓/✕, 설치·로그인 명령 복사.
 class EnvironmentCard extends StatelessWidget {
-  const EnvironmentCard({super.key, required this.environment, required this.onRecheck});
+  const EnvironmentCard({super.key, required this.environment, required this.onRecheck, this.onLogin});
 
   final EnvironmentStatus environment;
   final VoidCallback onRecheck;
+
+  /// 로그인 안내(SSH/HTTPS)를 연다. 없으면 명령 복사만.
+  final VoidCallback? onLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +210,15 @@ class EnvironmentCard extends StatelessWidget {
           item(env.ghLoggedIn, l10n.envLogin,
               env.ghLoggedIn ? l10n.envLoggedInAs(env.ghLogins['github.com'] ?? '') : l10n.envNotLoggedIn,
               command: 'gh auth login'),
+        if (env.hasGh && !env.ghLoggedIn && onLogin != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: onLogin,
+              icon: const Icon(Icons.login_rounded, size: 16),
+              label: Text(l10n.loginTitle),
+            ),
+          ),
         const SizedBox(height: AppSpacing.sm),
         Align(
           alignment: Alignment.centerRight,
@@ -186,7 +234,7 @@ class EnvironmentCard extends StatelessWidget {
 }
 
 /// 앱 바 메뉴의 "환경 점검".
-Future<void> showEnvironmentSheet(BuildContext context, EnvironmentStatus env, VoidCallback onRecheck) {
+Future<void> showEnvironmentSheet(BuildContext context, EnvironmentStatus env, VoidCallback onRecheck, {VoidCallback? onLogin}) {
   return showActionSheet<void>(
     context,
     (context) => SafeArea(
@@ -198,6 +246,12 @@ Future<void> showEnvironmentSheet(BuildContext context, EnvironmentStatus env, V
             Navigator.pop(context);
             onRecheck();
           },
+          onLogin: onLogin == null
+              ? null
+              : () {
+                  Navigator.pop(context);
+                  onLogin();
+                },
         ),
       ),
     ),

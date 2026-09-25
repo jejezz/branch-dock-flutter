@@ -22,6 +22,9 @@ import 'package:branch_dock/ui/tabs/remotes_tab.dart';
 import 'package:branch_dock/github/models.dart';
 import 'package:branch_dock/git/tags.dart';
 import 'package:branch_dock/release/release_flow.dart';
+import 'package:branch_dock/ui/onboarding.dart';
+import 'package:branch_dock/github/onboarding.dart';
+import 'package:branch_dock/ui/tabs/release_list.dart' show showRollbackDialog;
 import 'package:branch_dock/ui/markdown_editor.dart';
 import 'package:branch_dock/ui/merge_sheet.dart';
 import 'package:branch_dock/ui/tabs/pr_tab.dart';
@@ -363,5 +366,93 @@ void main() {
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('v0.5 screens: login guide, start screen init, fork card, version file, rollback, direct wizard', (tester) async {
+    // 로그인 안내: SSH 5단계 (로그인 안 됨 상태)
+    const loggedOut = EnvironmentStatus(gitVersion: '2.50.1', ghVersion: '2.101.0', checked: true);
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => showLoginSheet(context, loggedOut, onChanged: () {}, preferSsh: true),
+        child: const Text('login'),
+      );
+    }));
+    await tester.tap(find.text('login'));
+    await tester.pumpAndSettle();
+    expect(find.text('SSH 권장'), findsOneWidget);
+    expect(find.textContaining('gh auth login --hostname github.com --web --git-protocol ssh'), findsOneWidget);
+    expect(find.textContaining('ssh -T'), findsOneWidget);
+    await tester.tap(find.text('HTTPS'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('--git-protocol https'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    // 시작 화면: 저장소가 아닌 폴더 → git 저장소로 만들기
+    String? inited;
+    await pump(
+      tester,
+      StartScreen(
+        recent: const [],
+        environment: env,
+        failure: OpenFailure.notARepository,
+        failedPath: '/tmp/plain-folder',
+        onOpenFolder: () {},
+        onOpenRecent: (_) {},
+        onRemoveRecent: (_) {},
+        onCheckEnvironment: () {},
+        onInitRepository: (p) => inited = p,
+        onClone: () {},
+      ),
+    );
+    await tester.tap(find.text('이 폴더를 git 저장소로 만들기'));
+    expect(inited, '/tmp/plain-folder');
+    expect(find.text('GitHub에서 복제'), findsOneWidget);
+
+    // fork 카드
+    await pump(tester, ListView(children: [
+      ForkCard(fork: ForkInfo.parse('{"isFork":true,"nameWithOwner":"me/repo","parent":{"name":"repo","owner":{"login":"orig"}}}')!, repo: repo),
+    ]));
+    expect(find.text('orig/repo의 fork입니다'), findsOneWidget);
+    expect(find.textContaining('git remote add upstream https://github.com/orig/repo.git'), findsOneWidget);
+
+    // 버전 파일 지정, 되돌리기
+    await tester.runAsync(() async {
+      File('${repo.root}/Makefile').writeAsStringSync('APP_VERSION := 4.2.0\n');
+    });
+    final flow = ReleaseFlow(repo, ghReady: true);
+    addTearDown(flow.dispose);
+    await pump(tester, Builder(builder: (context) {
+      return Column(children: [
+        TextButton(onPressed: () => showVersionFileSheet(context, flow), child: const Text('vf')),
+        TextButton(onPressed: () => showRollbackDialog(context, repo, 'v0.3.0', hasRelease: true), child: const Text('rb')),
+      ]);
+    }));
+    await tester.tap(find.text('vf'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Makefile');
+    await tester.enterText(find.byType(TextField).last, r'APP_VERSION := (\S+)');
+    await tester.pumpAndSettle();
+    expect(find.text('찾았습니다: 4.2.0'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('rb'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('gh release delete v0.3.0 --yes'), findsOneWidget);
+    expect(find.textContaining('v0.3.1'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+
+    // 바로 커밋 방식 마법사: PR·병합은 건너뜀으로 그려진다.
+    flow
+      ..direct = true
+      ..checks.addAll({for (final c in ReleaseCheck.values) c: true})
+      ..next = SemVer.tryParse('0.2.0+4')
+      ..step = ReleaseStep.tag;
+    flow.tagChecks.addAll({for (final c in TagCheck.values) c: true});
+    await pump(tester, ReleaseTab(flow: flow, onShowChanges: () {}));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byIcon(Icons.redo_rounded), findsNWidgets(2));
+    expect(find.textContaining('원격에 내게 없는 커밋이 없다'), findsOneWidget);
   });
 }

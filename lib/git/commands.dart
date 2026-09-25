@@ -71,6 +71,9 @@ abstract final class GitCommands {
   static List<String> remoteRemove(String name) => ['git', 'remote', 'remove', name];
   static List<String> remoteSetUrl(String name, String url) => ['git', 'remote', 'set-url', name, url];
 
+  /// 원격의 기본 브랜치를 알아내 `<remote>/HEAD`로 기록한다 (upstream에서 가져올 때).
+  static List<String> remoteSetHeadAuto(String remote) => ['git', 'remote', 'set-head', remote, '--auto'];
+
   static const mergeAbort = ['git', 'merge', '--abort'];
   static const mergeContinue = ['git', 'commit', '--no-edit'];
   static const rebaseAbort = ['git', 'rebase', '--abort'];
@@ -297,9 +300,6 @@ abstract final class GhCommands {
   // --- 원격 (3.6 P1) ------------------------------------------------------
 
   static const repoViewFork = ['gh', 'repo', 'view', '--json', 'nameWithOwner,isFork,parent'];
-
-  /// 원격의 기본 브랜치를 알아내 `<remote>/HEAD`로 기록한다 (upstream에서 가져올 때).
-  static List<String> remoteSetHeadAuto(String remote) => ['git', 'remote', 'set-head', remote, '--auto'];
   static const setDefaultView = ['gh', 'repo', 'set-default', '--view'];
   static List<String> setDefault(String nameWithOwner) => ['gh', 'repo', 'set-default', nameWithOwner];
   static const browse = ['gh', 'browse'];
