@@ -117,47 +117,28 @@ class _ReleaseRow extends StatelessWidget {
     }
   }
 
+  /// 릴리스 삭제는 되돌릴 수 없어 태그 이름을 입력해야 지운다 (v0.6.1).
   Future<void> _delete(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     var cleanupTag = false;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          final command = GhCommands.releaseDelete(release.tag, cleanupTag: cleanupTag);
-          return AlertDialog(
-            title: Text(l10n.releaseDeleteTitle(release.tag)),
-            content: SizedBox(
-              width: 360,
-              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(l10n.releaseDeleteMessage),
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  value: cleanupTag,
-                  onChanged: (v) => setState(() => cleanupTag = v ?? false),
-                  title: Text(l10n.releaseDeleteTagToo(release.tag)),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                CommandPreview(commands: [command]),
-              ]),
-            ),
-            actions: [
-              TextButton(autofocus: true, onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(l10n.releaseDelete),
-              ),
-            ],
-          );
-        },
+    final ok = await confirmTyped(
+      context,
+      title: l10n.releaseDeleteTitle(release.tag),
+      message: l10n.releaseDeleteMessage,
+      expected: release.tag,
+      confirm: l10n.releaseDelete,
+      commands: [GhCommands.releaseDelete(release.tag)],
+      extra: StatefulBuilder(
+        builder: (context, setState) => CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          value: cleanupTag,
+          onChanged: (v) => setState(() => cleanupTag = v ?? false),
+          title: Text(l10n.releaseDeleteTagToo(release.tag)),
+        ),
       ),
     );
-    if (ok == true && context.mounted) {
+    if (ok && context.mounted) {
       await _run(context, GhCommands.releaseDelete(release.tag, cleanupTag: cleanupTag), l10n.doneReleaseDeleted(release.tag));
       if (cleanupTag) await repo.loadRemoteTags();
     }
@@ -309,10 +290,11 @@ Future<bool> showRollbackDialog(BuildContext context, RepoController repo, Strin
   ];
   if (commands.isEmpty) return false;
   final next = SemVer.tryParse(tag);
-  final ok = await confirmDanger(
+  final ok = await confirmTyped(
     context,
     title: l10n.rollbackConfirmTitle(tag),
     message: l10n.rollbackMessage(next == null ? '' : 'v${next.major}.${next.minor}.${next.patch + 1}'),
+    expected: tag,
     confirm: l10n.rollbackTitle,
     commands: commands,
   );

@@ -1667,7 +1667,7 @@ abstract class AppLocalizations {
   /// No description provided for @tagsDeleteRemoteMessage.
   ///
   /// In ko, this message translates to:
-  /// **'{target}에서 {tag} 태그를 삭제합니다. 이미 받아 간 사람이 있을 수 있으니, 같은 이름을 다시 쓰기보다 다음 번호를 쓰세요. 이 태그의 GitHub 릴리스는 그대로 남습니다.'**
+  /// **'{target}에서 {tag} 태그를 삭제합니다. 이미 받아 간 사람이 있을 수 있으니, 같은 이름을 다시 쓰기보다 다음 번호를 쓰세요.'**
   String tagsDeleteRemoteMessage(String tag, String target);
 
   /// No description provided for @tagsEmptyTitle.
@@ -4021,6 +4021,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'다른 브랜치의 버그 수정 하나만 급히 가져올 때 씁니다. 브랜치를 나중에 병합하면 같은 변경이 두 번 들어와 충돌할 수 있으니, 자주 쓰기보다 병합이 기본입니다.'**
   String get helpCherryPickWhy;
+
+  /// No description provided for @confirmTypeToContinue.
+  ///
+  /// In ko, this message translates to:
+  /// **'되돌릴 수 없습니다. 계속하려면 {text}을(를) 그대로 입력하세요.'**
+  String confirmTypeToContinue(String text);
+
+  /// No description provided for @tagsDeleteRemoteReleaseDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'⚠️ {tag}에는 GitHub 릴리스가 있습니다. 태그를 지우면 GitHub가 그 릴리스를 초안(비공개)으로 바꿉니다 — 파일은 남지만 사람들이 볼 수 없게 됩니다. 릴리스까지 정리하려면 태그 메뉴의 \'릴리스 되돌리기\'를 쓰세요.'**
+  String tagsDeleteRemoteReleaseDraft(String tag);
+
+  /// No description provided for @tagsPushCiTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 {count}개를 push하면 릴리스가 새로 만들어집니다'**
+  String tagsPushCiTitle(int count);
+
+  /// No description provided for @tagsPushCiMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 저장소는 태그를 push하면 {workflow}이(가) 태그마다 빌드하고 GitHub 릴리스를 만듭니다: {tags}. 일부러 지운 옛 릴리스라면 다시 생깁니다. 로컬에서만 지우려면 태그 메뉴의 \'삭제\'를 쓰세요.'**
+  String tagsPushCiMessage(String workflow, String tags);
+
+  /// No description provided for @tagsPushAnyway.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래도 push'**
+  String get tagsPushAnyway;
 }
 
 class _AppLocalizationsDelegate

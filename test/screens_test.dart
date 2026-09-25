@@ -536,4 +536,65 @@ void main() {
     expect(find.textContaining('cherry-pick 중'), findsOneWidget);
     expect(find.text('건너뛰기'), findsOneWidget);
   });
+
+  // v0.6.1: v0.5.0이 초안이 되고 v0.2.0·v0.5.0이 다시 빌드된 일의 재발 방지.
+  testWidgets('v0.6.1 guards: remote tag delete warns about draft, tag push warns about CI, typed confirm', (tester) async {
+    await tester.runAsync(() async {
+      Directory('${repo.root}/.github/workflows').createSync(recursive: true);
+      File('${repo.root}/.github/workflows/release.yml')
+          .writeAsStringSync('on:\n  push:\n    tags: ["v*"]\n  workflow_dispatch:\n');
+    });
+    var pushConfirmed = <bool>[];
+    await pump(tester, Builder(builder: (context) {
+      return Column(children: [
+        TextButton(
+          onPressed: () => showDeleteRemoteTagDialog(context, repo, 'v0.5.0', hasRelease: true),
+          child: const Text('deltag'),
+        ),
+        TextButton(
+          onPressed: () async => pushConfirmed.add(await confirmTagPush(context, repo, ['v0.2.0', 'v0.5.0'])),
+          child: const Text('pushtags'),
+        ),
+        TextButton(
+          onPressed: () async => pushConfirmed.add(await confirmTagPush(context, repo, ['experiment'])),
+          child: const Text('pushplain'),
+        ),
+        TextButton(onPressed: () => showRollbackDialog(context, repo, 'v0.6.0', hasRelease: true), child: const Text('rollback')),
+      ]);
+    }));
+
+    await tester.tap(find.text('deltag'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('초안(비공개)으로 바꿉니다'), findsOneWidget);
+    expect(find.textContaining('그대로 남습니다'), findsNothing);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('pushtags'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('release.yml'), findsOneWidget);
+    expect(find.textContaining('v0.2.0, v0.5.0'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+    expect(pushConfirmed, [false]);
+
+    // 버전 태그가 아니면 경고 없이 진행
+    await tester.tap(find.text('pushplain'));
+    await tester.pumpAndSettle();
+    expect(pushConfirmed, [false, true]);
+
+    // 되돌리기: 태그 이름을 입력해야 버튼이 켜진다.
+    await tester.tap(find.text('rollback'));
+    await tester.pumpAndSettle();
+    FilledButton button() => tester.widget<FilledButton>(find.widgetWithText(FilledButton, '릴리스 되돌리기'));
+    expect(button().onPressed, isNull);
+    await tester.enterText(find.byType(TextField), 'v0.6');
+    await tester.pump();
+    expect(button().onPressed, isNull);
+    await tester.enterText(find.byType(TextField), 'v0.6.0');
+    await tester.pump();
+    expect(button().onPressed, isNotNull);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+  });
 }

@@ -261,7 +261,7 @@
   "tagsDelete": "Delete",
   "tagsDeleteRemote": "Delete from remote",
   "tagsDeleteRemoteTitle": "Delete the remote tag?",
-  "tagsDeleteRemoteMessage": "Deletes {tag} from {target}. Others may already have it, so use the next number instead of reusing the name. Any GitHub release for this tag stays.",
+  "tagsDeleteRemoteMessage": "Deletes {tag} from {target}. Others may already have it, so use the next number instead of reusing the name.",
   "tagsEmptyTitle": "No tags yet",
   "tagsEmptyMessage": "A tag is a name for a specific commit, usually a release version like v1.0.0.",
   "tagsPushAfter": "Push to {remote} after creating",
@@ -653,5 +653,10 @@
   "helpCherryPickTitle": "Cherry-pick",
   "helpCherryPickWord": "To cherry-pick is to pick only the best cherries — take just what you want.",
   "helpCherryPickInGit": "Copies the change from one commit on another branch onto your current branch as a new commit. Same change, but a new commit (D') with a different hash.",
-  "helpCherryPickWhy": "Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default."
+  "helpCherryPickWhy": "Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default.",
+  "confirmTypeToContinue": "This can't be undone. Type {text} to continue.",
+  "tagsDeleteRemoteReleaseDraft": "⚠️ {tag} has a GitHub release. Deleting the tag makes GitHub turn that release into a draft (hidden) — the files stay but nobody can see them. To clean up the release too, use 'Roll back release' in the tag menu.",
+  "tagsPushCiTitle": "Pushing {count, plural, =1{this tag} other{these {count} tags}} creates releases",
+  "tagsPushCiMessage": "In this repository, pushing a tag makes {workflow} build it and create a GitHub release: {tags}. Old releases you deleted on purpose would come back. To remove them locally instead, use 'Delete' in the tag menu.",
+  "tagsPushAnyway": "Push anyway"
 }

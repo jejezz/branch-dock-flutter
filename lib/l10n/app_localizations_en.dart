@@ -987,7 +987,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String tagsDeleteRemoteMessage(String tag, String target) {
-    return 'Deletes $tag from $target. Others may already have it, so use the next number instead of reusing the name. Any GitHub release for this tag stays.';
+    return 'Deletes $tag from $target. Others may already have it, so use the next number instead of reusing the name.';
   }
 
   @override
@@ -2473,4 +2473,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helpCherryPickWhy =>
       'Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default.';
+
+  @override
+  String confirmTypeToContinue(String text) {
+    return 'This can\'t be undone. Type $text to continue.';
+  }
+
+  @override
+  String tagsDeleteRemoteReleaseDraft(String tag) {
+    return '⚠️ $tag has a GitHub release. Deleting the tag makes GitHub turn that release into a draft (hidden) — the files stay but nobody can see them. To clean up the release too, use \'Roll back release\' in the tag menu.';
+  }
+
+  @override
+  String tagsPushCiTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'these $count tags',
+      one: 'this tag',
+    );
+    return 'Pushing $_temp0 creates releases';
+  }
+
+  @override
+  String tagsPushCiMessage(String workflow, String tags) {
+    return 'In this repository, pushing a tag makes $workflow build it and create a GitHub release: $tags. Old releases you deleted on purpose would come back. To remove them locally instead, use \'Delete\' in the tag menu.';
+  }
+
+  @override
+  String get tagsPushAnyway => 'Push anyway';
 }
