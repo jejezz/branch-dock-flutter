@@ -2,9 +2,14 @@
 /// (PLAN.md 핵심 원칙 1). 순수 함수라 테스트로 확인한다.
 library;
 
+import 'commits.dart';
 import 'refs.dart';
+import 'tags.dart';
 
 enum PullMode { merge, rebase, fastForwardOnly }
+
+/// 다른 브랜치를 현재 브랜치로 합치는 방식 (PLAN.md 3.5).
+enum MergeMode { fastForward, mergeCommit, squash }
 
 abstract final class GitCommands {
   // --no-optional-locks: 상태를 읽을 때 index를 다시 쓰지 않는다. 쓰면
@@ -71,9 +76,66 @@ abstract final class GitCommands {
   static const rebaseContinue = ['git', '-c', 'core.editor=true', 'rebase', '--continue'];
 
   static const init = ['git', 'init', '-b', 'main'];
+
+  // --- 병합 (3.5) ---------------------------------------------------------
+
+  /// [base]에 없는 [branch]의 커밋 (들어올 커밋).
+  static List<String> incoming(String branch, {String base = 'HEAD'}) =>
+      ['git', 'log', '--format=$commitFormat', '$base..$branch'];
+
+  /// 종료 코드 0이면 [ancestor]가 [of]의 조상 — fast-forward 가능.
+  static List<String> isAncestor(String ancestor, String of) =>
+      ['git', 'merge-base', '--is-ancestor', ancestor, of];
+
+  /// squash는 병합 결과를 스테이징만 하므로 커밋이 한 번 더 필요하다.
+  static List<List<String>> merge(String branch, MergeMode mode, {String message = ''}) => switch (mode) {
+        MergeMode.fastForward => [
+            ['git', 'merge', '--ff-only', branch],
+          ],
+        MergeMode.mergeCommit => [
+            ['git', 'merge', '--no-ff', if (message.isNotEmpty) ...['-m', message], '--no-edit', branch],
+          ],
+        MergeMode.squash => [
+            ['git', 'merge', '--squash', branch],
+            commit(message),
+          ],
+      };
+
+  // --- 태그 (3.7) ---------------------------------------------------------
+
+  static const tags = ['git', 'for-each-ref', '--format=$tagFormat', 'refs/tags'];
+  static List<String> remoteTags(String remote) => ['git', 'ls-remote', '--tags', remote];
+
+  static List<String> createTag(String name, {String? message, String? target}) => [
+        'git',
+        'tag',
+        if (message != null) ...['-a', name, '-m', message] else name,
+        ?target,
+      ];
+
+  static List<String> pushTags(String remote, List<String> names) =>
+      ['git', 'push', remote, for (final n in names) 'refs/tags/$n'];
+  static List<String> deleteTag(String name) => ['git', 'tag', '-d', name];
+  static List<String> deleteRemoteTag(String remote, String name) =>
+      ['git', 'push', remote, '--delete', 'refs/tags/$name'];
+
+  // --- 릴리스 (3.8) -------------------------------------------------------
+
+  /// 마지막 태그 (없으면 실패).
+  static const lastTag = ['git', 'describe', '--tags', '--abbrev=0'];
+  static List<String> log({String? since, String until = 'HEAD'}) =>
+      ['git', 'log', '--format=$commitFormat', since == null ? until : '$since..$until'];
+  static List<String> changedFiles(String since) => ['git', 'diff', '--name-only', '$since..HEAD'];
+
+  /// 원격의 기본 브랜치 (`origin/main`).
+  static List<String> remoteHead(String remote) => ['git', 'rev-parse', '--abbrev-ref', '$remote/HEAD'];
+  static List<String> add(List<String> paths) => ['git', 'add', '--', ...paths];
+  static const pullFastForward = ['git', 'pull', '--ff-only'];
 }
 
 enum RepoVisibility { public, private }
+
+enum PrMergeMethod { merge, squash, rebase }
 
 abstract final class GhCommands {
   static const version = ['gh', '--version'];
@@ -101,4 +163,48 @@ abstract final class GhCommands {
         remote,
         if (push) '--push',
       ];
+
+  // --- PR (3.9) -----------------------------------------------------------
+
+  /// 브랜치의 PR (열린 것 우선). 없으면 실패.
+  static List<String> prView(String branchOrNumber, String fields) =>
+      ['gh', 'pr', 'view', branchOrNumber, '--json', fields];
+
+  /// 본문은 stdin으로 넘긴다 (--body-file -).
+  static List<String> prCreate({required String base, required String head, required String title, bool draft = false}) =>
+      ['gh', 'pr', 'create', '--base', base, '--head', head, '--title', title, '--body-file', '-', if (draft) '--draft'];
+
+  static List<String> prMerge(int number, PrMergeMethod method, {bool deleteBranch = true}) => [
+        'gh',
+        'pr',
+        'merge',
+        '$number',
+        '--${method.name}',
+        if (deleteBranch) '--delete-branch',
+      ];
+
+  // --- Actions·릴리스 (3.8.1, 3.8.5) --------------------------------------
+
+  static List<String> runList({required String branch, String? workflow, String? event, int limit = 5}) => [
+        'gh', 'run', 'list', '--branch', branch,
+        if (workflow != null) ...['--workflow', workflow],
+        if (event != null) ...['--event', event],
+        '--json', 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt',
+        '-L', '$limit',
+      ];
+  static List<String> runView(int id) => [
+        'gh', 'run', 'view', '$id', '--json',
+        'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,jobs',
+      ];
+  static List<String> runFailedLog(int id) => ['gh', 'run', 'view', '$id', '--log-failed'];
+  static List<String> runRerunFailed(int id) => ['gh', 'run', 'rerun', '$id', '--failed'];
+  static List<String> workflowRun(String file, String ref) => ['gh', 'workflow', 'run', file, '--ref', ref];
+
+  static List<String> releaseView(String tag) =>
+      ['gh', 'release', 'view', tag, '--json', 'tagName,name,url,isPrerelease,isDraft,body,assets'];
+
+  /// 노트는 stdin (--notes-file -).
+  static List<String> releaseCreate(String tag, {required String title, bool prerelease = false}) =>
+      ['gh', 'release', 'create', tag, '--title', title, '--notes-file', '-', '--verify-tag', if (prerelease) '--prerelease'];
+  static List<String> releaseEditNotes(String tag) => ['gh', 'release', 'edit', tag, '--notes-file', '-'];
 }
