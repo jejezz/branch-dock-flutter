@@ -2,7 +2,20 @@ import '../../l10n/app_localizations.dart';
 
 /// 개념 도움말 카드 (PLAN.md 3.13). v0.1.0은 동기화와 Pull 방식에 필요한
 /// 카드로 시작했고, v0.2.0에서 병합(squash)과 태그 카드를 더했다.
-enum Concept { fetchVsPull, upstream, fastForward, mergeCommit, rebase, squash, annotatedTag, stash, detachedHead, forceWithLease }
+enum Concept {
+  fetchVsPull,
+  upstream,
+  fastForward,
+  mergeCommit,
+  rebase,
+  squash,
+  annotatedTag,
+  stash,
+  detachedHead,
+  forceWithLease,
+  revert,
+  cherryPick,
+}
 
 /// 커밋 그래프 한 장면. 커밋은 왼쪽(오래됨) → 오른쪽(최신), 줄(lane)은 위에서 아래.
 class GraphScene {
@@ -335,6 +348,49 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
           ),
         ],
         links: [gitPush],
+      ),
+    Concept.revert => ConceptCard(
+        title: l10n.helpRevertTitle,
+        word: l10n.helpRevertWord,
+        inGit: l10n.helpRevertInGit,
+        why: l10n.helpRevertWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionAfterRevert,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit("C⁻", 3, 0, highlight: true)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', "C⁻")],
+            labels: const [GraphLabel('main', "C⁻", highlight: true)],
+          ),
+        ],
+        links: [const ConceptLink('git-revert', 'https://git-scm.com/docs/git-revert')],
+      ),
+    Concept.cherryPick => ConceptCard(
+        title: l10n.helpCherryPickTitle,
+        word: l10n.helpCherryPickWord,
+        inGit: l10n.helpCherryPickInGit,
+        why: l10n.helpCherryPickWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionBefore,
+            commits: const [_a, _b, GraphCommit('E', 2, 0), GraphCommit('C', 2, 1), GraphCommit('D', 3, 1)],
+            edges: const [('A', 'B'), ('B', 'E'), ('B', 'C'), ('C', 'D')],
+            labels: const [GraphLabel('main', 'E'), GraphLabel('feature', 'D')],
+          ),
+          GraphScene(
+            caption: l10n.helpCaptionAfterCherryPick,
+            commits: const [
+              _a,
+              _b,
+              GraphCommit('E', 2, 0),
+              GraphCommit("D'", 3, 0, highlight: true),
+              GraphCommit('C', 2, 1),
+              GraphCommit('D', 3, 1),
+            ],
+            edges: const [('A', 'B'), ('B', 'E'), ('E', "D'"), ('B', 'C'), ('C', 'D')],
+            labels: const [GraphLabel('main', "D'", highlight: true), GraphLabel('feature', 'D')],
+          ),
+        ],
+        links: [const ConceptLink('git-cherry-pick', 'https://git-scm.com/docs/git-cherry-pick')],
       ),
   };
 }

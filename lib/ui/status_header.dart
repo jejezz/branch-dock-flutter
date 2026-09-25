@@ -35,9 +35,12 @@ class StatusHeader extends StatelessWidget {
         StatusPill(
           tone: Tone.danger,
           icon: Icons.warning_amber_rounded,
-          label: repo.operation == RepoOperation.merging
-              ? l10n.headerMerging(s.conflicts.length)
-              : l10n.headerRebasing(s.conflicts.length),
+          label: switch (repo.operation) {
+            RepoOperation.rebasing => l10n.headerRebasing(s.conflicts.length),
+            RepoOperation.cherryPicking => l10n.headerCherryPicking(s.conflicts.length),
+            RepoOperation.reverting => l10n.headerReverting(s.conflicts.length),
+            _ => l10n.headerMerging(s.conflicts.length),
+          },
         ),
       if (s.ahead > 0)
         StatusPill(tone: Tone.primary, label: '↑${s.ahead}', tooltip: l10n.headerAheadTooltip(s.ahead)),
@@ -195,7 +198,7 @@ class _OperationButtons extends StatelessWidget {
     final repo = RepoScope.of(context);
     final l10n = AppLocalizations.of(context);
     final conflicts = repo.status.conflicts.length;
-    final rebasing = repo.operation == RepoOperation.rebasing;
+    final skip = repo.skipCommand;
     return Row(children: [
       Expanded(
         child: OutlinedButton(
@@ -205,9 +208,13 @@ class _OperationButtons extends StatelessWidget {
                   final ok = await confirmDanger(
                     context,
                     title: l10n.operationAbortTitle,
-                    message: rebasing ? l10n.operationAbortRebaseMessage : l10n.operationAbortMergeMessage,
+                    message: switch (repo.operation) {
+                      RepoOperation.rebasing => l10n.operationAbortRebaseMessage,
+                      RepoOperation.cherryPicking || RepoOperation.reverting => l10n.operationAbortPickMessage,
+                      _ => l10n.operationAbortMergeMessage,
+                    },
                     confirm: l10n.operationAbort,
-                    commands: [rebasing ? GitCommands.rebaseAbort : GitCommands.mergeAbort],
+                    commands: [repo.abortCommand],
                   );
                   if (ok && context.mounted) {
                     await RepoActions.report(context, repo.abortOperation(), done: l10n.doneAbort);
@@ -216,7 +223,7 @@ class _OperationButtons extends StatelessWidget {
           child: Text(l10n.operationAbort),
         ),
       ),
-      if (rebasing) ...[
+      if (skip != null) ...[
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Tooltip(
@@ -224,7 +231,7 @@ class _OperationButtons extends StatelessWidget {
             child: OutlinedButton(
               onPressed: repo.busy
                   ? null
-                  : () => RepoActions.report(context, repo.execute(GitCommands.rebaseSkip), done: l10n.doneSkip),
+                  : () => RepoActions.report(context, repo.execute(skip), done: l10n.doneSkip),
               child: Text(l10n.operationSkip),
             ),
           ),

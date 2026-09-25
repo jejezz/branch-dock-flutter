@@ -2177,4 +2177,158 @@ class AppLocalizationsKo extends AppLocalizations {
   String doneRollback(String tag) {
     return '$tag을(를) 되돌렸습니다';
   }
+
+  @override
+  String get diffBinary => '바이너리 파일이라 내용을 비교할 수 없습니다';
+
+  @override
+  String get diffEmpty => '차이가 없습니다';
+
+  @override
+  String diffTruncated(int count) {
+    return '너무 길어 처음 $count줄만 보여 줍니다. 전체는 편집기에서 보세요.';
+  }
+
+  @override
+  String headerCherryPicking(int count) {
+    return 'cherry-pick 중 · 충돌 $count';
+  }
+
+  @override
+  String headerReverting(int count) {
+    return '되돌리는 중 · 충돌 $count';
+  }
+
+  @override
+  String get operationAbortPickMessage =>
+      '시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
+
+  @override
+  String get historyBranchLabel => '볼 브랜치';
+
+  @override
+  String historyOtherBranchHint(String head) {
+    return '다른 브랜치의 기록입니다. 커밋 메뉴의 \'가져오기\'로 $head에 복사할 수 있습니다.';
+  }
+
+  @override
+  String get historyViewChanges => '변경 내용 보기';
+
+  @override
+  String historyFilesChanged(int count) {
+    return '바뀐 파일 $count개';
+  }
+
+  @override
+  String get historyMergeNote => '병합 커밋 — 병합으로 들어온 변경';
+
+  @override
+  String get historyRevert => '이 커밋 되돌리기 (revert)';
+
+  @override
+  String historyRevertTitle(String hash) {
+    return '$hash을(를) 되돌릴까요?';
+  }
+
+  @override
+  String get historyRevertMessage =>
+      '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록을 지우지 않으므로 이미 올린 커밋에도 안전합니다.';
+
+  @override
+  String get historyRevertUnpushed =>
+      '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 아직 올리지 않은 커밋이라면 \'직전 커밋 고치기\'나 새 커밋으로 고쳐도 됩니다.';
+
+  @override
+  String get historyCherryPick => '가져오기';
+
+  @override
+  String historyCherryPickMenu(String head) {
+    return '$head(으)로 가져오기 (cherry-pick)';
+  }
+
+  @override
+  String historyCherryPickTitle(String hash, String head) {
+    return '$hash을(를) $head(으)로 가져올까요?';
+  }
+
+  @override
+  String get historyCherryPickMessage =>
+      '이 커밋과 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 브랜치 전체를 병합하지 않고 필요한 커밋 하나만 가져올 때 씁니다.';
+
+  @override
+  String doneRevert(String hash) {
+    return '$hash을(를) 되돌리는 커밋을 만들었습니다';
+  }
+
+  @override
+  String doneCherryPick(String hash) {
+    return '$hash을(를) 가져왔습니다';
+  }
+
+  @override
+  String get menuPalette => '명령 팔레트';
+
+  @override
+  String get paletteHint => '무엇을 할까요? (예: push, 브랜치, 태그)';
+
+  @override
+  String get paletteEmpty => '맞는 명령이 없습니다';
+
+  @override
+  String get paletteGroupActions => '동작';
+
+  @override
+  String get paletteGroupTabs => '탭';
+
+  @override
+  String get paletteGroupBranches => '브랜치';
+
+  @override
+  String get paletteGroupRepos => '저장소';
+
+  @override
+  String paletteGoToTab(String name) {
+    return '$name 탭으로';
+  }
+
+  @override
+  String paletteSwitchTo(String branch) {
+    return '$branch(으)로 전환';
+  }
+
+  @override
+  String get helpCaptionAfterRevert => 'C를 지우지 않고, C를 거꾸로 적용한 새 커밋 C⁻를 더함';
+
+  @override
+  String get helpCaptionAfterCherryPick =>
+      'feature의 D와 같은 변경이 main에 새 커밋 D\'로 복사됨';
+
+  @override
+  String get helpRevertTitle => 'Revert (되돌리기)';
+
+  @override
+  String get helpRevertWord => 'revert는 \'원래 상태로 되돌리다\'.';
+
+  @override
+  String get helpRevertInGit =>
+      '커밋을 지우지 않고, 그 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록에는 원래 커밋과 되돌린 커밋이 모두 남습니다.';
+
+  @override
+  String get helpRevertWhy =>
+      '이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.';
+
+  @override
+  String get helpCherryPickTitle => 'Cherry-pick (골라 가져오기)';
+
+  @override
+  String get helpCherryPickWord =>
+      'cherry-pick은 \'체리를 하나씩 골라 따다\' — 좋은 것만 골라 가져오기.';
+
+  @override
+  String get helpCherryPickInGit =>
+      '다른 브랜치의 커밋 하나와 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 내용은 같지만 새 커밋(D\')이라 해시가 다릅니다.';
+
+  @override
+  String get helpCherryPickWhy =>
+      '다른 브랜치의 버그 수정 하나만 급히 가져올 때 씁니다. 브랜치를 나중에 병합하면 같은 변경이 두 번 들어와 충돌할 수 있으니, 자주 쓰기보다 병합이 기본입니다.';
 }
