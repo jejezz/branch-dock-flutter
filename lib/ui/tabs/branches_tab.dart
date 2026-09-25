@@ -57,7 +57,7 @@ class _BranchesTabState extends State<BranchesTab> {
           trailing: FilledButton.tonalIcon(
             onPressed: repo.busy || repo.status.unborn ? null : () => showCreateBranchSheet(context, repo),
             icon: const Icon(Icons.add_rounded, size: 16),
-            label: Text('${l10n.branchesNew}  ${shortcutLabel('B')}'),
+            label: Text('${l10n.branchesNew}  ${shortcutLabel('B')}', overflow: TextOverflow.ellipsis),
           ),
         ),
         Padding(

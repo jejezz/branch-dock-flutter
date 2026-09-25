@@ -31,7 +31,7 @@ class RemotesTab extends StatelessWidget {
           trailing: FilledButton.tonalIcon(
             onPressed: repo.busy ? null : () => showRemoteSheet(context, repo),
             icon: const Icon(Icons.add_rounded, size: 16),
-            label: Text(l10n.remotesAdd),
+            label: Text(l10n.remotesAdd, overflow: TextOverflow.ellipsis),
           ),
         ),
         if (repo.remotes.isEmpty)
@@ -109,7 +109,10 @@ class _RemoteCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(remote.name, style: theme.textTheme.titleSmall?.merge(AppFonts.userContent)),
+          Flexible(
+            child: Text(remote.name,
+                overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall?.merge(AppFonts.userContent)),
+          ),
           const SizedBox(width: AppSpacing.sm),
           StatusPill(label: hostLabel(l10n, remote.host), tone: github ? Tone.primary : Tone.neutral),
           const Spacer(),
