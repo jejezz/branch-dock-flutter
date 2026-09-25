@@ -124,7 +124,43 @@ abstract final class GitCommands {
 
   /// 태그나 커밋 위치로 이동 (분리된 HEAD).
   static List<String> switchDetach(String ref) => ['git', 'switch', '--detach', ref];
-  static List<String> history({int limit = 200}) => ['git', 'log', '-n', '$limit', '--format=$historyFormat'];
+  /// [ref]를 주면 그 브랜치의 기록 (cherry-pick할 커밋 고르기, PLAN.md 3.11 P2).
+  static List<String> history({int limit = 200, String? ref}) =>
+      ['git', 'log', '-n', '$limit', '--format=$historyFormat', ?ref];
+
+  // --- diff (3.2 P2) ------------------------------------------------------
+
+  static List<String> diffWorktree(String path) => ['git', 'diff', '--no-color', '--no-ext-diff', '--', path];
+  static List<String> diffStaged(String path) => ['git', 'diff', '--cached', '--no-color', '--no-ext-diff', '--', path];
+
+  /// 추적 안 된 파일은 빈 파일과 비교한다 (차이가 있으면 종료 코드 1).
+  static List<String> diffUntracked(String path) =>
+      ['git', 'diff', '--no-color', '--no-ext-diff', '--no-index', '--', '/dev/null', path];
+
+  /// 커밋이 바꾼 파일. 병합 커밋은 첫 부모와 비교하고, 첫 커밋은 --root.
+  static List<String> commitFiles(String hash, {String? parent}) => parent == null
+      ? ['git', 'show', '--root', '--format=', '--name-status', '--no-color', hash]
+      : ['git', 'diff', '--name-status', '--no-color', parent, hash];
+  static List<String> commitFileDiff(String hash, String path, {String? parent}) => parent == null
+      ? ['git', 'show', '--root', '--format=', '--no-color', '--no-ext-diff', hash, '--', path]
+      : ['git', 'diff', '--no-color', '--no-ext-diff', parent, hash, '--', path];
+
+  // --- revert·cherry-pick (3.11 P2) --------------------------------------
+
+  /// 커밋을 되돌리는 새 커밋. 병합 커밋은 첫 부모 쪽을 남긴다 (-m 1).
+  static List<String> revert(String hash, {bool merge = false}) =>
+      ['git', 'revert', '--no-edit', if (merge) ...['-m', '1'], hash];
+
+  /// 다른 브랜치의 커밋을 현재 브랜치로 복사한다.
+  static List<String> cherryPick(String hash, {bool merge = false}) =>
+      ['git', 'cherry-pick', if (merge) ...['-m', '1'], hash];
+
+  static const cherryPickContinue = ['git', '-c', 'core.editor=true', 'cherry-pick', '--continue'];
+  static const cherryPickAbort = ['git', 'cherry-pick', '--abort'];
+  static const cherryPickSkip = ['git', 'cherry-pick', '--skip'];
+  static const revertContinue = ['git', '-c', 'core.editor=true', 'revert', '--continue'];
+  static const revertAbort = ['git', 'revert', '--abort'];
+  static const revertSkip = ['git', 'revert', '--skip'];
 
   /// 추적 브랜치에 없는 내 커밋 (올릴 커밋).
   static const unpushed = ['git', 'rev-list', '@{u}..HEAD'];

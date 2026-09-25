@@ -2,7 +2,7 @@
 library;
 
 /// [GitCommands.history]의 --format. 레코드 구분 %x1e.
-const historyFormat = '%H%x00%h%x00%s%x00%D%x00%ct%x00%an%x1e';
+const historyFormat = '%H%x00%h%x00%s%x00%D%x00%ct%x00%an%x00%P%x1e';
 
 /// [GitCommands.stashList]의 --format.
 const stashFormat = '%gd%x00%s%x00%ct';
@@ -17,6 +17,7 @@ class LogEntry {
     this.isHead = false,
     this.date,
     this.author = '',
+    this.parents = const [],
   });
 
   final String hash;
@@ -29,6 +30,11 @@ class LogEntry {
   final bool isHead;
   final DateTime? date;
   final String author;
+
+  /// 부모 커밋. 둘 이상이면 병합 커밋, 없으면 첫 커밋.
+  final List<String> parents;
+
+  bool get isMerge => parents.length > 1;
 
   static List<LogEntry> parse(String output) {
     final list = <LogEntry>[];
@@ -63,6 +69,7 @@ class LogEntry {
         isHead: head,
         date: seconds == null ? null : DateTime.fromMillisecondsSinceEpoch(seconds * 1000),
         author: f[5],
+        parents: f.length > 6 ? f[6].split(' ').where((p) => p.isNotEmpty).toList() : const [],
       ));
     }
     return list;

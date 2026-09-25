@@ -13,7 +13,7 @@ import '../git/tags.dart';
 import '../github/models.dart';
 
 /// 병합·rebase가 끝나지 않은 상태.
-enum RepoOperation { none, merging, rebasing }
+enum RepoOperation { none, merging, rebasing, cherryPicking, reverting }
 
 /// 저장소를 열지 못한 이유.
 enum OpenFailure { notFound, notARepository }
@@ -251,6 +251,8 @@ class RepoController extends ChangeNotifier {
     bool exists(String name) => FileSystemEntity.typeSync('$gitDir/$name') != FileSystemEntityType.notFound;
     if (exists('rebase-merge') || exists('rebase-apply')) return RepoOperation.rebasing;
     if (exists('MERGE_HEAD')) return RepoOperation.merging;
+    if (exists('CHERRY_PICK_HEAD')) return RepoOperation.cherryPicking;
+    if (exists('REVERT_HEAD')) return RepoOperation.reverting;
     return RepoOperation.none;
   }
 
@@ -365,15 +367,30 @@ class RepoController extends ChangeNotifier {
     return execute(GitCommands.switchTrack(b.name));
   }
 
-  Future<CommandResult> continueOperation() => execute(switch (operation) {
+  List<String> get continueCommand => switch (operation) {
         RepoOperation.rebasing => GitCommands.rebaseContinue,
+        RepoOperation.cherryPicking => GitCommands.cherryPickContinue,
+        RepoOperation.reverting => GitCommands.revertContinue,
         _ => GitCommands.mergeContinue,
-      });
+      };
 
-  Future<CommandResult> abortOperation() => execute(switch (operation) {
+  List<String> get abortCommand => switch (operation) {
         RepoOperation.rebasing => GitCommands.rebaseAbort,
+        RepoOperation.cherryPicking => GitCommands.cherryPickAbort,
+        RepoOperation.reverting => GitCommands.revertAbort,
         _ => GitCommands.mergeAbort,
-      });
+      };
+
+  /// 병합에는 건너뛰기가 없다.
+  List<String>? get skipCommand => switch (operation) {
+        RepoOperation.rebasing => GitCommands.rebaseSkip,
+        RepoOperation.cherryPicking => GitCommands.cherryPickSkip,
+        RepoOperation.reverting => GitCommands.revertSkip,
+        _ => null,
+      };
+
+  Future<CommandResult> continueOperation() => execute(continueCommand);
+  Future<CommandResult> abortOperation() => execute(abortCommand);
 
   // --- 새로 고침 감시 -----------------------------------------------------
 
