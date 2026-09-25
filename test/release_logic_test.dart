@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:branch_dock/git/commands.dart';
 import 'package:branch_dock/git/commits.dart';
 import 'package:branch_dock/git/tags.dart';
@@ -145,5 +147,48 @@ void main() {
     expect(GitCommands.createTag('light', target: 'abc'), ['git', 'tag', 'light', 'abc']);
     expect(GitCommands.pushTags('origin', ['v1', 'v2']), ['git', 'push', 'origin', 'refs/tags/v1', 'refs/tags/v2']);
     expect(GhCommands.prMerge(4, PrMergeMethod.merge), ['gh', 'pr', 'merge', '4', '--merge', '--delete-branch']);
+  });
+
+  group('v0.3 models and commands', () {
+    test('release list, workflow list, PR list item, run title', () {
+      final rel = ReleaseSummary.parseList('[{"isDraft":false,"isLatest":true,"isPrerelease":false,'
+          '"name":"Branch Dock v0.2.2","publishedAt":"2026-09-25T08:09:07Z","tagName":"v0.2.2"},'
+          '{"isDraft":true,"isLatest":false,"isPrerelease":true,"name":"","publishedAt":"","tagName":"v0.3.0-rc.1"}]');
+      expect((rel.first.tag, rel.first.latest, rel.first.published?.year), ('v0.2.2', true, 2026));
+      expect((rel.last.draft, rel.last.prerelease, rel.last.published), (true, true, null));
+
+      final wf = Workflow.parseList('[{"id":366595003,"name":"Release","path":".github/workflows/release.yml","state":"active"}]');
+      expect((wf.single.file, wf.single.active), ('release.yml', true));
+
+      final prs = PullRequest.parseList('[{"author":{"login":"jejezz"},"baseRefName":"main","headRefName":"fix/x",'
+          '"isDraft":false,"number":9,"reviewDecision":"","state":"OPEN","title":"t","updatedAt":"2026-09-25T08:00:19Z",'
+          '"url":"u","statusCheckRollup":[]}]');
+      expect((prs.single.author, prs.single.updated?.hour), ('jejezz', 8));
+
+      final run = WorkflowRun.parseList('[{"databaseId":1,"displayTitle":"Merge pull request #9","status":"completed",'
+          '"conclusion":"success","workflowName":"Release"}]').single;
+      expect(run.title, 'Merge pull request #9');
+    });
+
+    test('commands', () {
+      expect(GhCommands.prList(PrFilter.mine, 'number'), ['gh', 'pr', 'list', '--state', 'open', '--author', '@me', '--json', 'number', '-L', '30']);
+      expect(GhCommands.prList(PrFilter.reviewRequested, 'number'),
+          contains('review-requested:@me'));
+      expect(GhCommands.prList(PrFilter.open, 'number'), isNot(contains('--author')));
+      expect(GhCommands.prCheckout(7), ['gh', 'pr', 'checkout', '7']);
+      expect(GhCommands.releaseSetPrerelease('v1.0.0', false), ['gh', 'release', 'edit', 'v1.0.0', '--prerelease=false']);
+      expect(GhCommands.releaseDelete('v1.0.0', cleanupTag: true), ['gh', 'release', 'delete', 'v1.0.0', '--yes', '--cleanup-tag']);
+      expect(GhCommands.runCancel(5), ['gh', 'run', 'cancel', '5']);
+    });
+
+    test('detectDispatchWorkflows', () {
+      final dir = Directory.systemTemp.createTempSync('bd_wf');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      Directory('${dir.path}/.github/workflows').createSync(recursive: true);
+      File('${dir.path}/.github/workflows/release.yml').writeAsStringSync('on:\n  push:\n    tags: ["v*"]\n  workflow_dispatch:\n');
+      File('${dir.path}/.github/workflows/ci.yml').writeAsStringSync('on:\n  pull_request:\n');
+      File('${dir.path}/.github/workflows/nightly.yaml').writeAsStringSync('on:\n  schedule:\n    - cron: "0 0 * * *"\n  workflow_dispatch:\n');
+      expect(detectDispatchWorkflows(dir.path), ['nightly.yaml', 'release.yml']);
+    });
   });
 }

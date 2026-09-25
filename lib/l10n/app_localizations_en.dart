@@ -1567,4 +1567,169 @@ class AppLocalizationsEn extends AppLocalizations {
   String prBaseNotDefault(String base) {
     return 'Merges into a branch other than the default ($base) — for a PR stacked on another feature branch.';
   }
+
+  @override
+  String get tabCi => 'CI';
+
+  @override
+  String get ciTitle => 'Workflow runs';
+
+  @override
+  String get ciNotGitHubMessage =>
+      'Actions need a GitHub repository — gh only works with GitHub.';
+
+  @override
+  String ciEmptyTitle(String branch) {
+    return 'No runs on $branch yet';
+  }
+
+  @override
+  String get ciEmptyMessage =>
+      'Runs triggered by pushes, pull requests or tags show up here.';
+
+  @override
+  String get ciRerun => 'Re-run';
+
+  @override
+  String get ciCancel => 'Cancel run';
+
+  @override
+  String get ciDispatch => 'Run workflow';
+
+  @override
+  String get ciDispatchNeedsPush =>
+      'Manual runs need a branch that\'s on the remote. Publish it first.';
+
+  @override
+  String ciDispatchTitle(String file) {
+    return 'Run $file';
+  }
+
+  @override
+  String ciDispatchMessage(String branch) {
+    return 'Runs the workflow on $branch. For workflows that need inputs, run them in the browser.';
+  }
+
+  @override
+  String get ciDispatchConfirm => 'Run';
+
+  @override
+  String doneDispatched(String file) {
+    return 'Started $file';
+  }
+
+  @override
+  String get doneRunCancelled => 'Run cancelled';
+
+  @override
+  String notifyRunTitle(String name, String state) {
+    return '$name $state';
+  }
+
+  @override
+  String notifyReleaseRun(String tag, String state) {
+    return '$tag release CI $state';
+  }
+
+  @override
+  String notifyManualBuild(String state) {
+    return 'Build check $state';
+  }
+
+  @override
+  String get prFilterMine => 'Mine';
+
+  @override
+  String get prFilterReview => 'To review';
+
+  @override
+  String get prFilterOpen => 'All open';
+
+  @override
+  String get prListEmpty => 'No open pull requests';
+
+  @override
+  String get prCurrentBranch => 'Current branch';
+
+  @override
+  String get prCheckout => 'Check out this PR';
+
+  @override
+  String get prCheckoutWhy =>
+      'Fetches the PR\'s branch and switches to it — to try it out or fix something.';
+
+  @override
+  String donePrCheckout(int number, String branch) {
+    return 'Switched to $branch from PR #$number';
+  }
+
+  @override
+  String get releasesTitle => 'Releases';
+
+  @override
+  String get releasesEmpty => 'No GitHub releases';
+
+  @override
+  String get releasesLoadFailed => 'Couldn\'t load releases';
+
+  @override
+  String get releaseLatestPill => 'Latest';
+
+  @override
+  String get releaseDraft => 'Draft';
+
+  @override
+  String get releaseMakeFinal => 'Mark as full release';
+
+  @override
+  String get releaseMakePrerelease => 'Mark as pre-release';
+
+  @override
+  String get releasePublishDraft => 'Publish draft';
+
+  @override
+  String get releaseDelete => 'Delete release';
+
+  @override
+  String releaseDeleteTitle(String tag) {
+    return 'Delete the $tag release?';
+  }
+
+  @override
+  String get releaseDeleteMessage =>
+      'The GitHub release and its files are removed. People may have downloaded them already.';
+
+  @override
+  String releaseDeleteTagToo(String tag) {
+    return 'Also delete the $tag tag on GitHub (the local tag stays)';
+  }
+
+  @override
+  String doneReleaseDeleted(String tag) {
+    return 'Deleted the $tag release';
+  }
+
+  @override
+  String doneReleaseMadeFinal(String tag) {
+    return '$tag is now a full release';
+  }
+
+  @override
+  String doneReleaseMadePrerelease(String tag) {
+    return '$tag is now a pre-release';
+  }
+
+  @override
+  String doneReleasePublished(String tag) {
+    return 'Published the $tag draft';
+  }
+
+  @override
+  String get notesEditTab => 'Edit';
+
+  @override
+  String get notesPreviewTab => 'Preview';
+
+  @override
+  String get notesEmpty => 'Nothing to preview';
 }

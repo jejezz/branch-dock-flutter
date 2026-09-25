@@ -137,6 +137,9 @@ enum RepoVisibility { public, private }
 
 enum PrMergeMethod { merge, squash, rebase }
 
+/// PR 목록 필터 (PLAN.md 3.9): 내가 만든 것 / 리뷰 요청받은 것 / 열린 것 전부.
+enum PrFilter { mine, reviewRequested, open }
+
 abstract final class GhCommands {
   static const version = ['gh', '--version'];
   static const authStatus = ['gh', 'auth', 'status', '--json', 'hosts'];
@@ -174,6 +177,19 @@ abstract final class GhCommands {
   static List<String> prCreate({required String base, required String head, required String title, bool draft = false}) =>
       ['gh', 'pr', 'create', '--base', base, '--head', head, '--title', title, '--body-file', '-', if (draft) '--draft'];
 
+  static List<String> prList(PrFilter filter, String fields, {int limit = 30}) => [
+        'gh', 'pr', 'list', '--state', 'open',
+        ...switch (filter) {
+          PrFilter.mine => ['--author', '@me'],
+          PrFilter.reviewRequested => ['--search', 'review-requested:@me'],
+          PrFilter.open => const <String>[],
+        },
+        '--json', fields, '-L', '$limit',
+      ];
+
+  /// PR 브랜치를 로컬로 가져와 전환한다.
+  static List<String> prCheckout(int number) => ['gh', 'pr', 'checkout', '$number'];
+
   static List<String> prMerge(int number, PrMergeMethod method, {bool deleteBranch = true}) => [
         'gh',
         'pr',
@@ -189,15 +205,18 @@ abstract final class GhCommands {
         'gh', 'run', 'list', '--branch', branch,
         if (workflow != null) ...['--workflow', workflow],
         if (event != null) ...['--event', event],
-        '--json', 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt',
+        '--json', 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,displayTitle',
         '-L', '$limit',
       ];
   static List<String> runView(int id) => [
         'gh', 'run', 'view', '$id', '--json',
-        'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,jobs',
+        'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,jobs,displayTitle',
       ];
   static List<String> runFailedLog(int id) => ['gh', 'run', 'view', '$id', '--log-failed'];
   static List<String> runRerunFailed(int id) => ['gh', 'run', 'rerun', '$id', '--failed'];
+  static List<String> runRerun(int id) => ['gh', 'run', 'rerun', '$id'];
+  static List<String> runCancel(int id) => ['gh', 'run', 'cancel', '$id'];
+  static const workflowList = ['gh', 'workflow', 'list', '--json', 'id,name,path,state'];
   static List<String> workflowRun(String file, String ref) => ['gh', 'workflow', 'run', file, '--ref', ref];
 
   static List<String> releaseView(String tag) =>
@@ -207,4 +226,16 @@ abstract final class GhCommands {
   static List<String> releaseCreate(String tag, {required String title, bool prerelease = false}) =>
       ['gh', 'release', 'create', tag, '--title', title, '--notes-file', '-', '--verify-tag', if (prerelease) '--prerelease'];
   static List<String> releaseEditNotes(String tag) => ['gh', 'release', 'edit', tag, '--notes-file', '-'];
+
+  // --- 릴리스 관리 (3.8.6) ------------------------------------------------
+
+  static List<String> releaseList({int limit = 30}) =>
+      ['gh', 'release', 'list', '--json', 'tagName,name,isLatest,isPrerelease,isDraft,publishedAt', '-L', '$limit'];
+  static List<String> releaseSetPrerelease(String tag, bool prerelease) =>
+      ['gh', 'release', 'edit', tag, '--prerelease=$prerelease'];
+  static List<String> releasePublishDraft(String tag) => ['gh', 'release', 'edit', tag, '--draft=false'];
+
+  /// [cleanupTag]면 태그도 함께 지운다 (로컬 태그는 남는다).
+  static List<String> releaseDelete(String tag, {bool cleanupTag = false}) =>
+      ['gh', 'release', 'delete', tag, '--yes', if (cleanupTag) '--cleanup-tag'];
 }

@@ -2587,6 +2587,270 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'기본 브랜치({base})가 아닌 곳으로 합칩니다. 다른 기능 브랜치 위에 쌓는 PR일 때 씁니다.'**
   String prBaseNotDefault(String base);
+
+  /// No description provided for @tabCi.
+  ///
+  /// In ko, this message translates to:
+  /// **'CI'**
+  String get tabCi;
+
+  /// No description provided for @ciTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'CI 실행'**
+  String get ciTitle;
+
+  /// No description provided for @ciNotGitHubMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'Actions는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.'**
+  String get ciNotGitHubMessage;
+
+  /// No description provided for @ciEmptyTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}에는 아직 실행이 없습니다'**
+  String ciEmptyTitle(String branch);
+
+  /// No description provided for @ciEmptyMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'push나 PR, 태그로 워크플로가 돌면 여기에 나옵니다.'**
+  String get ciEmptyMessage;
+
+  /// No description provided for @ciRerun.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 실행'**
+  String get ciRerun;
+
+  /// No description provided for @ciCancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소'**
+  String get ciCancel;
+
+  /// No description provided for @ciDispatch.
+  ///
+  /// In ko, this message translates to:
+  /// **'수동 실행'**
+  String get ciDispatch;
+
+  /// No description provided for @ciDispatchNeedsPush.
+  ///
+  /// In ko, this message translates to:
+  /// **'수동 실행은 원격에 있는 브랜치에서만 할 수 있습니다. 먼저 게시하세요.'**
+  String get ciDispatchNeedsPush;
+
+  /// No description provided for @ciDispatchTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{file} 수동 실행'**
+  String ciDispatchTitle(String file);
+
+  /// No description provided for @ciDispatchMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch} 브랜치로 워크플로를 실행합니다. 입력이 필요한 워크플로는 브라우저에서 실행하세요.'**
+  String ciDispatchMessage(String branch);
+
+  /// No description provided for @ciDispatchConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'실행'**
+  String get ciDispatchConfirm;
+
+  /// No description provided for @doneDispatched.
+  ///
+  /// In ko, this message translates to:
+  /// **'{file}을(를) 실행했습니다'**
+  String doneDispatched(String file);
+
+  /// No description provided for @doneRunCancelled.
+  ///
+  /// In ko, this message translates to:
+  /// **'실행을 취소했습니다'**
+  String get doneRunCancelled;
+
+  /// No description provided for @notifyRunTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} {state}'**
+  String notifyRunTitle(String name, String state);
+
+  /// No description provided for @notifyReleaseRun.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 릴리스 CI {state}'**
+  String notifyReleaseRun(String tag, String state);
+
+  /// No description provided for @notifyManualBuild.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 전 수동 빌드 {state}'**
+  String notifyManualBuild(String state);
+
+  /// No description provided for @prFilterMine.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 PR'**
+  String get prFilterMine;
+
+  /// No description provided for @prFilterReview.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰 요청'**
+  String get prFilterReview;
+
+  /// No description provided for @prFilterOpen.
+  ///
+  /// In ko, this message translates to:
+  /// **'전체'**
+  String get prFilterOpen;
+
+  /// No description provided for @prListEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'열린 PR이 없습니다'**
+  String get prListEmpty;
+
+  /// No description provided for @prCurrentBranch.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 브랜치'**
+  String get prCurrentBranch;
+
+  /// No description provided for @prCheckout.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 PR 브랜치로 체크아웃'**
+  String get prCheckout;
+
+  /// No description provided for @prCheckoutWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR 브랜치를 내 컴퓨터로 가져와 전환합니다. 직접 실행해 보거나 고칠 때 씁니다.'**
+  String get prCheckoutWhy;
+
+  /// No description provided for @donePrCheckout.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR #{number}의 {branch}(으)로 전환했습니다'**
+  String donePrCheckout(int number, String branch);
+
+  /// No description provided for @releasesTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스'**
+  String get releasesTitle;
+
+  /// No description provided for @releasesEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 릴리스가 없습니다'**
+  String get releasesEmpty;
+
+  /// No description provided for @releasesLoadFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 목록을 불러오지 못했습니다'**
+  String get releasesLoadFailed;
+
+  /// No description provided for @releaseLatestPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'최신'**
+  String get releaseLatestPill;
+
+  /// No description provided for @releaseDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'초안'**
+  String get releaseDraft;
+
+  /// No description provided for @releaseMakeFinal.
+  ///
+  /// In ko, this message translates to:
+  /// **'정식 릴리스로 바꾸기'**
+  String get releaseMakeFinal;
+
+  /// No description provided for @releaseMakePrerelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'프리릴리스로 바꾸기'**
+  String get releaseMakePrerelease;
+
+  /// No description provided for @releasePublishDraft.
+  ///
+  /// In ko, this message translates to:
+  /// **'초안 게시'**
+  String get releasePublishDraft;
+
+  /// No description provided for @releaseDelete.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 삭제'**
+  String get releaseDelete;
+
+  /// No description provided for @releaseDeleteTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 릴리스를 삭제할까요?'**
+  String releaseDeleteTitle(String tag);
+
+  /// No description provided for @releaseDeleteMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub 릴리스와 올라간 파일이 사라집니다. 이미 받아 간 사람이 있을 수 있습니다.'**
+  String get releaseDeleteMessage;
+
+  /// No description provided for @releaseDeleteTagToo.
+  ///
+  /// In ko, this message translates to:
+  /// **'GitHub의 {tag} 태그도 삭제 (로컬 태그는 남음)'**
+  String releaseDeleteTagToo(String tag);
+
+  /// No description provided for @doneReleaseDeleted.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 릴리스를 삭제했습니다'**
+  String doneReleaseDeleted(String tag);
+
+  /// No description provided for @doneReleaseMadeFinal.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}을(를) 정식 릴리스로 바꿨습니다'**
+  String doneReleaseMadeFinal(String tag);
+
+  /// No description provided for @doneReleaseMadePrerelease.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}을(를) 프리릴리스로 바꿨습니다'**
+  String doneReleaseMadePrerelease(String tag);
+
+  /// No description provided for @doneReleasePublished.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 초안을 게시했습니다'**
+  String doneReleasePublished(String tag);
+
+  /// No description provided for @notesEditTab.
+  ///
+  /// In ko, this message translates to:
+  /// **'편집'**
+  String get notesEditTab;
+
+  /// No description provided for @notesPreviewTab.
+  ///
+  /// In ko, this message translates to:
+  /// **'미리 보기'**
+  String get notesPreviewTab;
+
+  /// No description provided for @notesEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'내용이 없습니다'**
+  String get notesEmpty;
 }
 
 class _AppLocalizationsDelegate

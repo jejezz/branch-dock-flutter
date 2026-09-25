@@ -22,6 +22,7 @@ import 'package:branch_dock/ui/tabs/remotes_tab.dart';
 import 'package:branch_dock/github/models.dart';
 import 'package:branch_dock/git/tags.dart';
 import 'package:branch_dock/release/release_flow.dart';
+import 'package:branch_dock/ui/markdown_editor.dart';
 import 'package:branch_dock/ui/merge_sheet.dart';
 import 'package:branch_dock/ui/tabs/pr_tab.dart';
 import 'package:branch_dock/ui/tabs/release_tab.dart';
@@ -186,11 +187,9 @@ void main() {
 
     final flow = ReleaseFlow(repo, ghReady: true);
     addTearDown(flow.dispose);
-    await pump(tester, ReleaseTab(flow: flow, onShowChanges: () {}));
-    expect(find.byIcon(Icons.rocket_launch_rounded), findsOneWidget);
-
-    // 각 단계를 직접 세팅해 그려 본다.
+    // 각 단계를 직접 세팅해 그려 본다. 개요(릴리스 목록)는 gh를 불러서 건너뛴다.
     flow.checks.addAll({for (final c in ReleaseCheck.values) c: c != ReleaseCheck.synced});
+    await pump(tester, ReleaseTab(flow: flow, onShowChanges: () {}));
     flow.lastTag = 'v0.1.0';
     flow.buildRun = WorkflowRun.parse('{"databaseId":1,"workflowName":"Release","status":"in_progress","conclusion":"",'
         '"url":"u","jobs":[{"name":"build-macos","status":"in_progress","conclusion":"","startedAt":"2026-09-25T03:38:38Z"}]}');
@@ -252,5 +251,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('--base develop --head $head'), findsOneWidget);
     expect(find.textContaining('기본 브랜치(main)가 아닌 곳'), findsOneWidget);
+  });
+
+  testWidgets('markdown editor previews notes', (tester) async {
+    final notes = TextEditingController(text: '## 새 기능\n\n- **태그 탭** 추가\n- [링크](https://example.com)');
+    addTearDown(notes.dispose);
+    await pump(tester, ListView(children: [MarkdownEditor(controller: notes, label: 'notes')]));
+    expect(find.byType(TextField), findsOneWidget);
+    await tester.tap(find.text('미리 보기'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing);
+    expect(find.textContaining('새 기능', findRichText: true), findsWidgets);
+  });
+
+  testWidgets('PR sheet offers checkout for another branch', (tester) async {
+    final pr = PullRequest.parse('{"number":21,"title":"feat: 다른 사람 PR","url":"https://github.com/me/repo/pull/21",'
+        '"state":"OPEN","isDraft":false,"mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviewDecision":"",'
+        '"statusCheckRollup":[],"headRefName":"feat/other","baseRefName":"main"}')!;
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(onPressed: () => showPrSheetWith(context, repo, pr), child: const Text('open'));
+    }));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('gh pr checkout 21'), findsOneWidget);
+    expect(find.text('이 PR 브랜치로 체크아웃'), findsOneWidget);
   });
 }

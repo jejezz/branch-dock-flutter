@@ -10,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../app_identity.dart';
 import '../git/remotes.dart';
+import '../github/models.dart';
 import '../l10n/app_localizations.dart';
 import '../repo/environment.dart';
 import '../repo/next_action.dart';
@@ -23,6 +24,7 @@ import 'repo_scope.dart';
 import 'services.dart';
 import 'start_screen.dart';
 import 'status_header.dart';
+import 'tabs/actions_tab.dart';
 import 'tabs/branches_tab.dart';
 import 'tabs/changes_tab.dart';
 import 'tabs/pr_tab.dart';
@@ -57,8 +59,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   final _commitFocus = FocusNode();
   late final TabController _tabs = TabController(length: _tabCount, vsync: this);
 
-  /// 변경 · 브랜치 · 태그 · 원격 · 릴리스 · PR (UI_UX.md §3 D, CI 탭은 v0.3.0).
-  static const _tabCount = 6;
+  /// 변경 · 브랜치 · 태그 · 원격 · 릴리스 · PR · CI (UI_UX.md §3 D).
+  static const _tabCount = 7;
   static const _tabChanges = 0, _tabBranches = 1, _tabTags = 2, _tabRemotes = 3, _tabRelease = 4;
   bool _started = false;
 
@@ -119,7 +121,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     _flow?.dispose();
     _repo?.dispose();
     await _services.prefs.addRecent(repo.root);
-    final flow = ReleaseFlow(repo, ghReady: _env.ghReady);
+    final flow = ReleaseFlow(repo, ghReady: _env.ghReady)..onRunFinished = _onReleaseRunFinished;
     repo.ghReady = _env.ghReady;
     unawaited(repo.loadHeadPr());
     setState(() {
@@ -133,6 +135,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     if (_isDesktop) windowManager.setTitle('${AppIdentity.displayName} — ${repo.name}');
     // 진행 중이던 릴리스가 있으면 이어서 연다 (UI_UX.md §4.5).
     if (await flow.resume() && mounted) _tabs.index = _tabRelease;
+  }
+
+  /// 릴리스 CI·수동 빌드가 끝나면 창이 뒤에 있을 때 OS 알림 (PLAN.md 3.8.5).
+  void _onReleaseRunFinished(WorkflowRun run, {required bool manualBuild}) {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    final flow = _flow;
+    final state = runStateLabel(l10n, run.state);
+    _services.notifyIfAway(
+      manualBuild ? l10n.notifyManualBuild(state) : l10n.notifyReleaseRun(flow?.tag ?? '', state),
+      _repo?.name ?? '',
+    );
   }
 
   void _dismiss(String key) => setState(() => _dismissed.add(key));
@@ -426,6 +440,7 @@ class _RepoView extends StatelessWidget {
             text: l10n.tabRelease,
           ),
           Tab(height: 48, icon: const Icon(Icons.merge_rounded, size: 20), text: l10n.tabPr),
+          Tab(height: 48, icon: const Icon(Icons.bolt_rounded, size: 20), text: l10n.tabCi),
         ],
       ),
       Expanded(
@@ -438,6 +453,7 @@ class _RepoView extends StatelessWidget {
             const RemotesTab(),
             ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
             const PrTab(),
+            const ActionsTab(),
           ],
         ),
       ),
