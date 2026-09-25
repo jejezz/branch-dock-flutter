@@ -2313,4 +2313,164 @@ class AppLocalizationsEn extends AppLocalizations {
   String doneRollback(String tag) {
     return 'Rolled back $tag';
   }
+
+  @override
+  String get diffBinary => 'Binary file — no text diff';
+
+  @override
+  String get diffEmpty => 'No differences';
+
+  @override
+  String diffTruncated(int count) {
+    return 'Showing the first $count lines only. Open it in your editor for the rest.';
+  }
+
+  @override
+  String headerCherryPicking(int count) {
+    return 'Cherry-picking · $count conflicts';
+  }
+
+  @override
+  String headerReverting(int count) {
+    return 'Reverting · $count conflicts';
+  }
+
+  @override
+  String get operationAbortPickMessage =>
+      'Goes back to before it started. Any conflict resolutions you\'ve made are lost.';
+
+  @override
+  String get historyBranchLabel => 'Branch';
+
+  @override
+  String historyOtherBranchHint(String head) {
+    return 'Another branch\'s history. Use \'Bring into\' in a commit\'s menu to copy it onto $head.';
+  }
+
+  @override
+  String get historyViewChanges => 'View changes';
+
+  @override
+  String historyFilesChanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count files changed',
+      one: '1 file changed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historyMergeNote => 'merge commit — changes it brought in';
+
+  @override
+  String get historyRevert => 'Revert this commit';
+
+  @override
+  String historyRevertTitle(String hash) {
+    return 'Revert $hash?';
+  }
+
+  @override
+  String get historyRevertMessage =>
+      'Makes a new commit that undoes this one. History isn\'t rewritten, so it\'s safe even for commits you\'ve pushed.';
+
+  @override
+  String get historyRevertUnpushed =>
+      'Makes a new commit that undoes this one. Since it isn\'t pushed yet, you could also amend or fix it in a new commit.';
+
+  @override
+  String get historyCherryPick => 'Bring in';
+
+  @override
+  String historyCherryPickMenu(String head) {
+    return 'Bring into $head (cherry-pick)';
+  }
+
+  @override
+  String historyCherryPickTitle(String hash, String head) {
+    return 'Bring $hash into $head?';
+  }
+
+  @override
+  String get historyCherryPickMessage =>
+      'Copies the same change onto your current branch as a new commit — for taking just one commit without merging the whole branch.';
+
+  @override
+  String doneRevert(String hash) {
+    return 'Reverted $hash';
+  }
+
+  @override
+  String doneCherryPick(String hash) {
+    return 'Brought in $hash';
+  }
+
+  @override
+  String get menuPalette => 'Command palette';
+
+  @override
+  String get paletteHint => 'What do you want to do? (e.g. push, branch, tag)';
+
+  @override
+  String get paletteEmpty => 'No matching commands';
+
+  @override
+  String get paletteGroupActions => 'Action';
+
+  @override
+  String get paletteGroupTabs => 'Tab';
+
+  @override
+  String get paletteGroupBranches => 'Branch';
+
+  @override
+  String get paletteGroupRepos => 'Repository';
+
+  @override
+  String paletteGoToTab(String name) {
+    return 'Go to $name';
+  }
+
+  @override
+  String paletteSwitchTo(String branch) {
+    return 'Switch to $branch';
+  }
+
+  @override
+  String get helpCaptionAfterRevert => 'C stays; a new commit C⁻ undoes it';
+
+  @override
+  String get helpCaptionAfterCherryPick =>
+      'The change from feature\'s D is copied onto main as a new commit D\'';
+
+  @override
+  String get helpRevertTitle => 'Revert';
+
+  @override
+  String get helpRevertWord => 'To revert is to go back to how something was.';
+
+  @override
+  String get helpRevertInGit =>
+      'Doesn\'t delete the commit — it adds a new commit that applies the opposite change. Both the original and the revert stay in history.';
+
+  @override
+  String get helpRevertWhy =>
+      'Use it when a commit you\'ve already pushed causes trouble. History isn\'t rewritten, so nobody else is affected and no force push is needed. For commits not yet pushed, amending is cleaner.';
+
+  @override
+  String get helpCherryPickTitle => 'Cherry-pick';
+
+  @override
+  String get helpCherryPickWord =>
+      'To cherry-pick is to pick only the best cherries — take just what you want.';
+
+  @override
+  String get helpCherryPickInGit =>
+      'Copies the change from one commit on another branch onto your current branch as a new commit. Same change, but a new commit (D\') with a different hash.';
+
+  @override
+  String get helpCherryPickWhy =>
+      'Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default.';
 }

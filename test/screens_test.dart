@@ -25,6 +25,12 @@ import 'package:branch_dock/release/release_flow.dart';
 import 'package:branch_dock/ui/onboarding.dart';
 import 'package:branch_dock/github/onboarding.dart';
 import 'package:branch_dock/ui/tabs/release_list.dart' show showRollbackDialog;
+import 'package:branch_dock/git/diff.dart';
+import 'package:branch_dock/git/history.dart';
+import 'package:branch_dock/git/commands.dart';
+import 'package:branch_dock/ui/diff_view.dart';
+import 'package:branch_dock/ui/command_palette.dart';
+import 'package:branch_dock/ui/tabs/history_tab.dart';
 import 'package:branch_dock/ui/markdown_editor.dart';
 import 'package:branch_dock/ui/merge_sheet.dart';
 import 'package:branch_dock/ui/tabs/pr_tab.dart';
@@ -114,7 +120,7 @@ void main() {
 
   testWidgets('sheets and concept cards render', (tester) async {
     await pump(tester, Builder(builder: (context) {
-      return Column(children: [
+      return ListView(children: [
         TextButton(onPressed: () => showCreateBranchSheet(context, repo), child: const Text('branch')),
         TextButton(onPressed: () => showRemoteSheet(context, repo), child: const Text('remote')),
         TextButton(onPressed: () => showPublishToGitHubSheet(context, repo), child: const Text('publish')),
@@ -126,6 +132,8 @@ void main() {
     }));
 
     Future<void> openAndClose(String label) async {
+      await tester.ensureVisible(find.text(label));
+      await tester.pumpAndSettle();
       await tester.tap(find.text(label));
       await tester.pumpAndSettle();
       await tester.tapAt(const Offset(10, 10)); // 시트 밖을 눌러 닫는다
@@ -454,5 +462,78 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byIcon(Icons.redo_rounded), findsNWidgets(2));
     expect(find.textContaining('원격에 내게 없는 커밋이 없다'), findsOneWidget);
+  });
+
+  testWidgets('v0.6 screens: diff sheet, commit changes, palette, cherry-pick state', (tester) async {
+    const diffOut = 'diff --git a/a.txt b/a.txt\n--- a/a.txt\n+++ b/a.txt\n@@ -1 +1,2 @@\n-a\n+changed\n+a very long line that should wrap in a narrow window rather than overflow the row at all\n';
+    const entry = LogEntry(hash: 'abcdef1234', shortHash: 'abcdef1', subject: 'feat: 무언가', parents: ['p1', 'p2'], author: 'Me');
+    var ran = '';
+    await pump(tester, Builder(builder: (context) {
+      return Column(children: [
+        TextButton(
+          onPressed: () => showDiffSheet(
+            context,
+            title: 'a.txt',
+            command: GitCommands.diffWorktree('a.txt'),
+            result: const CommandResult(0, diffOut, ''),
+          ),
+          child: const Text('diff'),
+        ),
+        TextButton(
+          onPressed: () => showCommitChangesSheetWith(context, repo, entry, ChangedFile.parse('M\ta.txt\nR100\told.md\tnew.md\n')),
+          child: const Text('commit'),
+        ),
+        TextButton(
+          onPressed: () => showCommandPalette(context, [
+            PaletteItem(title: 'Push', keywords: 'push', onRun: () => ran = 'push'),
+            PaletteItem(title: '새 브랜치', keywords: 'branch', onRun: () => ran = 'branch'),
+            PaletteItem(title: '비활성', enabled: false, onRun: () => ran = 'disabled'),
+          ]),
+          child: const Text('palette'),
+        ),
+      ]);
+    }));
+    await tester.tap(find.text('diff'));
+    await tester.pumpAndSettle();
+    expect(find.text('+2'), findsOneWidget);
+    expect(find.text('−1'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('commit'));
+    await tester.pumpAndSettle();
+    expect(find.text('old.md → new.md'), findsOneWidget);
+    expect(find.textContaining('git diff --name-status --no-color p1 abcdef1234'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    // 팔레트: 검색 → ↓ → Enter
+    await tester.tap(find.text('palette'));
+    await tester.pumpAndSettle();
+    expect(find.text('비활성'), findsNothing);
+    await tester.enterText(find.byType(TextField), 'bra');
+    await tester.pumpAndSettle();
+    expect(find.text('Push'), findsNothing);
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(ran, 'branch');
+
+    // cherry-pick 충돌 → 헤더에 계속·건너뛰기·중단
+    await tester.runAsync(() async {
+      await git(repo.root, ['stash', '-u', '-q']);
+      final branch = repo.localBranches.firstWhere((b) => !b.current).name;
+      await git(repo.root, ['switch', '-q', branch]);
+      File('${repo.root}/a.txt').writeAsStringSync('from branch\n');
+      await git(repo.root, ['commit', '-q', '-am', 'feat: branch']);
+      await git(repo.root, ['switch', '-q', 'main']);
+      File('${repo.root}/a.txt').writeAsStringSync('from main\n');
+      await git(repo.root, ['commit', '-q', '-am', 'fix: main']);
+      await Process.run('git', ['cherry-pick', branch], workingDirectory: repo.root);
+      await repo.refresh();
+    });
+    expect(repo.operation, RepoOperation.cherryPicking);
+    await pump(tester, StatusHeader(onBranchTap: () {}));
+    expect(find.textContaining('cherry-pick 중'), findsOneWidget);
+    expect(find.text('건너뛰기'), findsOneWidget);
   });
 }

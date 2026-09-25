@@ -21,6 +21,7 @@ import '../repo/repo_controller.dart';
 import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
 import 'command_bar.dart';
+import 'command_palette.dart';
 import 'onboarding.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
@@ -163,6 +164,69 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     );
   }
 
+  /// 명령 팔레트 (⌘K, PLAN.md 3.12 P2): 동작·탭·브랜치 전환·최근 저장소.
+  void _openPalette(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final repo = _repo;
+    final actions = l10n.paletteGroupActions;
+    final items = <PaletteItem>[
+      PaletteItem(title: l10n.menuOpenFolder, icon: Icons.folder_open_rounded, group: actions, shortcut: shortcutLabel('O'), onRun: _pickFolder, keywords: 'open'),
+      if (_env.ghReady) PaletteItem(title: l10n.cloneTitle, icon: Icons.download_rounded, group: actions, onRun: _clone, keywords: 'clone'),
+      if (repo != null) ...[
+        PaletteItem(title: l10n.appBarRefresh, icon: Icons.refresh_rounded, group: actions, shortcut: shortcutLabel('R'), onRun: repo.refresh, keywords: 'refresh reload'),
+        PaletteItem(title: l10n.headerFetch, icon: Icons.sync_rounded, group: actions, shortcut: shortcutLabel('F', shift: true), onRun: () => RepoActions.fetch(context, repo), enabled: repo.remotes.isNotEmpty, keywords: 'fetch'),
+        PaletteItem(title: l10n.headerPull, icon: Icons.south_rounded, group: actions, shortcut: shortcutLabel('P', shift: true), onRun: () => RepoActions.pull(context, repo), enabled: repo.status.hasUpstream, keywords: 'pull'),
+        PaletteItem(title: repo.needsPublish ? l10n.headerPublish : l10n.headerPush, icon: Icons.north_rounded, group: actions, shortcut: shortcutLabel('P'), onRun: () => RepoActions.push(context, repo), enabled: repo.remotes.isNotEmpty && !repo.status.detached, keywords: 'push publish'),
+        PaletteItem(title: l10n.pushOptionsTitle, icon: Icons.tune_rounded, group: actions, onRun: () => showPushOptionsSheet(context, repo), keywords: 'push force tags'),
+        PaletteItem(title: l10n.branchesNew, icon: Icons.add_rounded, group: actions, shortcut: shortcutLabel('B'), onRun: () => showCreateBranchSheet(context, repo), enabled: !repo.status.unborn, keywords: 'branch create'),
+        PaletteItem(title: l10n.tagsNew, icon: Icons.sell_outlined, group: actions, shortcut: shortcutLabel('T'), onRun: () => showCreateTagSheet(context, repo, onOpenReleaseWizard: _openReleaseWizard), enabled: !repo.status.unborn, keywords: 'tag create'),
+        PaletteItem(title: l10n.releaseStart, icon: Icons.rocket_launch_outlined, group: actions, shortcut: shortcutLabel('R', shift: true), onRun: _openReleaseWizard, keywords: 'release'),
+        PaletteItem(title: l10n.stashSave, icon: Icons.inventory_2_outlined, group: actions, onRun: () => showStashSheet(context, repo), enabled: !repo.status.clean, keywords: 'stash'),
+        PaletteItem(title: l10n.branchesCleanup, icon: Icons.cleaning_services_outlined, group: actions, onRun: () => showCleanupSheet(context, repo), keywords: 'cleanup prune'),
+        if (repo.githubRemote != null && _env.ghReady && !repo.status.detached && repo.status.head != repo.defaultBranch)
+          PaletteItem(title: l10n.prCreate, icon: Icons.merge_rounded, group: actions, onRun: () => showCreatePrSheet(context, repo), keywords: 'pr pull request'),
+        if (repo.githubRemote != null && _env.ghReady)
+          PaletteItem(title: l10n.menuBrowse, icon: Icons.open_in_new_rounded, group: actions, onRun: () => _services.runner.run(GhCommands.browse, workingDirectory: repo.root), keywords: 'browse github web'),
+      ],
+      PaletteItem(title: l10n.logToggleTooltip, icon: Icons.terminal_rounded, group: actions, shortcut: shortcutLabel('J'), onRun: () => setState(() => _logExpanded = !_logExpanded), keywords: 'log'),
+      if (_isDesktop) ...[
+        PaletteItem(title: _pinned ? l10n.appBarUnpin : l10n.appBarPin, icon: Icons.push_pin_outlined, group: actions, onRun: _togglePin, keywords: 'pin top'),
+        PaletteItem(title: l10n.menuSnapRight, icon: Icons.align_horizontal_right_rounded, group: actions, onRun: () => _snap(right: true), keywords: 'snap window'),
+        PaletteItem(title: l10n.menuSnapLeft, icon: Icons.align_horizontal_left_rounded, group: actions, onRun: () => _snap(right: false), keywords: 'snap window'),
+      ],
+      PaletteItem(title: l10n.menuEnvironment, icon: Icons.health_and_safety_outlined, group: actions, onRun: () => showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin), keywords: 'environment gh git'),
+      if (repo != null) ...[
+        for (final (i, name) in [
+          l10n.tabChanges, l10n.tabBranches, l10n.tabTags, l10n.tabRemotes, l10n.tabRelease, l10n.tabPr, l10n.tabCi, l10n.tabHistory,
+        ].indexed)
+          PaletteItem(
+            title: l10n.paletteGoToTab(name),
+            icon: Icons.tab_rounded,
+            group: l10n.paletteGroupTabs,
+            shortcut: shortcutLabel('${i + 1}'),
+            onRun: () => _tabs.animateTo(i),
+          ),
+        for (final b in repo.localBranches.where((b) => !b.current))
+          PaletteItem(
+            title: l10n.paletteSwitchTo(b.name),
+            icon: Icons.call_split_rounded,
+            group: l10n.paletteGroupBranches,
+            keywords: 'switch checkout',
+            onRun: () => RepoActions.withStashRetry(context, repo, () => repo.switchTo(b), done: l10n.doneSwitch(b.name)),
+          ),
+      ],
+      for (final path in _services.prefs.recent.where((p) => p != repo?.root))
+        PaletteItem(
+          title: path.split(Platform.pathSeparator).where((s) => s.isNotEmpty).last,
+          icon: Icons.folder_outlined,
+          group: l10n.paletteGroupRepos,
+          keywords: path,
+          onRun: () => _open(path),
+        ),
+    ];
+    showCommandPalette(context, items);
+  }
+
   /// 릴리스 탭으로 가서 마법사를 시작한다 (⌘⇧R, 태그 탭의 버전 불일치 안내).
   void _openReleaseWizard() {
     final repo = _repo;
@@ -261,6 +325,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     final repo = _repo;
     return {
       key(LogicalKeyboardKey.keyO): _pickFolder,
+      key(LogicalKeyboardKey.keyK): () => _openPalette(context),
       key(LogicalKeyboardKey.keyJ): () => setState(() => _logExpanded = !_logExpanded),
       key(LogicalKeyboardKey.keyT, alt: true): _togglePin,
       if (repo != null) ...{
@@ -390,6 +455,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
               case ':editor':
                 final cmd = await showEditorCommandSheet(context, _services.prefs.editorCommand);
                 if (cmd != null) await _services.prefs.setEditorCommand(cmd);
+              case ':palette':
+                if (context.mounted) _openPalette(context);
               case ':autofetch':
                 await _services.prefs.setAutoFetch(!_services.prefs.autoFetch);
                 setState(() {});
@@ -416,6 +483,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
               ),
             if (others.isNotEmpty) const PopupMenuDivider(),
             PopupMenuItem(value: ':open', child: Text('${l10n.menuOpenFolder}  ${shortcutLabel('O')}')),
+            PopupMenuItem(value: ':palette', child: Text('${l10n.menuPalette}  ${shortcutLabel('K')}')),
             PopupMenuItem(value: ':editor', child: Text(l10n.menuEditor)),
             CheckedPopupMenuItem(value: ':autofetch', checked: _services.prefs.autoFetch, child: Text(l10n.menuAutoFetch)),
             PopupMenuItem(value: ':env', child: Text(l10n.menuEnvironment)),

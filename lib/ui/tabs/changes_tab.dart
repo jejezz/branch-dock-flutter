@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../diff_view.dart';
 import '../help/concepts.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
@@ -286,7 +287,8 @@ class _FileRowState extends State<_FileRow> {
       child: InkWell(
         splashFactory: NoSplash.splashFactory,
         onDoubleTap: () => RepoActions.openInEditor(context, repo, f),
-        onTap: () {},
+        // 누르면 읽기 전용 diff (PLAN.md 3.2 P2)
+        onTap: () => _showDiff(context),
         child: SizedBox(
           height: 36,
           child: Padding(
@@ -358,6 +360,32 @@ class _FileRowState extends State<_FileRow> {
         ),
       ),
       ),
+    );
+  }
+
+  Future<void> _showDiff(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final f = widget.file;
+    final repo = widget.repo;
+    final command = switch (widget.group) {
+      _Group.untracked => GitCommands.diffUntracked(f.path),
+      _Group.staged => GitCommands.diffStaged(f.path),
+      _ => GitCommands.diffWorktree(f.path),
+    };
+    final r = await repo.read(command);
+    if (!context.mounted) return;
+    await showDiffSheet(
+      context,
+      title: f.path,
+      command: command,
+      result: r,
+      actions: [
+        TextButton.icon(
+          onPressed: () => RepoActions.openInEditor(context, repo, f),
+          icon: const Icon(Icons.open_in_new_rounded, size: 14),
+          label: Text(l10n.changesOpenInEditor),
+        ),
+      ],
     );
   }
 

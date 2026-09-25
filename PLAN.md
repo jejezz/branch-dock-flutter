@@ -481,7 +481,8 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 | v0.3.0 | 3.9 PR 나머지(목록·체크아웃), 3.10 Actions, 3.8.6 릴리스 관리, CI 완료 알림 |
 | v0.4.0 | 매일 쓰는 git 작업 P1 — 3.2 stash·amend·변경 취소, 3.3 자동 fetch·force-with-lease·태그 함께 push, 3.4 추적 브랜치·병합된 브랜치 정리, 3.5 충돌 한쪽 고르기·rebase 건너뛰기, 3.7 태그 이동·태그 사이 커밋, 3.11 기록 탭, 개념 카드(stash·분리된 HEAD·force-with-lease) |
 | v0.5.0 | 시작·원격·릴리스 P1 — 3.1 git init·clone·gh 로그인(SSH 안내), 3.6 fork upstream·set-default·browse, 3.8.2 bump-version.sh·**3.8.2a 버전 파일 보완**(lock 파일, 감지 넓히기, pyproject 표, 버전 파일 지정, 빌드 영향 파일), 3.8.3 바로 커밋 방식, 3.8.7 되돌리기, 화면 가장자리에 붙이기 |
-| 이후 | P2 |
+| v0.6.0 | P2 일부 — 3.2 diff 보기(변경 파일, 기록의 커밋), 3.11 revert·cherry-pick(다른 브랜치 기록 보기, 진행 중 상태 계속/건너뛰기/중단), 3.12 명령 팔레트(⌘K), 개념 카드(revert·cherry-pick) |
+| 이후 | P2 나머지 — PR 리뷰, 산출물 업로드·다운로드, 넓은 창 레일 배치, 모노레포 |
 
 첫 정식 릴리스 전에 README의 기능·동작 방식·스크린샷·데모 GIF를 채운다.
 
