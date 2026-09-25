@@ -145,5 +145,17 @@ void main() {
       )!.kind,
       NextActionKind.switchToDefault,
     );
+    // 다 올렸는데 PR이 없으면 PR 만들기. 올릴 커밋이 남아 있으면 Push가 먼저.
+    const pushed = RepoStatus(oid: 'a', head: 'feat/y', upstream: 'origin/feat/y');
+    expect(suggestNextAction(status: pushed, remotes: const [origin], suggestPr: true)!.kind, NextActionKind.createPr);
+    expect(
+      suggestNextAction(
+        status: const RepoStatus(oid: 'a', head: 'feat/y', upstream: 'origin/feat/y', ahead: 1),
+        remotes: const [origin],
+        suggestPr: true,
+      )!.kind,
+      NextActionKind.push,
+    );
+    expect(suggestNextAction(status: pushed, remotes: const [origin]), isNull);
   });
 }

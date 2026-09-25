@@ -1554,4 +1554,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String bannerSwitchTo(String branch) {
     return 'Switch to $branch';
   }
+
+  @override
+  String bannerCreatePr(String branch) {
+    return '$branch is pushed but has no pull request yet';
+  }
+
+  @override
+  String get prBaseLabel => 'Base branch';
+
+  @override
+  String prBaseNotDefault(String base) {
+    return 'Merges into a branch other than the default ($base) — for a PR stacked on another feature branch.';
+  }
 }

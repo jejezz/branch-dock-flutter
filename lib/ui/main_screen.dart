@@ -98,6 +98,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
 
   Future<void> _checkEnvironment() async {
     final env = await EnvironmentStatus.check(_services.runner, Directory.systemTemp.path);
+    _repo?.ghReady = env.ghReady;
     if (mounted) setState(() => _env = env);
   }
 
@@ -119,6 +120,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     _repo?.dispose();
     await _services.prefs.addRecent(repo.root);
     final flow = ReleaseFlow(repo, ghReady: _env.ghReady);
+    repo.ghReady = _env.ghReady;
+    unawaited(repo.loadHeadPr());
     setState(() {
       _repo = repo;
       _flow = flow;
@@ -153,6 +156,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   void onWindowFocus() {
     // 다른 앱(편집기, 터미널, 브라우저)에서 돌아오면 상태를 다시 읽는다.
     _repo?.refresh();
+    _repo?.loadHeadPr();
     _flow?.poll();
   }
 
@@ -365,6 +369,7 @@ class _RepoView extends StatelessWidget {
       status: repo.status,
       remotes: repo.remotes,
       headMergedAndGone: repo.headMergedAndGone,
+      suggestPr: repo.shouldSuggestPr,
     );
     final showNext = next != null && !state._dismissed.contains(next.key);
     final host = repo.primaryHost;
