@@ -1000,5 +1000,23 @@
   "helpTagTitle": "태그 (주석 태그와 가벼운 태그)",
   "helpTagWord": "tag는 '꼬리표, 이름표'.",
   "helpTagInGit": "특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.",
-  "helpTagWhy": "릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요."
+  "helpTagWhy": "릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.",
+  "headerMergedAndGone": "병합됨 · 원격 삭제됨",
+  "headerMergedAndGoneTooltip": "이 브랜치는 이미 기본 브랜치에 병합되었고 원격에서 삭제되었습니다. 다시 게시하면 지운 브랜치가 되살아납니다.",
+  "bannerMergedAndGone": "이 브랜치는 병합되어 원격에서 삭제되었습니다. {branch}(으)로 돌아가세요",
+  "@bannerMergedAndGone": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "bannerSwitchTo": "{branch}(으)로 전환",
+  "@bannerSwitchTo": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  }
 }

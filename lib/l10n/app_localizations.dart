@@ -2545,6 +2545,30 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.'**
   String get helpTagWhy;
+
+  /// No description provided for @headerMergedAndGone.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합됨 · 원격 삭제됨'**
+  String get headerMergedAndGone;
+
+  /// No description provided for @headerMergedAndGoneTooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 브랜치는 이미 기본 브랜치에 병합되었고 원격에서 삭제되었습니다. 다시 게시하면 지운 브랜치가 되살아납니다.'**
+  String get headerMergedAndGoneTooltip;
+
+  /// No description provided for @bannerMergedAndGone.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 브랜치는 병합되어 원격에서 삭제되었습니다. {branch}(으)로 돌아가세요'**
+  String bannerMergedAndGone(String branch);
+
+  /// No description provided for @bannerSwitchTo.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}(으)로 전환'**
+  String bannerSwitchTo(String branch);
 }
 
 class _AppLocalizationsDelegate

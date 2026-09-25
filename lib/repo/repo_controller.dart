@@ -37,6 +37,11 @@ class RepoController extends ChangeNotifier {
 
   /// 원격의 기본 브랜치 (`main`). 모르면 main → master → 현재 브랜치.
   String? defaultBranch;
+
+  /// 현재 브랜치의 원격 브랜치가 사라졌고, 그 커밋이 이미 원격 기본 브랜치에
+  /// 들어 있다 — PR이 병합되고 브랜치가 지워진 경우. 이때 게시하면 지운
+  /// 브랜치가 다시 생기므로 게시 대신 기본 브랜치로 전환을 권한다.
+  bool headMergedAndGone = false;
   RepoOperation operation = RepoOperation.none;
   bool loaded = false;
 
@@ -123,6 +128,7 @@ class RepoController extends ChangeNotifier {
       if (results[2].ok) remotes = Remote.parse(results[2].stdout);
       operation = _readOperation();
       defaultBranch = await _readDefaultBranch();
+      headMergedAndGone = await _readHeadMergedAndGone();
       loaded = true;
       notifyListeners();
     } while (_refreshAgain && !_disposed);
@@ -158,6 +164,23 @@ class RepoController extends ChangeNotifier {
     if (names.contains('main')) return 'main';
     if (names.contains('master')) return 'master';
     return status.head;
+  }
+
+  Future<bool> _readHeadMergedAndGone() async {
+    final head = status.head;
+    final remote = defaultRemote;
+    final base = defaultBranch;
+    if (!status.upstreamGone || head == null || remote == null || base == null || head == base) return false;
+    final r = await runner.run(GitCommands.isAncestor('HEAD', '$remote/$base'), workingDirectory: root, quiet: true);
+    return r.ok;
+  }
+
+  /// 기본 브랜치로 전환한다. 로컬에 없으면 원격 브랜치를 추적해 만든다.
+  Future<CommandResult> switchToDefault() {
+    final base = defaultBranch ?? 'main';
+    final local = localBranches.where((b) => b.name == base);
+    if (local.isNotEmpty) return switchTo(local.first);
+    return execute(GitCommands.switchTrack('${defaultRemote ?? 'origin'}/$base'));
   }
 
   RepoOperation _readOperation() {
@@ -232,7 +255,14 @@ class RepoController extends ChangeNotifier {
     return GitCommands.push;
   }
 
-  bool get needsPublish => !status.detached && !status.hasUpstream && remotes.isNotEmpty;
+  bool get needsPublish => !status.detached && !status.hasUpstream && remotes.isNotEmpty && !headMergedAndGone;
+
+  /// [switchTo]가 실행할 명령 (툴팁·미리 보기).
+  List<String> switchCommand(Branch b) {
+    if (!b.remote) return GitCommands.switchTo(b.name);
+    final local = localBranches.where((l) => l.name == b.shortName);
+    return local.isNotEmpty ? GitCommands.switchTo(local.first.name) : GitCommands.switchTrack(b.name);
+  }
 
   Future<CommandResult> switchTo(Branch b) {
     if (!b.remote) return execute(GitCommands.switchTo(b.name));

@@ -136,5 +136,14 @@ void main() {
         const NextAction(NextActionKind.push, 2));
     expect(s(const RepoStatus(oid: 'a', head: 'main'), const [])!.kind, NextActionKind.publishToGitHub);
     expect(s(const RepoStatus(oid: 'a', head: 'main', upstream: 'origin/main')), isNull);
+    // 병합되어 원격에서 지워진 브랜치: 게시가 아니라 기본 브랜치로 전환.
+    expect(
+      suggestNextAction(
+        status: const RepoStatus(oid: 'a', head: 'feat/x', upstream: 'origin/feat/x', upstreamGone: true),
+        remotes: const [origin],
+        headMergedAndGone: true,
+      )!.kind,
+      NextActionKind.switchToDefault,
+    );
   });
 }

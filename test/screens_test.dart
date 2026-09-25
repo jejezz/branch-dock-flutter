@@ -26,6 +26,7 @@ import 'package:branch_dock/ui/merge_sheet.dart';
 import 'package:branch_dock/ui/tabs/pr_tab.dart';
 import 'package:branch_dock/ui/tabs/release_tab.dart';
 import 'package:branch_dock/ui/tabs/tags_tab.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -211,5 +212,16 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
     }
     expect(find.textContaining('Test-0.2.0-macos-universal.dmg'), findsOneWidget);
+  });
+
+  testWidgets('branch row shows a switch button on hover', (tester) async {
+    await pump(tester, const BranchesTab());
+    expect(find.text('전환'), findsNothing);
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.text('feature/a-rather-long-branch-name-for-narrow-windows')));
+    await tester.pumpAndSettle();
+    expect(find.text('전환'), findsOneWidget);
   });
 }

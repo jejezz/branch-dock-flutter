@@ -361,7 +361,11 @@ class _RepoView extends StatelessWidget {
     final theme = Theme.of(context);
     if (!repo.loaded) return const Center(child: CircularProgressIndicator());
 
-    final next = suggestNextAction(status: repo.status, remotes: repo.remotes);
+    final next = suggestNextAction(
+      status: repo.status,
+      remotes: repo.remotes,
+      headMergedAndGone: repo.headMergedAndGone,
+    );
     final showNext = next != null && !state._dismissed.contains(next.key);
     final host = repo.primaryHost;
     final notGitHub = host != null && repo.githubRemote == null;
