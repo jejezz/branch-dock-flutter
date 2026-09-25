@@ -232,6 +232,34 @@ push할 커밋을 만들 수 있어야 나머지 흐름이 이어지므로 최�
 - `P1` 저장소에 `scripts/bump-version.sh`가 있으면 그것을 실행한다
   (conventions 규약 앱과 동작을 맞춤).
 
+#### 3.8.2a 버전 파일 보완 (P1, v0.5.0)
+
+마법사는 Flutter 전용이 아니다 — 빌드는 저장소의 워크플로가 하고, 마법사는
+버전 올림·PR·태그·CI 확인만 한다. 다른 언어 저장소에서 틀리거나 빠지는 곳을
+채운다.
+
+- **lock 파일 버전 맞추기**: 버전 올림 커밋에 함께 넣는다. 안 맞추면 CI의
+  `--locked`/`npm ci`가 실패할 수 있다.
+  - `Cargo.lock`: 워크스페이스 크레이트의 `[[package]]` 버전. `cargo`가 있으면
+    `cargo update -w --offline`, 없으면 해당 항목만 고친다.
+  - `package-lock.json`: 맨 위 `"version"`과 `packages[""].version`.
+- **`scripts/bump-version.sh`가 있으면 그것을 실행한다** (위 3.8.2의 P1).
+  conventions 규약 앱과 결과가 같아야 하고, 스크립트가 lock 파일도 함께 올린다.
+  실행될 명령에 스크립트를 보여 준다.
+- **버전 파일 감지 넓히기**: `build.gradle(.kts)`의 `versionName`/`versionCode`
+  (Android 단독), `.csproj`의 `<Version>`, `pom.xml`의 프로젝트 `<version>`,
+  `setup.cfg`/`setup.py`, `VERSION`·`version.txt`. build number가 있는 형식
+  (`versionCode`)은 pubspec처럼 +1.
+- **`pyproject.toml` 표 구분**: `[project]` → `[tool.poetry]` 순으로 그 표 안의
+  `version`만 고친다. 지금은 첫 `version =` 줄을 고쳐 다른 표를 건드릴 수 있다.
+- **버전 파일 지정 설정**: 감지가 안 되거나 틀릴 때 저장소별로 파일과 패턴을
+  고른다 — 경로 + 버전 줄 정규식(`version = "(.*)"`의 캡처 그룹 하나).
+  앱 설정에 저장하고, 마법사 ② 버전 단계에서 "버전 파일 바꾸기"로 연다.
+- **태그 전 수동 빌드 권장 범위 넓히기**: 언어별 빌드 영향 파일 —
+  `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `go.sum`, `*.gradle*`,
+  `*.csproj`, `Podfile.lock`, `Dockerfile`.
+- `P2` 모노레포(하위 폴더의 여러 패키지를 각각 릴리스)는 범위 밖으로 둔다.
+
 #### 3.8.3 PR 경유 릴리스와 태그 (P0)
 
 **PR 경유를 기본으로 한다.** conventions 규약(`versioning.md` §5,
@@ -451,7 +479,9 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 | v0.1.0 | 3.1 · 3.2 · 3.3 · 3.4 · 3.6 P0, 명령 로그 — 매일 쓰는 동기화 흐름 |
 | v0.2.0 | 3.5 병합, 3.7 태그, 3.8 릴리스 마법사 P0 — **PR 경유**(3.8.3), 여기에 필요한 3.9 PR 만들기·병합, 태그 전 수동 빌드, 태그 전 점검 |
 | v0.3.0 | 3.9 PR 나머지(목록·체크아웃), 3.10 Actions, 3.8.6 릴리스 관리, CI 완료 알림 |
-| 이후 | P1 나머지, P2 |
+| v0.4.0 | 매일 쓰는 git 작업 P1 — 3.2 stash·amend·변경 취소, 3.3 자동 fetch·force-with-lease·태그 함께 push, 3.4 추적 브랜치·병합된 브랜치 정리, 3.5 충돌 한쪽 고르기·rebase 건너뛰기, 3.7 태그 이동·태그 사이 커밋, 3.11 기록 탭, 개념 카드(stash·분리된 HEAD·force-with-lease) |
+| v0.5.0 | 시작·원격·릴리스 P1 — 3.1 git init·clone·gh 로그인(SSH 안내), 3.6 fork upstream·set-default·browse, 3.8.2 bump-version.sh·**3.8.2a 버전 파일 보완**(lock 파일, 감지 넓히기, pyproject 표, 버전 파일 지정, 빌드 영향 파일), 3.8.3 바로 커밋 방식, 3.8.7 되돌리기, 화면 가장자리에 붙이기 |
+| 이후 | P2 |
 
 첫 정식 릴리스 전에 README의 기능·동작 방식·스크린샷·데모 GIF를 채운다.
 
