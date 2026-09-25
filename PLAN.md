@@ -14,6 +14,10 @@
   한다.
 - **중점 기능**: branch, tag, merge, pull, push, remote, 그리고 **릴리스
   흐름**(버전 올리기 → 태그 생성 → 태그 push → 릴리스 노트).
+- **GitHub 전용**: `gh`는 GitHub 전용 도구이므로 이 앱은 **GitHub 저장소에
+  가장 알맞게** 만든다. GitLab, Bitbucket 같은 다른 호스팅의 저장소도 열 수는
+  있지만, `gh`가 필요한 동작(PR, 릴리스, Actions, 로그인, 저장소 생성)은 쓸 수
+  없다 (§2.1).
 - **사용 방식**: 편집기(VS Code, Xcode, Android Studio 등) 옆에 세로로 길게
   띄워 두고 함께 쓴다 ([UI_UX.md](UI_UX.md) §1).
 
@@ -50,6 +54,40 @@ branch, tag, merge, pull, push, remote는 **로컬 git 작업**이라 `gh`가 �
 출력은 사람이 읽는 형식이 아니라 **기계용 형식**만 파싱한다:
 `git status --porcelain=v2 --branch`, `git for-each-ref --format`,
 `gh ... --json <fields>`.
+
+### 2.1 GitHub가 아닌 원격 (GitLab 등)
+
+`gh`는 GitHub의 API만 다룬다. GitLab, Bitbucket, Gitea, 사내 git 서버의
+저장소에서는 `gh` 명령이 동작하지 않으므로, 이 앱은 그런 저장소에서 **git으로
+하는 동작만 제공하고 `gh`가 필요한 동작은 막는다.** GitLab의 MR, 릴리스, CI는
+GitLab 웹이나 GitLab 전용 도구(`glab`)를 써야 한다. 이 앱은 `glab` 등 다른
+호스팅 도구를 지원하지 않는다.
+
+- **판별**: 원격 URL의 호스트로 판단한다 (`https://`, `git@host:`, `ssh://`
+  형식 모두). `github.com`이면 GitHub, 그 밖은 "GitHub 아님"으로 본다.
+  GitHub Enterprise Server는 `gh auth status`에 로그인된 호스트일 때만
+  GitHub로 보며, 시험하지 않은 환경으로 표시한다 (P2).
+- **원격이 여러 개일 때**: `gh`가 필요한 동작은 GitHub 원격을 대상으로 한다.
+  예: `origin`은 GitLab, `github`은 GitHub이면 PR·릴리스는 `github` 원격으로
+  한다 (`gh repo set-default`). GitHub 원격이 하나도 없으면 막는다.
+
+| 동작 | GitHub 원격 | GitHub가 아닌 원격 (GitLab 등) |
+|---|---|---|
+| 변경·커밋, 브랜치, 병합, stash, 기록 | ✓ | ✓ |
+| Fetch / Pull / Push, 게시(Publish) | ✓ | ✓ (인증은 사용자의 git 설정에 맡김) |
+| 원격 추가·삭제·URL 변경 | ✓ | ✓ |
+| 태그 만들기·push·삭제 | ✓ | ✓ |
+| 릴리스 마법사 ① 점검 ~ ④ Push | ✓ | ✓ |
+| 릴리스 마법사 ⑤ 릴리스 노트, ⑥ CI 확인, 릴리스 관리 | ✓ | ✕ |
+| Pull Request, Actions | ✓ | ✕ |
+| `gh` 로그인, GitHub에 올리기(`gh repo create`), 복제(`gh repo clone`) | ✓ | ✕ |
+
+- 막힌 동작은 숨기지 않고 비활성으로 두고, "이 저장소의 원격은 GitLab입니다.
+  PR·릴리스·Actions는 GitHub 저장소에서만 쓸 수 있습니다" 같은 이유를
+  보여 준다 ([UI_UX.md](UI_UX.md) §3 D).
+- `gh auth setup-git`은 GitHub에만 git 인증을 설정한다. GitHub가 아닌
+  원격에서 push가 인증 실패하면 해당 호스팅의 인증 방법을 확인하라고
+  안내한다 (앱이 대신 설정하지 않는다).
 
 ## 3. 기능 목록
 
@@ -349,7 +387,9 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 
 - 대화형 rebase, 서브모듈, Git LFS, blame, 코드 리뷰 코멘트 작성, 3-way 병합 편집기
 - Issues, Projects, Discussions, Gist, Codespaces
-- 여러 GitHub 계정 전환, GitHub Enterprise (gh 설정에 맡김)
+- GitLab, Bitbucket 등 GitHub가 아닌 호스팅의 PR/MR·릴리스·CI (`glab` 등
+  다른 도구 지원 없음, §2.1). git 동작은 호스팅과 관계없이 쓸 수 있다.
+- 여러 GitHub 계정 전환, GitHub Enterprise Server 공식 지원 (gh 설정에 맡김)
 
 ## 5. 기술 사항
 
