@@ -19,6 +19,13 @@ import 'package:branch_dock/ui/status_header.dart';
 import 'package:branch_dock/ui/tabs/branches_tab.dart';
 import 'package:branch_dock/ui/tabs/changes_tab.dart';
 import 'package:branch_dock/ui/tabs/remotes_tab.dart';
+import 'package:branch_dock/github/models.dart';
+import 'package:branch_dock/git/tags.dart';
+import 'package:branch_dock/release/release_flow.dart';
+import 'package:branch_dock/ui/merge_sheet.dart';
+import 'package:branch_dock/ui/tabs/pr_tab.dart';
+import 'package:branch_dock/ui/tabs/release_tab.dart';
+import 'package:branch_dock/ui/tabs/tags_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -137,5 +144,72 @@ void main() {
     await tester.enterText(find.byType(TextField), 'feature/login');
     await tester.pump();
     expect(find.text('git switch -c feature/login'), findsOneWidget);
+  });
+
+  testWidgets('v0.2 screens: tags, PR card, merge sheet, every wizard step', (tester) async {
+    await tester.runAsync(() async {
+      await git(repo.root, ['tag', '-a', 'v0.1.0', '-m', 'Test 0.1.0']);
+      await git(repo.root, ['tag', 'light-tag']);
+      await repo.refresh();
+    });
+    await pump(tester, const TagsTab());
+    expect(find.text('v0.1.0'), findsOneWidget);
+
+    final pr = PullRequest.parse('{"number":12,"title":"chore(release): v0.2.0","url":"https://github.com/me/repo/pull/12",'
+        '"state":"OPEN","isDraft":false,"mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviewDecision":"REVIEW_REQUIRED",'
+        '"statusCheckRollup":[{"name":"test","status":"COMPLETED","conclusion":"SUCCESS"},'
+        '{"name":"lint","status":"IN_PROGRESS","conclusion":""}],'
+        '"headRefName":"release/v0.2.0","baseRefName":"main"}')!;
+    await pump(tester, ListView(children: [PrCard(pr: pr, repo: repo, onChanged: () {})]));
+    expect(find.text('#12'), findsOneWidget);
+
+    late MergePreview preview;
+    final source = repo.localBranches.firstWhere((b) => !b.current);
+    await tester.runAsync(() async {
+      await git(repo.root, ['switch', '-q', source.name]);
+      await git(repo.root, ['commit', '-q', '--allow-empty', '-m', 'feat: on branch']);
+      await git(repo.root, ['switch', '-q', 'main']);
+      await repo.refresh();
+      preview = await loadMergePreview(repo, source);
+    });
+    expect(preview.commits.single.subject, 'feat: on branch');
+    expect(preview.canFastForward, isTrue);
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(onPressed: () => showMergeSheetWith(context, repo, source, preview), child: const Text('merge'));
+    }));
+    await tester.tap(find.text('merge'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('git merge --ff-only'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    final flow = ReleaseFlow(repo, ghReady: true);
+    addTearDown(flow.dispose);
+    await pump(tester, ReleaseTab(flow: flow, onShowChanges: () {}));
+    expect(find.byIcon(Icons.rocket_launch_rounded), findsOneWidget);
+
+    // 각 단계를 직접 세팅해 그려 본다.
+    flow.checks.addAll({for (final c in ReleaseCheck.values) c: c != ReleaseCheck.synced});
+    flow.lastTag = 'v0.1.0';
+    flow.buildRun = WorkflowRun.parse('{"databaseId":1,"workflowName":"Release","status":"in_progress","conclusion":"",'
+        '"url":"u","jobs":[{"name":"build-macos","status":"in_progress","conclusion":"","startedAt":"2026-09-25T03:38:38Z"}]}');
+    for (final step in ReleaseStep.values) {
+      flow.step = step;
+      flow.next = SemVer.tryParse('0.2.0+4');
+      flow.pr = pr;
+      flow.tagChecks.addAll({for (final c in TagCheck.values) c: c != TagCheck.versionMatches});
+      if (step == ReleaseStep.ci || step == ReleaseStep.done) {
+        flow.run = WorkflowRun.parse('{"databaseId":2,"workflowName":"Release","status":"completed","conclusion":"failure",'
+            '"url":"u","jobs":[{"name":"build-windows","status":"completed","conclusion":"failure",'
+            '"startedAt":"2026-09-25T03:38:38Z","completedAt":"2026-09-25T03:42:00Z","steps":[{"name":"Package installer","conclusion":"failure"}]}]}');
+        flow.failedLog = 'error: something failed\n' * 5;
+        flow.release = GitHubRelease.parse('{"tagName":"v0.2.0","name":"Test v0.2.0","url":"u","isPrerelease":false,'
+            '"assets":[{"name":"Test-0.2.0-macos-universal.dmg","size":24980387}]}');
+      }
+      flow.notifyListeners();
+      // 기다리는 단계에는 도는 진행 표시가 있어서 settle되지 않는다.
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+    expect(find.textContaining('Test-0.2.0-macos-universal.dmg'), findsOneWidget);
   });
 }

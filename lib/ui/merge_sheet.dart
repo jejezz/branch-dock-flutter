@@ -11,21 +11,32 @@ import 'help/concepts.dart';
 import 'repo_actions.dart';
 import 'widgets.dart';
 
-/// 다른 브랜치를 현재 브랜치로 병합 (PLAN.md 3.5): 방식 비교, 들어올 커밋 미리 보기.
-Future<void> showMergeSheet(BuildContext context, RepoController repo, Branch source) async {
-  final l10n = AppLocalizations.of(context);
-  // 들어올 커밋과 fast-forward 가능 여부를 먼저 읽는다.
+/// 병합 미리 보기: 들어올 커밋과 fast-forward 가능 여부.
+typedef MergePreview = ({List<Commit> commits, bool canFastForward});
+
+Future<MergePreview> loadMergePreview(RepoController repo, Branch source) async {
   final incoming = await repo.read(GitCommands.incoming(source.name));
   final ff = await repo.read(GitCommands.isAncestor('HEAD', source.name));
+  return (commits: incoming.ok ? Commit.parse(incoming.stdout) : const <Commit>[], canFastForward: ff.ok);
+}
+
+/// 다른 브랜치를 현재 브랜치로 병합 (PLAN.md 3.5): 방식 비교, 들어올 커밋 미리 보기.
+Future<void> showMergeSheet(BuildContext context, RepoController repo, Branch source) async {
+  final preview = await loadMergePreview(repo, source);
   if (!context.mounted) return;
-  final commits = incoming.ok ? Commit.parse(incoming.stdout) : const <Commit>[];
-  if (commits.isEmpty) {
+  await showMergeSheetWith(context, repo, source, preview);
+}
+
+Future<void> showMergeSheetWith(BuildContext context, RepoController repo, Branch source, MergePreview preview) async {
+  final l10n = AppLocalizations.of(context);
+  if (preview.commits.isEmpty) {
     showDone(context, l10n.mergeNothing(source.name, repo.status.head ?? 'HEAD'));
     return;
   }
   await showActionSheet<void>(
     context,
-    (context) => _MergeSheet(repo: repo, source: source, commits: commits, canFastForward: ff.ok),
+    (context) =>
+        _MergeSheet(repo: repo, source: source, commits: preview.commits, canFastForward: preview.canFastForward),
   );
 }
 
