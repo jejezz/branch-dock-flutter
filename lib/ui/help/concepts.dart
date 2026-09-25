@@ -1,8 +1,8 @@
 import '../../l10n/app_localizations.dart';
 
 /// 개념 도움말 카드 (PLAN.md 3.13). v0.1.0은 동기화와 Pull 방식에 필요한
-/// 카드만 담는다. squash 등 병합 카드는 병합 기능과 함께 들어온다.
-enum Concept { fetchVsPull, upstream, fastForward, mergeCommit, rebase }
+/// 카드로 시작했고, v0.2.0에서 병합(squash)과 태그 카드를 더했다.
+enum Concept { fetchVsPull, upstream, fastForward, mergeCommit, rebase, squash, annotatedTag }
 
 /// 커밋 그래프 한 장면. 커밋은 왼쪽(오래됨) → 오른쪽(최신), 줄(lane)은 위에서 아래.
 class GraphScene {
@@ -207,6 +207,62 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
           ),
         ],
         links: [rebasing],
+      ),
+    Concept.squash => ConceptCard(
+        title: l10n.helpSquashTitle,
+        word: l10n.helpSquashWord,
+        inGit: l10n.helpSquashInGit,
+        why: l10n.helpSquashWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionBefore,
+            commits: const [_a, _b, GraphCommit('C', 2, 1), GraphCommit('D', 3, 1), GraphCommit('E', 4, 1)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'E')],
+            labels: const [GraphLabel('main', 'B'), GraphLabel('feature', 'E')],
+          ),
+          GraphScene(
+            caption: l10n.helpCaptionAfterSquash,
+            commits: const [
+              _a,
+              _b,
+              GraphCommit('S', 2, 0, highlight: true),
+              GraphCommit('C', 2, 1),
+              GraphCommit('D', 3, 1),
+              GraphCommit('E', 4, 1),
+            ],
+            edges: const [('A', 'B'), ('B', 'S'), ('B', 'C'), ('C', 'D'), ('D', 'E')],
+            labels: const [GraphLabel('main', 'S', highlight: true), GraphLabel('feature', 'E')],
+          ),
+        ],
+        links: [
+          ConceptLink(l10n.helpLinkGitHubMergeMethods,
+              'https://docs.github.com/${ko ? 'ko' : 'en'}/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github'),
+          gitMerge,
+        ],
+      ),
+    Concept.annotatedTag => ConceptCard(
+        title: l10n.helpTagTitle,
+        word: l10n.helpTagWord,
+        inGit: l10n.helpTagInGit,
+        why: l10n.helpTagWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionTag,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit('D', 3, 0)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D')],
+            labels: const [
+              GraphLabel('v1.0.0', 'B', highlight: true),
+              GraphLabel('v1.1.0', 'D', highlight: true),
+              GraphLabel('main', 'D'),
+            ],
+          ),
+        ],
+        links: [
+          ConceptLink(
+            l10n.helpLinkTagging,
+            ko ? '$book/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%ED%83%9C%EA%B7%B8' : '$book/Git-Basics-Tagging',
+          ),
+        ],
       ),
   };
 }

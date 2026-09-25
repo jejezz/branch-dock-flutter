@@ -793,4 +793,640 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get helpRebaseWhy =>
       '병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다.';
+
+  @override
+  String get tabTags => '태그';
+
+  @override
+  String get tabRelease => '릴리스';
+
+  @override
+  String get tabPr => 'PR';
+
+  @override
+  String branchesMergeInto(String head) {
+    return '$head(으)로 병합해 오기';
+  }
+
+  @override
+  String mergeTitle(String source, String into) {
+    return '$source → $into 병합';
+  }
+
+  @override
+  String mergeNothing(String source, String into) {
+    return '$source에는 $into에 없는 커밋이 없습니다';
+  }
+
+  @override
+  String mergeIncoming(int count) {
+    return '들어올 커밋 $count개';
+  }
+
+  @override
+  String get mergeFastForward => 'Fast-forward';
+
+  @override
+  String get mergeFastForwardWhen => '새 커밋 없이 이름표만 앞으로 옮깁니다. 기록이 한 줄로 남습니다.';
+
+  @override
+  String get mergeFastForwardDisabled => '현재 브랜치에도 새 커밋이 있어서(갈라져서) 쓸 수 없습니다.';
+
+  @override
+  String get mergeMergeCommit => '병합 커밋';
+
+  @override
+  String get mergeMergeCommitWhen => '두 기록을 그대로 두고 병합 커밋으로 합칩니다. 가장 안전합니다.';
+
+  @override
+  String get mergeSquash => 'Squash';
+
+  @override
+  String get mergeSquashWhen => '브랜치의 커밋을 하나로 눌러 합칩니다. 기능 하나 = 커밋 하나.';
+
+  @override
+  String mergeSquashNote(String source) {
+    return 'squash 뒤 $source를 계속 쓰면 같은 변경이 다시 충돌할 수 있습니다. 병합 후 브랜치를 지우는 것을 권합니다.';
+  }
+
+  @override
+  String get mergeMessageLabel => '커밋 메시지';
+
+  @override
+  String get mergeConfirm => '병합';
+
+  @override
+  String doneMerge(String source, String into) {
+    return '$source을(를) $into(으)로 병합했습니다';
+  }
+
+  @override
+  String get tagsTitle => '태그';
+
+  @override
+  String get tagsNew => '새 태그';
+
+  @override
+  String get tagsCreate => '만들기';
+
+  @override
+  String get tagsCreateAndPush => '만들고 push';
+
+  @override
+  String tagsPushAll(int count) {
+    return '원격에 없는 태그 $count개 push';
+  }
+
+  @override
+  String get tagsPushed => '원격에 있음';
+
+  @override
+  String get tagsLocalOnly => '내 컴퓨터에만 있음';
+
+  @override
+  String get tagsLightweight => '가벼운 태그';
+
+  @override
+  String get tagsAnnotated => '주석 태그';
+
+  @override
+  String get tagsPush => 'Push';
+
+  @override
+  String get tagsDelete => '삭제';
+
+  @override
+  String get tagsDeleteRemote => '원격에서 삭제';
+
+  @override
+  String get tagsDeleteRemoteTitle => '원격 태그를 삭제할까요?';
+
+  @override
+  String tagsDeleteRemoteMessage(String tag, String target) {
+    return '$target에서 $tag 태그를 삭제합니다. 이미 받아 간 사람이 있을 수 있으니, 같은 이름을 다시 쓰기보다 다음 번호를 쓰세요. 이 태그의 GitHub 릴리스는 그대로 남습니다.';
+  }
+
+  @override
+  String get tagsEmptyTitle => '아직 태그가 없습니다';
+
+  @override
+  String get tagsEmptyMessage =>
+      '태그는 특정 커밋에 붙이는 이름표입니다. 보통 v1.0.0처럼 릴리스 버전에 씁니다.';
+
+  @override
+  String tagsPushAfter(String remote) {
+    return '만든 뒤 $remote에 push';
+  }
+
+  @override
+  String get tagNameLabel => '태그 이름';
+
+  @override
+  String get tagNameExists => '같은 이름의 태그가 이미 있습니다';
+
+  @override
+  String get tagNameInvalid => '공백, .., ~ ^ : ? * [ \\ 는 쓸 수 없습니다';
+
+  @override
+  String get tagNameNotSemVer =>
+      '버전 형식(v1.2.3)이 아닙니다. 만들 수는 있지만 릴리스에는 버전 형식을 권합니다.';
+
+  @override
+  String get tagNameMissingV => '릴리스 태그는 v를 붙이는 것이 관례입니다 (v1.2.3).';
+
+  @override
+  String get tagMessageLabel => '메시지';
+
+  @override
+  String get tagTargetLabel => '어느 커밋에 달까요';
+
+  @override
+  String tagTargetHead(String name) {
+    return '현재 위치 ($name)';
+  }
+
+  @override
+  String doneCreateTag(String name) {
+    return '$name 태그를 만들었습니다';
+  }
+
+  @override
+  String donePushTags(int count) {
+    return '태그 $count개를 push했습니다';
+  }
+
+  @override
+  String doneDeleteTag(String name) {
+    return '$name 태그를 삭제했습니다';
+  }
+
+  @override
+  String doneDeleteRemoteTag(String name) {
+    return '원격에서 $name 태그를 삭제했습니다';
+  }
+
+  @override
+  String get prTitle => 'Pull Request';
+
+  @override
+  String get prCreate => 'PR 만들기';
+
+  @override
+  String get prPublishAndCreate => '게시하고 PR 만들기';
+
+  @override
+  String get prTitleLabel => '제목';
+
+  @override
+  String get prBodyLabel => '본문';
+
+  @override
+  String get prBodyChanges => '변경 내용';
+
+  @override
+  String get prDraft => '초안으로 만들기';
+
+  @override
+  String get prNotGitHubTitle => 'GitHub 저장소가 아닙니다';
+
+  @override
+  String get prNotGitHubMessage =>
+      'Pull Request는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
+
+  @override
+  String get prGhRequiredTitle => 'gh가 필요합니다';
+
+  @override
+  String get prDetached => '브랜치에 있지 않습니다';
+
+  @override
+  String get prOnDefaultTitle => '기본 브랜치에 있습니다';
+
+  @override
+  String get prOnDefaultMessage => 'PR은 작업 브랜치에서 만듭니다. 브랜치 탭에서 새 브랜치를 만드세요.';
+
+  @override
+  String prNoneTitle(String head) {
+    return '$head에는 아직 PR이 없습니다';
+  }
+
+  @override
+  String prNoneMessage(String base) {
+    return '$base(으)로 합칠 PR을 만들면 GitHub에서 검토와 검사를 거쳐 병합합니다.';
+  }
+
+  @override
+  String get prOpenOnGitHub => 'GitHub에서 보기';
+
+  @override
+  String get prStateOpen => '열림';
+
+  @override
+  String get prStateDraft => '초안';
+
+  @override
+  String get prStateMerged => '병합됨';
+
+  @override
+  String get prStateClosed => '닫힘';
+
+  @override
+  String get prNoChecks => '검사 없음';
+
+  @override
+  String prChecksPassed(int n) {
+    return '통과 $n';
+  }
+
+  @override
+  String prChecksFailed(int n) {
+    return '실패 $n';
+  }
+
+  @override
+  String prChecksPending(int n) {
+    return '진행 중 $n';
+  }
+
+  @override
+  String get prApproved => '승인됨';
+
+  @override
+  String get prReviewRequired => '리뷰 필요';
+
+  @override
+  String get prBlockedDraft =>
+      '초안 PR은 병합할 수 없습니다. GitHub에서 \'검토 준비 완료\'로 바꾸세요.';
+
+  @override
+  String get prBlockedConflict => '기준 브랜치와 충돌이 있습니다. 기준 브랜치를 병합해 와서 충돌을 해결하세요.';
+
+  @override
+  String prBlockedChecks(String names) {
+    return '실패한 검사가 있습니다: $names';
+  }
+
+  @override
+  String prBlockedPending(int count) {
+    return '검사 $count개가 아직 진행 중입니다.';
+  }
+
+  @override
+  String get prBlockedReview => '리뷰 승인이 필요할 수 있습니다. 병합이 거부되면 GitHub에서 확인하세요.';
+
+  @override
+  String get prMethodMerge => '병합 커밋 (merge)';
+
+  @override
+  String get prMethodSquash => 'Squash 후 병합';
+
+  @override
+  String get prMethodRebase => 'Rebase 후 병합';
+
+  @override
+  String get prDeleteBranch => '병합 후 브랜치 삭제';
+
+  @override
+  String get prMerge => '병합하기';
+
+  @override
+  String get donePrCreated => 'PR을 만들었습니다';
+
+  @override
+  String donePrMerged(int number) {
+    return 'PR #$number을(를) 병합했습니다';
+  }
+
+  @override
+  String get releaseTitle => '릴리스';
+
+  @override
+  String releaseLatest(String tag) {
+    return '마지막 릴리스 $tag';
+  }
+
+  @override
+  String get releaseNoTags => '아직 릴리스가 없습니다';
+
+  @override
+  String get releaseIntro => '버전 올리기 → PR → 병합 → 태그 → CI 확인을 차례로 안내합니다.';
+
+  @override
+  String get releaseNeedsGitHub =>
+      '릴리스 마법사는 GitHub 저장소에서 쓸 수 있습니다. 태그는 태그 탭에서 만들 수 있습니다.';
+
+  @override
+  String get releaseStart => '새 릴리스';
+
+  @override
+  String get releaseNew => '새 릴리스';
+
+  @override
+  String releaseNewVersion(String tag) {
+    return '새 릴리스 $tag';
+  }
+
+  @override
+  String get releaseCancel => '그만두기';
+
+  @override
+  String get releaseCancelTitle => '릴리스를 그만둘까요?';
+
+  @override
+  String releaseCancelMessage(String branch) {
+    return '지금까지 만든 $branch 브랜치와 PR은 그대로 남습니다. 필요 없으면 직접 지우세요.';
+  }
+
+  @override
+  String get releaseCancelAfterTag =>
+      '태그는 이미 push되었습니다. 마법사만 닫고, CI와 릴리스는 GitHub에서 확인하세요.';
+
+  @override
+  String releaseDone(String tag) {
+    return '$tag 릴리스를 마쳤습니다';
+  }
+
+  @override
+  String get releasePrerelease => '프리릴리스';
+
+  @override
+  String get releasePushAndPr => 'push하고 PR 만들기';
+
+  @override
+  String get stepCheck => '점검';
+
+  @override
+  String get stepVersion => '버전';
+
+  @override
+  String get stepPr => 'PR';
+
+  @override
+  String get stepMerge => '병합';
+
+  @override
+  String get stepTag => '태그';
+
+  @override
+  String get stepNotes => '릴리스 노트';
+
+  @override
+  String get stepNotesCi => '노트 (CI 릴리스 후)';
+
+  @override
+  String get stepNotesCiSummary => 'CI가 릴리스를 만듭니다';
+
+  @override
+  String get stepCi => 'CI 확인';
+
+  @override
+  String get stepNext => '다음';
+
+  @override
+  String get stepCheckDone => '모두 통과';
+
+  @override
+  String stepMergeDone(int number) {
+    return 'PR #$number 병합됨';
+  }
+
+  @override
+  String get checkCleanTree => '커밋하지 않은 변경이 없다';
+
+  @override
+  String get checkShowChanges => '변경 보기';
+
+  @override
+  String checkOnDefault(String branch) {
+    return '기본 브랜치($branch)에 있다';
+  }
+
+  @override
+  String get checkSynced => '원격과 같다';
+
+  @override
+  String get checkGitHub => 'GitHub 원격과 gh 로그인';
+
+  @override
+  String checkChangesSince(int count, String tag) {
+    return '$tag 이후 커밋 $count개';
+  }
+
+  @override
+  String get checkFirstRelease => '첫 릴리스입니다';
+
+  @override
+  String get checkNoWorkflow => '태그로 도는 워크플로가 없습니다. 앱이 GitHub 릴리스를 만듭니다.';
+
+  @override
+  String checkWorkflowCi(String file) {
+    return '$file이(가) 태그 push로 릴리스를 만듭니다. 앱은 태그까지 달고 CI를 지켜봅니다.';
+  }
+
+  @override
+  String checkWorkflowOther(String file) {
+    return '$file이(가) 태그 push로 돕니다.';
+  }
+
+  @override
+  String get manualBuildTitle => '태그 전 수동 빌드 (권장)';
+
+  @override
+  String get manualBuildWhy =>
+      '지난 릴리스 이후 빌드에 영향을 주는 파일이 바뀌었습니다. 태그 전에 모든 플랫폼이 빌드되는지 확인하세요. 수동 실행은 릴리스를 만들지 않습니다.';
+
+  @override
+  String get manualBuildStart => '빌드만 확인';
+
+  @override
+  String manualBuildShort(String state) {
+    return '수동 빌드 $state';
+  }
+
+  @override
+  String get doneManualBuildStarted => '수동 빌드를 시작했습니다';
+
+  @override
+  String versionCurrent(String version, String source) {
+    return '현재 $version ($source)';
+  }
+
+  @override
+  String get versionFromTag => '마지막 태그';
+
+  @override
+  String get versionRecommended => '추천';
+
+  @override
+  String versionReason(int feats, int fixes, int breaking) {
+    return '새 기능 $feats · 버그 수정 $fixes · 호환 깨짐 $breaking';
+  }
+
+  @override
+  String get versionCustom => '직접 입력';
+
+  @override
+  String get versionFiles => '바뀌는 파일';
+
+  @override
+  String get versionNoFiles => '버전 파일이 없어서 태그만 만듭니다.';
+
+  @override
+  String get versionCommit => '릴리스 브랜치 만들고 커밋';
+
+  @override
+  String get bumpFinal => '정식';
+
+  @override
+  String get bumpPrerelease => '프리릴리스';
+
+  @override
+  String doneReleaseCommit(String tag) {
+    return '$tag 버전 올림을 커밋했습니다';
+  }
+
+  @override
+  String mergeWaiting(int number) {
+    return 'PR #$number 병합을 기다리는 중 — GitHub에서 병합해도 알아챕니다';
+  }
+
+  @override
+  String tagCheckPrMerged(int number) {
+    return 'PR #$number이(가) 병합됐다';
+  }
+
+  @override
+  String tagCheckSynced(String branch) {
+    return '$branch에 있고 원격과 같다';
+  }
+
+  @override
+  String tagCheckVersion(String tag) {
+    return '버전 파일이 $tag와 같다';
+  }
+
+  @override
+  String tagCheckVersionWrong(String version) {
+    return '지금 버전은 $version입니다. 버전 올림 PR이 아직 병합되지 않았을 수 있습니다.';
+  }
+
+  @override
+  String tagCheckFree(String tag) {
+    return '$tag 태그가 아직 없다';
+  }
+
+  @override
+  String tagConfirmTitle(String tag) {
+    return '$tag 태그를 push할까요?';
+  }
+
+  @override
+  String tagConfirmMessage(String tag, String branch) {
+    return '$branch의 병합 커밋에 $tag를 답니다. push하면 릴리스가 공개되고, 태그는 옮기거나 지우지 않는 것이 규칙입니다.';
+  }
+
+  @override
+  String get tagConfirmPush => '태그 달고 push';
+
+  @override
+  String doneTagPushed(String tag) {
+    return '$tag 태그를 push했습니다';
+  }
+
+  @override
+  String get notesLabel => '릴리스 노트 (마크다운)';
+
+  @override
+  String get notesFeatures => '새 기능';
+
+  @override
+  String get notesFixes => '버그 수정';
+
+  @override
+  String get notesOther => '기타';
+
+  @override
+  String get notesCreateRelease => 'GitHub 릴리스 만들기';
+
+  @override
+  String get notesEdit => '노트 고치기';
+
+  @override
+  String get doneReleaseCreated => 'GitHub 릴리스를 만들었습니다';
+
+  @override
+  String get doneNotesSaved => '릴리스 노트를 저장했습니다';
+
+  @override
+  String ciWaitingForRun(String tag) {
+    return '$tag(으)로 시작된 워크플로를 찾는 중';
+  }
+
+  @override
+  String get ciOpenInBrowser => '브라우저에서 보기';
+
+  @override
+  String get ciRerunFailed => '실패한 잡 다시 실행';
+
+  @override
+  String get doneRerun => '실패한 잡을 다시 실행했습니다';
+
+  @override
+  String get runQueued => '대기 중';
+
+  @override
+  String get runRunning => '진행 중';
+
+  @override
+  String get runSuccess => '성공';
+
+  @override
+  String get runFailure => '실패';
+
+  @override
+  String get runCancelled => '취소됨';
+
+  @override
+  String get runSkipped => '건너뜀';
+
+  @override
+  String get helpCaptionAfterSquash => 'squash 병합 후 — main에 새 커밋 S 하나';
+
+  @override
+  String get helpCaptionTag =>
+      'v1.0.0과 v1.1.0은 옮겨지지 않는 이름표, main은 앞으로 나아가는 이름표';
+
+  @override
+  String get helpLinkGitHubMergeMethods => 'GitHub — 병합 방법 정보';
+
+  @override
+  String get helpLinkTagging => 'Pro Git — 태그';
+
+  @override
+  String get helpSquashTitle => 'Squash (눌러 합치기)';
+
+  @override
+  String get helpSquashWord => '눌러서 납작하게 만들다, 찌그러뜨리다.';
+
+  @override
+  String get helpSquashInGit =>
+      '브랜치의 여러 커밋을 눌러 커밋 하나로 합친 뒤 대상 브랜치에 올립니다. 변경 내용은 그대로이고 커밋 개수만 하나가 됩니다.';
+
+  @override
+  String get helpSquashWhy =>
+      '\'오타 수정\', \'다시 시도\' 같은 작업 중 커밋을 기본 브랜치 기록에 남기지 않고, 기능 하나 = 커밋 하나로 정리합니다. PR을 병합할 때 많이 씁니다. 원래 커밋들은 기본 브랜치에 남지 않으니, 병합한 브랜치를 계속 쓰지 말고 지우세요.';
+
+  @override
+  String get helpTagTitle => '태그 (주석 태그와 가벼운 태그)';
+
+  @override
+  String get helpTagWord => 'tag는 \'꼬리표, 이름표\'.';
+
+  @override
+  String get helpTagInGit =>
+      '특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.';
+
+  @override
+  String get helpTagWhy =>
+      '릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.';
 }

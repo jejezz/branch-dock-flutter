@@ -13,6 +13,7 @@ import '../git/remotes.dart';
 import '../l10n/app_localizations.dart';
 import '../repo/environment.dart';
 import '../repo/next_action.dart';
+import '../release/release_flow.dart';
 import '../repo/repo_controller.dart';
 import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
@@ -24,7 +25,10 @@ import 'start_screen.dart';
 import 'status_header.dart';
 import 'tabs/branches_tab.dart';
 import 'tabs/changes_tab.dart';
+import 'tabs/pr_tab.dart';
+import 'tabs/release_tab.dart';
 import 'tabs/remotes_tab.dart';
+import 'tabs/tags_tab.dart';
 import 'widgets.dart';
 import 'shortcut_label.dart';
 
@@ -43,6 +47,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   late AppServices _services;
   EnvironmentStatus _env = const EnvironmentStatus();
   RepoController? _repo;
+  ReleaseFlow? _flow;
   OpenFailure? _failure;
   String? _failedPath;
   bool _logExpanded = false;
@@ -50,7 +55,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   bool _pinned = false;
   final _dismissed = <String>{};
   final _commitFocus = FocusNode();
-  late final TabController _tabs = TabController(length: 3, vsync: this);
+  late final TabController _tabs = TabController(length: _tabCount, vsync: this);
+
+  /// 변경 · 브랜치 · 태그 · 원격 · 릴리스 · PR (UI_UX.md §3 D, CI 탭은 v0.3.0).
+  static const _tabCount = 6;
+  static const _tabChanges = 0, _tabBranches = 1, _tabTags = 2, _tabRemotes = 3, _tabRelease = 4;
   bool _started = false;
 
   bool get _isDesktop => Platform.isMacOS || Platform.isWindows || Platform.isLinux;
@@ -80,6 +89,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   @override
   void dispose() {
     if (_isDesktop) windowManager.removeListener(this);
+    _flow?.dispose();
     _repo?.dispose();
     _tabs.dispose();
     _commitFocus.dispose();
@@ -105,23 +115,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
       });
       return;
     }
+    _flow?.dispose();
     _repo?.dispose();
     await _services.prefs.addRecent(repo.root);
+    final flow = ReleaseFlow(repo, ghReady: _env.ghReady);
     setState(() {
       _repo = repo;
+      _flow = flow;
       _failure = null;
       _failedPath = null;
       _dismissed.clear();
     });
     _tabs.index = _services.prefs.lastTab(repo.root).clamp(0, _tabs.length - 1);
     if (_isDesktop) windowManager.setTitle('${AppIdentity.displayName} — ${repo.name}');
+    // 진행 중이던 릴리스가 있으면 이어서 연다 (UI_UX.md §4.5).
+    if (await flow.resume() && mounted) _tabs.index = _tabRelease;
   }
 
   void _dismiss(String key) => setState(() => _dismissed.add(key));
 
   void _close() {
+    _flow?.dispose();
     _repo?.dispose();
-    setState(() => _repo = null);
+    setState(() {
+      _repo = null;
+      _flow = null;
+    });
     if (_isDesktop) windowManager.setTitle(AppIdentity.displayName);
   }
 
@@ -132,8 +151,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
 
   @override
   void onWindowFocus() {
-    // 다른 앱(편집기, 터미널)에서 돌아오면 상태를 다시 읽는다.
+    // 다른 앱(편집기, 터미널, 브라우저)에서 돌아오면 상태를 다시 읽는다.
     _repo?.refresh();
+    _flow?.poll();
   }
 
   Future<void> _togglePin() async {
@@ -156,9 +176,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
       if (repo != null) ...{
         key(LogicalKeyboardKey.keyR): repo.refresh,
         const SingleActivator(LogicalKeyboardKey.f5): repo.refresh,
-        key(LogicalKeyboardKey.digit1): () => _tabs.animateTo(0),
-        key(LogicalKeyboardKey.digit2): () => _tabs.animateTo(1),
-        key(LogicalKeyboardKey.digit3): () => _tabs.animateTo(2),
+        for (var i = 0; i < _tabCount; i++)
+          key(LogicalKeyboardKey(LogicalKeyboardKey.digit1.keyId + i)): () => _tabs.animateTo(i),
+        key(LogicalKeyboardKey.keyT): () {
+          if (repo.status.unborn) return;
+          _tabs.animateTo(_tabTags);
+          showCreateTagSheet(context, repo);
+        },
+        key(LogicalKeyboardKey.keyR, shift: true): () {
+          _tabs.animateTo(_tabRelease);
+          final flow = _flow;
+          if (flow != null && flow.checks.isEmpty && repo.githubRemote != null && _env.ghReady) {
+            flow.ghReady = _env.ghReady;
+            flow.runChecks();
+          }
+        },
         key(LogicalKeyboardKey.keyP): () => RepoActions.push(context, repo),
         key(LogicalKeyboardKey.keyP, shift: true): () => RepoActions.pull(context, repo),
         key(LogicalKeyboardKey.keyF, shift: true): () => RepoActions.fetch(context, repo),
@@ -336,7 +368,7 @@ class _RepoView extends StatelessWidget {
     final notGitHubKey = 'host:${repo.root}';
 
     return Column(children: [
-      StatusHeader(onBranchTap: () => state._tabs.animateTo(1)),
+      StatusHeader(onBranchTap: () => state._tabs.animateTo(_MainScreenState._tabBranches)),
       _DelayedProgress(visible: repo.busy),
       if (notGitHub && !state._dismissed.contains(notGitHubKey))
         _InfoBanner(
@@ -347,11 +379,15 @@ class _RepoView extends StatelessWidget {
         NextActionBanner(
           action: next,
           onDismiss: () => state._dismiss(next.key),
-          onShowChanges: () => state._tabs.animateTo(0),
-          onShowRemotes: () => state._tabs.animateTo(2),
+          onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges),
+          onShowRemotes: () => state._tabs.animateTo(_MainScreenState._tabRemotes),
         ),
       TabBar(
         controller: state._tabs,
+        // 380–439px에서는 탭을 가로로 스크롤한다 (UI_UX.md §2).
+        isScrollable: MediaQuery.sizeOf(context).width < 440,
+        tabAlignment: MediaQuery.sizeOf(context).width < 440 ? TabAlignment.start : TabAlignment.fill,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
         unselectedLabelStyle: theme.textTheme.labelMedium,
         tabs: [
@@ -365,7 +401,22 @@ class _RepoView extends StatelessWidget {
             text: l10n.tabChanges,
           ),
           Tab(height: 48, icon: const Icon(Icons.call_split_rounded, size: 20), text: l10n.tabBranches),
+          Tab(height: 48, icon: const Icon(Icons.sell_outlined, size: 20), text: l10n.tabTags),
           Tab(height: 48, icon: const Icon(Icons.cloud_outlined, size: 20), text: l10n.tabRemotes),
+          Tab(
+            height: 48,
+            icon: ListenableBuilder(
+              listenable: state._flow!,
+              builder: (context, _) {
+                final flow = state._flow!;
+                // 진행 중인 릴리스가 있으면 점으로 알린다 (UI_UX.md §3 D).
+                final active = flow.step != ReleaseStep.check && flow.step != ReleaseStep.done;
+                return Badge(isLabelVisible: active, smallSize: 8, child: const Icon(Icons.rocket_launch_outlined, size: 20));
+              },
+            ),
+            text: l10n.tabRelease,
+          ),
+          Tab(height: 48, icon: const Icon(Icons.merge_rounded, size: 20), text: l10n.tabPr),
         ],
       ),
       Expanded(
@@ -374,7 +425,10 @@ class _RepoView extends StatelessWidget {
           children: [
             ChangesTab(commitFocus: state._commitFocus),
             const BranchesTab(),
+            const TagsTab(),
             const RemotesTab(),
+            ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
+            const PrTab(),
           ],
         ),
       ),

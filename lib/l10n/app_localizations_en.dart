@@ -861,4 +861,680 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helpRebaseWhy =>
       'Keeps history clean with no merge commits. Use it only on commits you haven\'t pushed yet: rebasing pushed commits makes your history differ from everyone else\'s and needs a force push.';
+
+  @override
+  String get tabTags => 'Tags';
+
+  @override
+  String get tabRelease => 'Release';
+
+  @override
+  String get tabPr => 'PRs';
+
+  @override
+  String branchesMergeInto(String head) {
+    return 'Merge into $head';
+  }
+
+  @override
+  String mergeTitle(String source, String into) {
+    return 'Merge $source into $into';
+  }
+
+  @override
+  String mergeNothing(String source, String into) {
+    return '$source has nothing that $into doesn\'t already have';
+  }
+
+  @override
+  String mergeIncoming(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count incoming commits',
+      one: '1 incoming commit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mergeFastForward => 'Fast-forward';
+
+  @override
+  String get mergeFastForwardWhen =>
+      'Just moves the label forward, no new commit. History stays in one line.';
+
+  @override
+  String get mergeFastForwardDisabled =>
+      'Not possible: the current branch has its own new commits (history has split).';
+
+  @override
+  String get mergeMergeCommit => 'Merge commit';
+
+  @override
+  String get mergeMergeCommitWhen =>
+      'Keeps both histories and joins them with a merge commit. The safest choice.';
+
+  @override
+  String get mergeSquash => 'Squash';
+
+  @override
+  String get mergeSquashWhen =>
+      'Squashes the branch\'s commits into one. One feature, one commit.';
+
+  @override
+  String mergeSquashNote(String source) {
+    return 'If you keep using $source after a squash, the same changes can conflict again. Delete the branch after merging.';
+  }
+
+  @override
+  String get mergeMessageLabel => 'Commit message';
+
+  @override
+  String get mergeConfirm => 'Merge';
+
+  @override
+  String doneMerge(String source, String into) {
+    return 'Merged $source into $into';
+  }
+
+  @override
+  String get tagsTitle => 'Tags';
+
+  @override
+  String get tagsNew => 'New tag';
+
+  @override
+  String get tagsCreate => 'Create';
+
+  @override
+  String get tagsCreateAndPush => 'Create and push';
+
+  @override
+  String tagsPushAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '1 tag',
+    );
+    return 'Push $_temp0 not on the remote';
+  }
+
+  @override
+  String get tagsPushed => 'On the remote';
+
+  @override
+  String get tagsLocalOnly => 'Only on this computer';
+
+  @override
+  String get tagsLightweight => 'Lightweight';
+
+  @override
+  String get tagsAnnotated => 'Annotated';
+
+  @override
+  String get tagsPush => 'Push';
+
+  @override
+  String get tagsDelete => 'Delete';
+
+  @override
+  String get tagsDeleteRemote => 'Delete from remote';
+
+  @override
+  String get tagsDeleteRemoteTitle => 'Delete the remote tag?';
+
+  @override
+  String tagsDeleteRemoteMessage(String tag, String target) {
+    return 'Deletes $tag from $target. Others may already have it, so use the next number instead of reusing the name. Any GitHub release for this tag stays.';
+  }
+
+  @override
+  String get tagsEmptyTitle => 'No tags yet';
+
+  @override
+  String get tagsEmptyMessage =>
+      'A tag is a name for a specific commit, usually a release version like v1.0.0.';
+
+  @override
+  String tagsPushAfter(String remote) {
+    return 'Push to $remote after creating';
+  }
+
+  @override
+  String get tagNameLabel => 'Tag name';
+
+  @override
+  String get tagNameExists => 'A tag with this name already exists';
+
+  @override
+  String get tagNameInvalid => 'No spaces, .., or ~ ^ : ? * [ \\';
+
+  @override
+  String get tagNameNotSemVer =>
+      'Not a version (v1.2.3). Allowed, but releases should use versions.';
+
+  @override
+  String get tagNameMissingV => 'Release tags usually start with v (v1.2.3).';
+
+  @override
+  String get tagMessageLabel => 'Message';
+
+  @override
+  String get tagTargetLabel => 'Tag which commit';
+
+  @override
+  String tagTargetHead(String name) {
+    return 'Current position ($name)';
+  }
+
+  @override
+  String doneCreateTag(String name) {
+    return 'Created tag $name';
+  }
+
+  @override
+  String donePushTags(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '1 tag',
+    );
+    return 'Pushed $_temp0';
+  }
+
+  @override
+  String doneDeleteTag(String name) {
+    return 'Deleted tag $name';
+  }
+
+  @override
+  String doneDeleteRemoteTag(String name) {
+    return 'Deleted tag $name from the remote';
+  }
+
+  @override
+  String get prTitle => 'Pull request';
+
+  @override
+  String get prCreate => 'Create pull request';
+
+  @override
+  String get prPublishAndCreate => 'Publish and create';
+
+  @override
+  String get prTitleLabel => 'Title';
+
+  @override
+  String get prBodyLabel => 'Description';
+
+  @override
+  String get prBodyChanges => 'Changes';
+
+  @override
+  String get prDraft => 'Create as draft';
+
+  @override
+  String get prNotGitHubTitle => 'Not a GitHub repository';
+
+  @override
+  String get prNotGitHubMessage =>
+      'Pull requests need a GitHub repository — gh only works with GitHub.';
+
+  @override
+  String get prGhRequiredTitle => 'Needs gh';
+
+  @override
+  String get prDetached => 'Not on a branch';
+
+  @override
+  String get prOnDefaultTitle => 'You\'re on the default branch';
+
+  @override
+  String get prOnDefaultMessage =>
+      'Pull requests come from a work branch. Create one in Branches.';
+
+  @override
+  String prNoneTitle(String head) {
+    return '$head has no pull request yet';
+  }
+
+  @override
+  String prNoneMessage(String base) {
+    return 'Open a pull request into $base to review, check and merge it on GitHub.';
+  }
+
+  @override
+  String get prOpenOnGitHub => 'Open on GitHub';
+
+  @override
+  String get prStateOpen => 'Open';
+
+  @override
+  String get prStateDraft => 'Draft';
+
+  @override
+  String get prStateMerged => 'Merged';
+
+  @override
+  String get prStateClosed => 'Closed';
+
+  @override
+  String get prNoChecks => 'No checks';
+
+  @override
+  String prChecksPassed(int n) {
+    return '$n passed';
+  }
+
+  @override
+  String prChecksFailed(int n) {
+    return '$n failed';
+  }
+
+  @override
+  String prChecksPending(int n) {
+    return '$n running';
+  }
+
+  @override
+  String get prApproved => 'Approved';
+
+  @override
+  String get prReviewRequired => 'Review required';
+
+  @override
+  String get prBlockedDraft =>
+      'Draft pull requests can\'t be merged. Mark it ready for review on GitHub.';
+
+  @override
+  String get prBlockedConflict =>
+      'It conflicts with the base branch. Merge the base branch in and resolve the conflicts.';
+
+  @override
+  String prBlockedChecks(String names) {
+    return 'Some checks failed: $names';
+  }
+
+  @override
+  String prBlockedPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count checks are',
+      one: '1 check is',
+    );
+    return '$_temp0 still running.';
+  }
+
+  @override
+  String get prBlockedReview =>
+      'A review may be required. If merging is refused, check on GitHub.';
+
+  @override
+  String get prMethodMerge => 'Merge commit';
+
+  @override
+  String get prMethodSquash => 'Squash and merge';
+
+  @override
+  String get prMethodRebase => 'Rebase and merge';
+
+  @override
+  String get prDeleteBranch => 'Delete the branch after merging';
+
+  @override
+  String get prMerge => 'Merge';
+
+  @override
+  String get donePrCreated => 'Pull request created';
+
+  @override
+  String donePrMerged(int number) {
+    return 'Merged pull request #$number';
+  }
+
+  @override
+  String get releaseTitle => 'Release';
+
+  @override
+  String releaseLatest(String tag) {
+    return 'Latest release $tag';
+  }
+
+  @override
+  String get releaseNoTags => 'No releases yet';
+
+  @override
+  String get releaseIntro =>
+      'Walks you through version bump → PR → merge → tag → CI.';
+
+  @override
+  String get releaseNeedsGitHub =>
+      'The release wizard needs a GitHub repository. You can still create tags in Tags.';
+
+  @override
+  String get releaseStart => 'New release';
+
+  @override
+  String get releaseNew => 'New release';
+
+  @override
+  String releaseNewVersion(String tag) {
+    return 'New release $tag';
+  }
+
+  @override
+  String get releaseCancel => 'Stop';
+
+  @override
+  String get releaseCancelTitle => 'Stop this release?';
+
+  @override
+  String releaseCancelMessage(String branch) {
+    return 'The $branch branch and pull request made so far stay. Delete them yourself if you don\'t need them.';
+  }
+
+  @override
+  String get releaseCancelAfterTag =>
+      'The tag is already pushed. This only closes the wizard; check CI and the release on GitHub.';
+
+  @override
+  String releaseDone(String tag) {
+    return '$tag is released';
+  }
+
+  @override
+  String get releasePrerelease => 'Pre-release';
+
+  @override
+  String get releasePushAndPr => 'Push and create PR';
+
+  @override
+  String get stepCheck => 'Check';
+
+  @override
+  String get stepVersion => 'Version';
+
+  @override
+  String get stepPr => 'Pull request';
+
+  @override
+  String get stepMerge => 'Merge';
+
+  @override
+  String get stepTag => 'Tag';
+
+  @override
+  String get stepNotes => 'Release notes';
+
+  @override
+  String get stepNotesCi => 'Notes (after CI release)';
+
+  @override
+  String get stepNotesCiSummary => 'CI creates the release';
+
+  @override
+  String get stepCi => 'CI';
+
+  @override
+  String get stepNext => 'Next';
+
+  @override
+  String get stepCheckDone => 'All passed';
+
+  @override
+  String stepMergeDone(int number) {
+    return 'PR #$number merged';
+  }
+
+  @override
+  String get checkCleanTree => 'No uncommitted changes';
+
+  @override
+  String get checkShowChanges => 'Show changes';
+
+  @override
+  String checkOnDefault(String branch) {
+    return 'On the default branch ($branch)';
+  }
+
+  @override
+  String get checkSynced => 'In sync with the remote';
+
+  @override
+  String get checkGitHub => 'GitHub remote and gh login';
+
+  @override
+  String checkChangesSince(int count, String tag) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count commits',
+      one: '1 commit',
+    );
+    return '$_temp0 since $tag';
+  }
+
+  @override
+  String get checkFirstRelease => 'This is the first release';
+
+  @override
+  String get checkNoWorkflow =>
+      'No workflow runs on tags, so the app creates the GitHub release.';
+
+  @override
+  String checkWorkflowCi(String file) {
+    return '$file creates the release when a tag is pushed. The app tags and then watches CI.';
+  }
+
+  @override
+  String checkWorkflowOther(String file) {
+    return '$file runs when a tag is pushed.';
+  }
+
+  @override
+  String get manualBuildTitle => 'Build check before tagging (recommended)';
+
+  @override
+  String get manualBuildWhy =>
+      'Files that affect the build changed since the last release. Check that every platform builds before tagging. A manual run never publishes.';
+
+  @override
+  String get manualBuildStart => 'Run build check';
+
+  @override
+  String manualBuildShort(String state) {
+    return 'build check $state';
+  }
+
+  @override
+  String get doneManualBuildStarted => 'Build check started';
+
+  @override
+  String versionCurrent(String version, String source) {
+    return 'Current $version ($source)';
+  }
+
+  @override
+  String get versionFromTag => 'last tag';
+
+  @override
+  String get versionRecommended => 'Suggested';
+
+  @override
+  String versionReason(int feats, int fixes, int breaking) {
+    return '$feats features · $fixes fixes · $breaking breaking';
+  }
+
+  @override
+  String get versionCustom => 'Custom version';
+
+  @override
+  String get versionFiles => 'Files to change';
+
+  @override
+  String get versionNoFiles => 'No version file, so only the tag is created.';
+
+  @override
+  String get versionCommit => 'Create release branch and commit';
+
+  @override
+  String get bumpFinal => 'Final';
+
+  @override
+  String get bumpPrerelease => 'Pre-release';
+
+  @override
+  String doneReleaseCommit(String tag) {
+    return 'Committed the $tag version bump';
+  }
+
+  @override
+  String mergeWaiting(int number) {
+    return 'Waiting for PR #$number to merge — merging on GitHub works too';
+  }
+
+  @override
+  String tagCheckPrMerged(int number) {
+    return 'PR #$number is merged';
+  }
+
+  @override
+  String tagCheckSynced(String branch) {
+    return 'On $branch and in sync with the remote';
+  }
+
+  @override
+  String tagCheckVersion(String tag) {
+    return 'Version files match $tag';
+  }
+
+  @override
+  String tagCheckVersionWrong(String version) {
+    return 'The version is $version. The version bump PR may not be merged yet.';
+  }
+
+  @override
+  String tagCheckFree(String tag) {
+    return '$tag doesn\'t exist yet';
+  }
+
+  @override
+  String tagConfirmTitle(String tag) {
+    return 'Push tag $tag?';
+  }
+
+  @override
+  String tagConfirmMessage(String tag, String branch) {
+    return 'Tags the merge commit on $branch as $tag. Pushing publishes the release, and tags aren\'t moved or deleted afterwards.';
+  }
+
+  @override
+  String get tagConfirmPush => 'Tag and push';
+
+  @override
+  String doneTagPushed(String tag) {
+    return 'Pushed $tag';
+  }
+
+  @override
+  String get notesLabel => 'Release notes (Markdown)';
+
+  @override
+  String get notesFeatures => 'New features';
+
+  @override
+  String get notesFixes => 'Bug fixes';
+
+  @override
+  String get notesOther => 'Other changes';
+
+  @override
+  String get notesCreateRelease => 'Create GitHub release';
+
+  @override
+  String get notesEdit => 'Edit notes';
+
+  @override
+  String get doneReleaseCreated => 'GitHub release created';
+
+  @override
+  String get doneNotesSaved => 'Release notes saved';
+
+  @override
+  String ciWaitingForRun(String tag) {
+    return 'Looking for the workflow run for $tag';
+  }
+
+  @override
+  String get ciOpenInBrowser => 'Open in browser';
+
+  @override
+  String get ciRerunFailed => 'Re-run failed jobs';
+
+  @override
+  String get doneRerun => 'Re-running failed jobs';
+
+  @override
+  String get runQueued => 'queued';
+
+  @override
+  String get runRunning => 'running';
+
+  @override
+  String get runSuccess => 'succeeded';
+
+  @override
+  String get runFailure => 'failed';
+
+  @override
+  String get runCancelled => 'cancelled';
+
+  @override
+  String get runSkipped => 'skipped';
+
+  @override
+  String get helpCaptionAfterSquash =>
+      'After a squash merge — one new commit S on main';
+
+  @override
+  String get helpCaptionTag =>
+      'v1.0.0 and v1.1.0 stay put; main keeps moving forward';
+
+  @override
+  String get helpLinkGitHubMergeMethods => 'GitHub — About merge methods';
+
+  @override
+  String get helpLinkTagging => 'Pro Git — Tagging';
+
+  @override
+  String get helpSquashTitle => 'Squash';
+
+  @override
+  String get helpSquashWord => 'To press something flat.';
+
+  @override
+  String get helpSquashInGit =>
+      'Presses the branch\'s commits into a single commit on the target branch. The changes are the same; only the number of commits becomes one.';
+
+  @override
+  String get helpSquashWhy =>
+      'Keeps work-in-progress commits like \'fix typo\' out of the main history: one feature, one commit. Common when merging pull requests. The original commits don\'t reach the default branch, so delete the merged branch instead of reusing it.';
+
+  @override
+  String get helpTagTitle => 'Tags (annotated and lightweight)';
+
+  @override
+  String get helpTagWord => 'A tag is a label you attach to something.';
+
+  @override
+  String get helpTagInGit =>
+      'A name attached to one commit. A branch label moves forward with new commits; a tag stays on its commit. An annotated tag also stores who made it, when, and a message; a lightweight tag stores only the name.';
+
+  @override
+  String get helpTagWhy =>
+      'Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don\'t move or delete a pushed tag; if it\'s wrong, tag the next number.';
 }
