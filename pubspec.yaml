@@ -40,6 +40,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   window_manager: ^0.5.2
+  file_selector: ^1.1.0
+  desktop_drop: ^0.8.4
 
 dev_dependencies:
   flutter_test:
