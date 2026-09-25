@@ -276,4 +276,54 @@ void main() {
     expect(find.text('gh pr checkout 21'), findsOneWidget);
     expect(find.text('이 PR 브랜치로 체크아웃'), findsOneWidget);
   });
+
+  // v0.3.0 사고 재현: 버전 올림 없이 태그 탭에서 v0.3.0을 push하려 함.
+  testWidgets('new tag is blocked from pushing when it does not match the version file', (tester) async {
+    late SemVer? head;
+    await tester.runAsync(() async {
+      File('${repo.root}/pubspec.yaml').writeAsStringSync('name: x\nversion: 0.2.2+6\n');
+      await git(repo.root, ['add', 'pubspec.yaml']);
+      await git(repo.root, ['commit', '-q', '-m', 'chore: pubspec']);
+      await repo.refresh();
+      head = await loadCommittedVersion(repo, 'HEAD');
+    });
+    expect(head.toString(), '0.2.2+6');
+    var wizardOpened = false;
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => showCreateTagSheet(context, repo, headVersion: head, onOpenReleaseWizard: () => wizardOpened = true),
+        child: const Text('open'),
+      );
+    }));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final nameField = find.byType(TextField).first;
+    await tester.enterText(nameField, 'v0.3.0');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('pubspec.yaml의 버전은 0.2.2인데 태그는 v0.3.0'), findsOneWidget);
+    expect(find.textContaining('push는 막았습니다'), findsOneWidget);
+    FilledButton confirm() => tester.widget<FilledButton>(find.widgetWithText(FilledButton, '만들고 push'));
+    expect(confirm().onPressed, isNull);
+    // 메시지는 직접 고치기 전까지 이름을 따라간다 (표시 이름이 없으면 저장소 이름).
+    expect(tester.widget<TextField>(find.byType(TextField).at(1)).controller!.text, 'repo 0.3.0');
+
+    // push를 끄면 로컬 태그는 만들 수 있다.
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, '만들기')).onPressed, isNotNull);
+
+    // 버전 파일과 같은 태그는 막지 않는다.
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.enterText(nameField, 'v0.2.2');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('push는 막았습니다'), findsNothing);
+    expect(confirm().onPressed, isNotNull);
+
+    await tester.enterText(nameField, 'v0.3.0');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('릴리스 마법사 열기'));
+    await tester.pumpAndSettle();
+    expect(wizardOpened, isTrue);
+  });
 }

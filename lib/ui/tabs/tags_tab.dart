@@ -5,6 +5,7 @@ import '../../git/commands.dart';
 import '../../git/tags.dart';
 import '../../l10n/app_localizations.dart';
 import '../../release/repo_release_info.dart';
+import '../../release/version_files.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
@@ -16,7 +17,9 @@ import '../widgets.dart';
 
 /// 태그 탭 (UI_UX.md §4.3, PLAN.md 3.7).
 class TagsTab extends StatefulWidget {
-  const TagsTab({super.key});
+  const TagsTab({super.key, this.onOpenReleaseWizard});
+
+  final VoidCallback? onOpenReleaseWizard;
 
   @override
   State<TagsTab> createState() => _TagsTabState();
@@ -49,7 +52,7 @@ class _TagsTabState extends State<TagsTab> {
           title: l10n.tagsTitle,
           help: Concept.annotatedTag,
           trailing: FilledButton.tonalIcon(
-            onPressed: repo.busy || repo.status.unborn ? null : () => showCreateTagSheet(context, repo),
+            onPressed: repo.busy || repo.status.unborn ? null : () => showCreateTagSheet(context, repo, onOpenReleaseWizard: widget.onOpenReleaseWizard),
             icon: const Icon(Icons.add_rounded, size: 16),
             label: Text('${l10n.tagsNew}  ${shortcutLabel('T')}', overflow: TextOverflow.ellipsis),
           ),
@@ -192,13 +195,35 @@ class _TagRow extends StatelessWidget {
 }
 
 /// 새 태그 (PLAN.md 3.7): 주석 태그(기본)/가벼운 태그, 대상, 메시지, 이름 검사.
-Future<void> showCreateTagSheet(BuildContext context, RepoController repo) =>
-    showActionSheet<void>(context, (context) => _CreateTagSheet(repo: repo));
+/// [onOpenReleaseWizard]: 버전 파일과 맞지 않는 릴리스 태그를 막을 때 보여 줄
+/// "릴리스 마법사 열기" 버튼의 동작.
+/// [headVersion]을 주면 HEAD의 버전을 다시 읽지 않는다 (테스트에서 미리 읽을 때).
+Future<void> showCreateTagSheet(
+  BuildContext context,
+  RepoController repo, {
+  VoidCallback? onOpenReleaseWizard,
+  SemVer? headVersion,
+}) =>
+    showActionSheet<void>(
+      context,
+      (context) => _CreateTagSheet(repo: repo, onOpenReleaseWizard: onOpenReleaseWizard, headVersion: headVersion),
+    );
+
+/// [ref] 커밋에 커밋된 버전 파일의 버전. 버전 파일이 없으면 null.
+Future<SemVer?> loadCommittedVersion(RepoController repo, String ref) async {
+  final files = detectVersionFiles(repo.root);
+  if (files.isEmpty) return null;
+  final f = files.first;
+  final r = await repo.read(['git', 'show', '$ref:${f.path}']);
+  return r.ok ? readVersion(f.kind, r.stdout) : null;
+}
 
 class _CreateTagSheet extends StatefulWidget {
-  const _CreateTagSheet({required this.repo});
+  const _CreateTagSheet({required this.repo, this.onOpenReleaseWizard, this.headVersion});
 
   final RepoController repo;
+  final VoidCallback? onOpenReleaseWizard;
+  final SemVer? headVersion;
 
   @override
   State<_CreateTagSheet> createState() => _CreateTagSheetState();
@@ -211,18 +236,50 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
   bool _push = true;
   String? _target;
 
+  /// 메시지를 직접 고치기 전까지는 태그 이름을 따라간다 (`<표시 이름> <버전>`).
+  bool _messageEdited = false;
+  String _autoMessage = '';
+
+  /// 태그를 달 커밋의 버전 파일 버전 (태그 전 점검, PLAN.md 3.8.3 5단계와 같은 규칙).
+  /// v0.3.0을 태그 탭에서 버전 올림 없이 달아 CI가 멈춘 일에서 나왔다.
+  VersionFile? _versionFile;
+  SemVer? _targetVersion;
+  late final bool _ciReleases = detectReleaseWorkflows(widget.repo.root).any((w) => w.onTags);
+
   String _suggestion() {
     final latest = widget.repo.tags.map((t) => t.version).whereType<SemVer>().firstOrNull;
     if (latest == null) return 'v0.1.0';
     return latest.pre != null ? 'v${latest.major}.${latest.minor}.${latest.patch}' : 'v${latest.major}.${latest.minor}.${latest.patch + 1}';
   }
 
+  String _messageFor(String tag) => '${displayNameFor(widget.repo.root, widget.repo.name)} ${tag.replaceFirst('v', '')}';
+
   @override
   void initState() {
     super.initState();
-    _message.text = '${displayNameFor(widget.repo.root, widget.repo.name)} ${_name.text.replaceFirst('v', '')}';
-    _name.addListener(() => setState(() {}));
-    _message.addListener(() => setState(() {}));
+    _message.text = _autoMessage = _messageFor(_name.text);
+    _name.addListener(() {
+      if (!_messageEdited) _message.text = _autoMessage = _messageFor(_name.text.trim());
+      setState(() {});
+    });
+    _message.addListener(() {
+      if (_message.text != _autoMessage) _messageEdited = true;
+      setState(() {});
+    });
+    final files = detectVersionFiles(widget.repo.root);
+    _versionFile = files.isEmpty ? null : files.first;
+    _loadTargetVersion();
+  }
+
+  /// 대상 커밋에 커밋된 버전 (작업 트리가 아니라 태그가 가리킬 커밋 기준).
+  Future<void> _loadTargetVersion() async {
+    if (_versionFile == null) return;
+    if (_target == null && widget.headVersion != null) {
+      _targetVersion = widget.headVersion;
+      return;
+    }
+    final v = await loadCommittedVersion(widget.repo, _target ?? 'HEAD');
+    if (mounted) setState(() => _targetVersion = v);
   }
 
   @override
@@ -247,6 +304,10 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
       _ => null,
     };
     final remote = repo.defaultRemote;
+    final tagVersion = SemVer.tryParse(name);
+    final mismatch = tagVersion != null && _targetVersion != null && tagVersion.name != _targetVersion!.name;
+    // 버전이 맞지 않는 릴리스 태그는 push하지 않는다. 로컬에만 만드는 것은 허용.
+    final pushBlocked = mismatch && _push && remote != null;
     final commands = [
       GitCommands.createTag(name.isEmpty ? '<tag>' : name,
           message: _annotated ? _message.text.trim() : null, target: _target),
@@ -272,8 +333,24 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
       help: Concept.annotatedTag,
       commands: commands,
       confirmLabel: _push ? l10n.tagsCreateAndPush : l10n.tagsCreate,
-      onConfirm: blocking || name.isEmpty ? null : submit,
+      onConfirm: blocking || name.isEmpty || pushBlocked ? null : submit,
       children: [
+        if (mismatch) ...[
+          _VersionMismatch(
+            file: _versionFile!.path,
+            fileVersion: _targetVersion!.name,
+            tag: name,
+            ciReleases: _ciReleases,
+            pushBlocked: pushBlocked,
+            onOpenReleaseWizard: widget.onOpenReleaseWizard == null
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    widget.onOpenReleaseWizard!();
+                  },
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
         TextField(
           controller: _name,
           autofocus: true,
@@ -308,7 +385,10 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
             for (final b in repo.localBranches.where((b) => !b.current))
               DropdownMenuItem(value: b.name, child: Text(b.name, style: AppFonts.userContent)),
           ],
-          onChanged: (v) => setState(() => _target = v),
+          onChanged: (v) {
+            setState(() => _target = v);
+            _loadTargetVersion();
+          },
         ),
         if (remote != null)
           CheckboxListTile(
@@ -319,6 +399,64 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
             title: Text(l10n.tagsPushAfter(remote)),
           ),
       ],
+    );
+  }
+}
+
+/// 태그 버전과 버전 파일이 다를 때의 안내 (태그 전 점검).
+class _VersionMismatch extends StatelessWidget {
+  const _VersionMismatch({
+    required this.file,
+    required this.fileVersion,
+    required this.tag,
+    required this.ciReleases,
+    required this.pushBlocked,
+    this.onOpenReleaseWizard,
+  });
+
+  final String file;
+  final String fileVersion;
+  final String tag;
+  final bool ciReleases;
+  final bool pushBlocked;
+  final VoidCallback? onOpenReleaseWizard;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final color = toneColor(context, Tone.warning);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppRadius.button),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(Icons.warning_amber_rounded, size: 18, color: color),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(child: Text(l10n.tagVersionMismatch(file, fileVersion, tag), style: theme.textTheme.bodyMedium)),
+        ]),
+        const SizedBox(height: 4),
+        Text(
+          [
+            l10n.tagVersionMismatchWhy,
+            if (ciReleases) l10n.tagVersionMismatchCi,
+            if (pushBlocked) l10n.tagVersionMismatchBlocked,
+          ].join(' '),
+          style: theme.textTheme.bodySmall,
+        ),
+        if (onOpenReleaseWizard != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          FilledButton.tonalIcon(
+            onPressed: onOpenReleaseWizard,
+            icon: const Icon(Icons.rocket_launch_rounded, size: 16),
+            label: Text(l10n.tagOpenReleaseWizard),
+          ),
+        ],
+      ]),
     );
   }
 }

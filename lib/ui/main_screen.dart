@@ -149,6 +149,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     );
   }
 
+  /// 릴리스 탭으로 가서 마법사를 시작한다 (⌘⇧R, 태그 탭의 버전 불일치 안내).
+  void _openReleaseWizard() {
+    final repo = _repo;
+    final flow = _flow;
+    if (repo == null || flow == null) return;
+    _tabs.animateTo(_tabRelease);
+    if (flow.checks.isEmpty && flow.step == ReleaseStep.check && repo.githubRemote != null && _env.ghReady) {
+      flow.ghReady = _env.ghReady;
+      flow.runChecks();
+    }
+  }
+
   void _dismiss(String key) => setState(() => _dismissed.add(key));
 
   void _close() {
@@ -199,16 +211,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
         key(LogicalKeyboardKey.keyT): () {
           if (repo.status.unborn) return;
           _tabs.animateTo(_tabTags);
-          showCreateTagSheet(context, repo);
+          showCreateTagSheet(context, repo, onOpenReleaseWizard: _openReleaseWizard);
         },
-        key(LogicalKeyboardKey.keyR, shift: true): () {
-          _tabs.animateTo(_tabRelease);
-          final flow = _flow;
-          if (flow != null && flow.checks.isEmpty && repo.githubRemote != null && _env.ghReady) {
-            flow.ghReady = _env.ghReady;
-            flow.runChecks();
-          }
-        },
+        key(LogicalKeyboardKey.keyR, shift: true): _openReleaseWizard,
         key(LogicalKeyboardKey.keyP): () => RepoActions.push(context, repo),
         key(LogicalKeyboardKey.keyP, shift: true): () => RepoActions.pull(context, repo),
         key(LogicalKeyboardKey.keyF, shift: true): () => RepoActions.fetch(context, repo),
@@ -449,7 +454,7 @@ class _RepoView extends StatelessWidget {
           children: [
             ChangesTab(commitFocus: state._commitFocus),
             const BranchesTab(),
-            const TagsTab(),
+            TagsTab(onOpenReleaseWizard: state._openReleaseWizard),
             const RemotesTab(),
             ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
             const PrTab(),

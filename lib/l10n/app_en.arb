@@ -458,5 +458,10 @@
   "doneReleasePublished": "Published the {tag} draft",
   "notesEditTab": "Edit",
   "notesPreviewTab": "Preview",
-  "notesEmpty": "Nothing to preview"
+  "notesEmpty": "Nothing to preview",
+  "tagVersionMismatch": "{file} says {version}, but the tag is {tag}.",
+  "tagVersionMismatchWhy": "A release tag goes on the commit that bumps the version — the release wizard does the bump PR through the tag in order.",
+  "tagVersionMismatchCi": "In this repository pushing a tag makes CI build the release, and CI stops when the versions differ.",
+  "tagVersionMismatchBlocked": "So pushing is blocked. Turn off push to create it only locally.",
+  "tagOpenReleaseWizard": "Open the release wizard"
 }
