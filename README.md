@@ -25,19 +25,22 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: open a repository, create a branch, push it, then tag and publish a release">
+  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: create and switch to a new branch feature/hourly from the Branches tab, then publish it to the remote">
 </p>
 
 ## Features
 
-- **{{TODO: Feature}}** — {{TODO: what it does, concretely (names, numbers, formats)}}
-- **{{TODO: Feature}}** — {{TODO: …}}
-- **{{TODO: Feature}}** — {{TODO: …}}
+- **A tall window that sits beside your editor** — 440×960 by default, down to 380px wide. Saves in your editor and commits from a terminal show up right away, and it can stay on top
+- **Status at a glance, one next step** — branch → upstream, ↑ commits to push / ↓ commits to pull and the number of changes stay at the top, with one suggestion such as "2 commits aren't on the remote yet [Push]"
+- **Fetch · pull · push · publish** — remembers the pull method (merge / rebase / fast-forward only) per repository, and publishes (`git push -u`) branches that aren't on the remote yet
+- **Branches and remotes** — create (with name checks), switch, rename, delete and delete-on-remote; add remotes, change URLs, switch HTTPS↔SSH, and publish to GitHub with `gh repo create`
+- **Buttons that show their command** — every form shows the `git`/`gh` command it will run, and the command log (⌘J) keeps the output, so you learn the commands as you go
+- **Confusing words, drawn** — fetch vs. pull, upstream, fast-forward, merge commit and rebase explained as the word → what it means in git → a commit graph. The 12 most common errors come with the reason and the fix
 - **Light & dark, English & 한국어** — follows the system, or pick one in the toolbar
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="360" alt="{{TODO: screen 1}}">
-  <img src="docs/screenshots/detail.png" width="360" alt="{{TODO: screen 2}}">
+  <img src="docs/screenshots/home.png" width="360" alt="Changes tab: the status header with main → origin/main, ↑2, 4 changed and Fetch, Pull and Push, a suggestion banner, and the staged and changed files (light and dark)">
+  <img src="docs/screenshots/detail.png" width="360" alt="New branch form: branch name, prefix chips, start point, switch after creating, and the command to run: git switch -c feature/hourly">
 </p>
 
 ## Install
@@ -54,7 +57,7 @@ Download from [**Releases**](https://github.com/jejezz/branch-dock-flutter/relea
 
 ## How it works
 
-{{TODO: 2–4 sentences for the curious — the one interesting technical choice (e.g. "Dart drives the UI; a 100-line Swift bridge covers Trash and Full Disk Access"). Delete this section if there is nothing interesting to say.}}
+Branch Dock doesn't reimplement git. It runs the `git` and `gh` you have installed, with argument lists and no shell, and reads only machine-readable output (`git status --porcelain=v2`, `git for-each-ref`, `gh --json`), so it isn't thrown off by git versions or locale settings. What you do in the app and what you do in a terminal always agree, and the command each button shows can be copied and run as is.
 
 ## Development
 
