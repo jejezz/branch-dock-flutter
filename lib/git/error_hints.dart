@@ -2,7 +2,7 @@
 /// 언어별로 붙인다. git은 LC_ALL=C로 실행하므로 영어 원문을 기준으로 한다.
 library;
 
-enum ErrorHint {
+enum GitErrorKind {
   /// push 거부: 원격에 내게 없는 커밋이 있다.
   pushRejected,
 
@@ -40,41 +40,41 @@ enum ErrorHint {
   notInstalled,
 }
 
-ErrorHint? classifyError(String output, {int? exitCode}) {
+GitErrorKind? classifyError(String output, {int? exitCode}) {
   final o = output.toLowerCase();
   if (exitCode == 127 || o.contains('no such file or directory') && o.contains('failed to find')) {
-    return ErrorHint.notInstalled;
+    return GitErrorKind.notInstalled;
   }
-  if (o.contains('protected branch') || o.contains('gh006')) return ErrorHint.protectedBranch;
+  if (o.contains('protected branch') || o.contains('gh006')) return GitErrorKind.protectedBranch;
   if (o.contains('[rejected]') && (o.contains('fetch first') || o.contains('non-fast-forward'))) {
-    return ErrorHint.pushRejected;
+    return GitErrorKind.pushRejected;
   }
-  if (o.contains('updates were rejected')) return ErrorHint.pushRejected;
+  if (o.contains('updates were rejected')) return GitErrorKind.pushRejected;
   if (o.contains('not possible to fast-forward') || o.contains('diverging branches')) {
-    return ErrorHint.notFastForward;
+    return GitErrorKind.notFastForward;
   }
   if (o.contains('would be overwritten by') || o.contains('please commit your changes or stash them')) {
-    return ErrorHint.localChangesWouldBeOverwritten;
+    return GitErrorKind.localChangesWouldBeOverwritten;
   }
   if (o.contains('conflict') && (o.contains('merge conflict') || o.contains('fix conflicts'))) {
-    return ErrorHint.conflict;
+    return GitErrorKind.conflict;
   }
-  if (o.contains('is not fully merged')) return ErrorHint.branchNotMerged;
+  if (o.contains('is not fully merged')) return GitErrorKind.branchNotMerged;
   if (o.contains('has no upstream branch') || o.contains('no tracking information')) {
-    return ErrorHint.noUpstream;
+    return GitErrorKind.noUpstream;
   }
-  if (o.contains('already exists')) return ErrorHint.alreadyExists;
+  if (o.contains('already exists')) return GitErrorKind.alreadyExists;
   if (o.contains('authentication failed') ||
       o.contains('could not read username') ||
       o.contains('permission denied (publickey)') ||
       o.contains('gh auth login')) {
-    return ErrorHint.authFailed;
+    return GitErrorKind.authFailed;
   }
   if (o.contains('repository not found') || o.contains('does not appear to be a git repository')) {
-    return ErrorHint.repositoryNotFound;
+    return GitErrorKind.repositoryNotFound;
   }
   if (o.contains('could not resolve host') || o.contains('unable to access') || o.contains('timed out')) {
-    return ErrorHint.network;
+    return GitErrorKind.network;
   }
   return null;
 }

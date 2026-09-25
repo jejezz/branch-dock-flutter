@@ -39,6 +39,8 @@ void main() {
       expect(RepoStatus.parse('# branch.oid (initial)\x00# branch.head main\x00').unborn, isTrue);
       final d = RepoStatus.parse('# branch.oid abc\x00# branch.head (detached)\x00');
       expect(d.detached, isTrue);
+      final gone = RepoStatus.parse('# branch.oid abc\x00# branch.head main\x00# branch.upstream origin/main\x00');
+      expect((gone.upstreamGone, gone.hasUpstream), (true, false));
       expect(d.clean, isTrue);
     });
   });
@@ -107,11 +109,11 @@ void main() {
   test('classifyError', () {
     expect(
       classifyError(' ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs'),
-      ErrorHint.pushRejected,
+      GitErrorKind.pushRejected,
     );
-    expect(classifyError('fatal: Not possible to fast-forward, aborting.'), ErrorHint.notFastForward);
-    expect(classifyError("error: The branch 'x' is not fully merged."), ErrorHint.branchNotMerged);
-    expect(classifyError('fatal: could not read Username for'), ErrorHint.authFailed);
+    expect(classifyError('fatal: Not possible to fast-forward, aborting.'), GitErrorKind.notFastForward);
+    expect(classifyError("error: The branch 'x' is not fully merged."), GitErrorKind.branchNotMerged);
+    expect(classifyError('fatal: could not read Username for'), GitErrorKind.authFailed);
     expect(classifyError('whatever'), isNull);
   });
 

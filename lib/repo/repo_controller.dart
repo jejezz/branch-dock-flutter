@@ -39,7 +39,7 @@ class RepoController extends ChangeNotifier {
   StreamSubscription<FileSystemEvent>? _watch;
   Timer? _debounce;
   Timer? _poll;
-  bool _refreshing = false;
+  Future<void>? _refreshing;
   bool _refreshAgain = false;
   bool _disposed = false;
 
@@ -87,32 +87,34 @@ class RepoController extends ChangeNotifier {
   /// Windows의 git은 `C:/a/b`로 돌려준다.
   static String _nativePath(String p) => Platform.isWindows ? p.replaceAll('/', r'\') : p;
 
-  Future<void> refresh() async {
-    if (_disposed) return;
-    if (_refreshing) {
+  /// 상태를 다시 읽는다. 이미 읽는 중이면 그 작업이 한 번 더 돌도록 표시하고
+  /// 끝날 때까지 기다린다 — 호출한 쪽은 항상 최신 상태를 본다.
+  Future<void> refresh() {
+    if (_disposed) return Future.value();
+    final running = _refreshing;
+    if (running != null) {
       _refreshAgain = true;
-      return;
+      return running;
     }
-    _refreshing = true;
-    try {
-      do {
-        _refreshAgain = false;
-        final results = await Future.wait([
-          runner.run(GitCommands.status, workingDirectory: root, quiet: true),
-          runner.run(GitCommands.branches, workingDirectory: root, quiet: true),
-          runner.run(GitCommands.remotes, workingDirectory: root, quiet: true),
-        ]);
-        if (_disposed) return;
-        if (results[0].ok) status = RepoStatus.parse(results[0].stdout);
-        if (results[1].ok) branches = Branch.parse(results[1].stdout);
-        if (results[2].ok) remotes = Remote.parse(results[2].stdout);
-        operation = _readOperation();
-        loaded = true;
-        notifyListeners();
-      } while (_refreshAgain && !_disposed);
-    } finally {
-      _refreshing = false;
-    }
+    return _refreshing = _refreshLoop().whenComplete(() => _refreshing = null);
+  }
+
+  Future<void> _refreshLoop() async {
+    do {
+      _refreshAgain = false;
+      final results = await Future.wait([
+        runner.run(GitCommands.status, workingDirectory: root, quiet: true),
+        runner.run(GitCommands.branches, workingDirectory: root, quiet: true),
+        runner.run(GitCommands.remotes, workingDirectory: root, quiet: true),
+      ]);
+      if (_disposed) return;
+      if (results[0].ok) status = RepoStatus.parse(results[0].stdout);
+      if (results[1].ok) branches = Branch.parse(results[1].stdout);
+      if (results[2].ok) remotes = Remote.parse(results[2].stdout);
+      operation = _readOperation();
+      loaded = true;
+      notifyListeners();
+    } while (_refreshAgain && !_disposed);
   }
 
   RepoOperation _readOperation() {
@@ -166,7 +168,7 @@ class RepoController extends ChangeNotifier {
   /// 추적 브랜치가 없으면 게시한다.
   Future<CommandResult> push() {
     final head = status.head;
-    if (head != null && status.upstream == null && defaultRemote != null) {
+    if (head != null && !status.hasUpstream && defaultRemote != null) {
       return execute(GitCommands.publish(defaultRemote!, head));
     }
     return execute(GitCommands.push);
@@ -174,13 +176,13 @@ class RepoController extends ChangeNotifier {
 
   List<String> get pushCommand {
     final head = status.head;
-    if (head != null && status.upstream == null && defaultRemote != null) {
+    if (head != null && !status.hasUpstream && defaultRemote != null) {
       return GitCommands.publish(defaultRemote!, head);
     }
     return GitCommands.push;
   }
 
-  bool get needsPublish => !status.detached && status.upstream == null && remotes.isNotEmpty;
+  bool get needsPublish => !status.detached && !status.hasUpstream && remotes.isNotEmpty;
 
   Future<CommandResult> switchTo(Branch b) {
     if (!b.remote) return execute(GitCommands.switchTo(b.name));

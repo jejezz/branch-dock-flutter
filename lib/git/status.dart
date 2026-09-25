@@ -59,6 +59,7 @@ class RepoStatus {
     this.upstream,
     this.ahead = 0,
     this.behind = 0,
+    this.upstreamGone = false,
     this.files = const [],
   });
 
@@ -70,7 +71,14 @@ class RepoStatus {
   final String? upstream;
   final int ahead;
   final int behind;
+
+  /// 추적 브랜치가 설정돼 있지만 원격에 없다 (빈 저장소를 복제했거나 원격에서
+  /// 지워짐). git은 이때 branch.ab 줄을 내지 않는다.
+  final bool upstreamGone;
   final List<FileChange> files;
+
+  /// 원격에 짝이 있는 추적 브랜치가 있는가.
+  bool get hasUpstream => upstream != null && !upstreamGone;
 
   bool get detached => head == null;
   bool get unborn => oid == null;
@@ -90,6 +98,7 @@ class RepoStatus {
     String? upstream;
     var ahead = 0;
     var behind = 0;
+    var hasAb = false;
     final files = <FileChange>[];
 
     final records = output.split('\x00');
@@ -108,6 +117,7 @@ class RepoStatus {
           upstream = header.substring(16);
         } else if (header.startsWith('branch.ab ')) {
           final m = RegExp(r'\+(\d+) -(\d+)').firstMatch(header);
+          hasAb = true;
           if (m != null) {
             ahead = int.parse(m.group(1)!);
             behind = int.parse(m.group(2)!);
@@ -135,7 +145,15 @@ class RepoStatus {
           break; // '!' 무시된 파일은 요청하지 않는다.
       }
     }
-    return RepoStatus(head: head, oid: oid, upstream: upstream, ahead: ahead, behind: behind, files: files);
+    return RepoStatus(
+      head: head,
+      oid: oid,
+      upstream: upstream,
+      ahead: ahead,
+      behind: behind,
+      upstreamGone: upstream != null && !hasAb,
+      files: files,
+    );
   }
 }
 

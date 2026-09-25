@@ -27,7 +27,7 @@ NextAction? suggestNextAction({required RepoStatus status, required List<Remote>
   if (remotes.isEmpty) {
     return status.unborn ? null : const NextAction(NextActionKind.publishToGitHub);
   }
-  if (!status.detached && status.upstream == null && !status.unborn) {
+  if (!status.detached && !status.hasUpstream && !status.unborn) {
     return const NextAction(NextActionKind.publish);
   }
   if (status.ahead > 0) return NextAction(NextActionKind.push, status.ahead);
