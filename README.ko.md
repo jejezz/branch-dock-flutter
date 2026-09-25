@@ -9,7 +9,7 @@
 <h1 align="center">Branch Dock</h1>
 
 <p align="center">
-  <b>GitHub CLI(gh)를 위한 데스크톱 GUI</b> — 터미널 대신 창에서 gh 명령을 실행하고, 저장소·풀 리퀘스트·이슈·릴리스를 한 화면에서 봅니다.
+  <b>Git과 GitHub CLI를 위한 데스크톱 도우미</b> — 편집기 옆에 세워 두고 브랜치·태그·병합·Pull/Push·원격·릴리스를 버튼으로 다룹니다. 버튼마다 실제로 실행되는 명령을 보여 줍니다.
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock 데모: {{TODO: GIF가 보여주는 흐름}}">
+  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock 데모: 저장소 열기, 브랜치 만들기, Push, 태그를 달고 릴리스 게시">
 </p>
 
 ## 기능
@@ -63,7 +63,9 @@ flutter pub get
 flutter run -d macos
 ```
 
-{{TODO: 빌드에 더 필요한 것(네이티브 도구, 환경 변수). 구조 문서 링크: [ARCHITECTURE.md](ARCHITECTURE.md), [UI_UX.md](UI_UX.md).}}
+실행하려면 [git](https://git-scm.com)과 [GitHub CLI](https://cli.github.com)(`gh`)가 설치되어 있고 로그인(`gh auth login`)되어 있어야 합니다. Branch Dock은 설치된 것을 호출할 뿐 함께 넣어 배포하지 않습니다. git 동작은 어느 호스팅에서나 되지만, Pull Request·릴리스·Actions는 GitHub 원격이 있어야 합니다 — `gh`는 GitHub 전용입니다.
+
+계획서: [PLAN.md](PLAN.md)(기능), [UI_UX.md](UI_UX.md)(화면).
 
 릴리스: `scripts/bump-version.sh patch` → 병합 → `vX.Y.Z` 태그. CI가 모든 플랫폼을 빌드해서 올립니다. 규칙: [application-release-templates/conventions](https://github.com/jejezz/application-release-templates/tree/main/conventions).
 

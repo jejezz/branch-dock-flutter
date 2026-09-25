@@ -9,7 +9,7 @@
 <h1 align="center">Branch Dock</h1>
 
 <p align="center">
-  A free, open-source <b>desktop GUI for the GitHub CLI (gh)</b> — run gh commands and see repositories, pull requests, issues and releases in one window instead of a terminal.
+  A free, open-source <b>desktop companion for Git and the GitHub CLI</b> — dock it beside your editor and handle branches, tags, merges, pull/push, remotes and releases with buttons that show the exact command they run.
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: {{TODO: what the GIF shows, e.g. open, scan, clean}}">
+  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: open a repository, create a branch, push it, then tag and publish a release">
 </p>
 
 ## Features
@@ -63,7 +63,9 @@ flutter pub get
 flutter run -d macos
 ```
 
-{{TODO: Anything else needed to build (native tools, env vars). Link docs/ for architecture: [ARCHITECTURE.md](ARCHITECTURE.md), [UI_UX.md](UI_UX.md).}}
+To run it you also need [git](https://git-scm.com) and the [GitHub CLI](https://cli.github.com) (`gh`) installed and logged in (`gh auth login`). Branch Dock calls the ones you have; it never bundles them. Git operations work with any host, but pull requests, releases and Actions need a GitHub remote — `gh` is GitHub-only.
+
+Plans: [PLAN.md](PLAN.md) (features), [UI_UX.md](UI_UX.md) (screens).
 
 Releasing: `scripts/bump-version.sh patch`, merge, then tag `vX.Y.Z` — CI builds and publishes every platform. Rules: [application-release-templates/conventions](https://github.com/jejezz/application-release-templates/tree/main/conventions).
 
