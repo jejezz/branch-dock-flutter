@@ -1,12 +1,12 @@
 // From jejezz/application-release-templates common/ @ conventions-v1.
 // conventions/about-dialog.md §4 — 정보 창이 열리고 버전·저작권·라이선스
-// 화면이 동작하는지. github_cli를 앱의 pubspec name으로 바꾼다.
+// 화면이 동작하는지. branch_dock를 앱의 pubspec name으로 바꾼다.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:github_cli/about/about_dialog.dart';
-import 'package:github_cli/app_identity.dart';
-import 'package:github_cli/l10n/app_localizations.dart';
+import 'package:branch_dock/about/about_dialog.dart';
+import 'package:branch_dock/app_identity.dart';
+import 'package:branch_dock/l10n/app_localizations.dart';
 
 Widget _host(Locale locale) => MaterialApp(
       locale: locale,

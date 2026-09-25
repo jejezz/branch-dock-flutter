@@ -1,4 +1,4 @@
-# GitHub CLI — 기능 계획서 (v0.1 초안)
+# Branch Dock — 기능 계획서 (v0.1 초안)
 
 화면 구성은 [UI_UX.md](UI_UX.md), 공통 규약은
 [conventions](https://github.com/jejezz/application-release-templates/tree/main/conventions)를 따른다.
@@ -429,6 +429,7 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 
 - 기본 편집기 연결 방식: OS 기본 앱으로 열기 vs `code`/`idea` 같은 명령 지정 (둘 다 지원 예정, 기본값 결정 필요)
 - Windows에서 `gh`/`git` 경로 탐색 (Git for Windows, winget, scoop 설치 위치)
-- 앱 이름: "GitHub CLI"는 공식 도구 이름과 같아 혼동과 상표 문제가 있을 수 있다.
-  첫 정식 릴리스 전에 이름을 확정한다 (식별자 `art.zoomon.githubcli`는 정식
-  릴리스 전인 지금은 아직 바꿀 수 있다).
+- ~~앱 이름~~ → **Branch Dock**으로 확정 (2026-09-25). 처음 이름 "GitHub CLI"는
+  공식 도구 이름과 같고, "Git Dock"은 Git 상표 정책(git-scm.com/about/trademark
+  §2.3: "Git"을 음절·합성어로 쓰는 제품명 금지)에 걸려 제외했다. "Git"과
+  "GitHub"는 이름이 아니라 소개 문구에서 "for Git / for the GitHub CLI"처럼 쓴다.

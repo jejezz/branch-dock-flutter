@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Jongyun Ahn" "\0"
-            VALUE "FileDescription", "GitHub CLI" "\0"
+            VALUE "FileDescription", "Branch Dock" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "github_cli" "\0"
+            VALUE "InternalName", "branch_dock" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 Jongyun Ahn" "\0"
-            VALUE "OriginalFilename", "github_cli.exe" "\0"
-            VALUE "ProductName", "GitHub CLI" "\0"
+            VALUE "OriginalFilename", "branch_dock.exe" "\0"
+            VALUE "ProductName", "Branch Dock" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

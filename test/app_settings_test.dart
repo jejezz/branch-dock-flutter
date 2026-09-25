@@ -1,10 +1,10 @@
 // From jejezz/application-release-templates common/ @ conventions-v1.
 // 설정 저장 키·기존 키 이전·언어 해석 (localization.md §3·§5).
-// github_cli를 앱의 pubspec name으로 바꾼다.
+// branch_dock를 앱의 pubspec name으로 바꾼다.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:github_cli/settings/app_settings.dart';
+import 'package:branch_dock/settings/app_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

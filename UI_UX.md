@@ -1,4 +1,4 @@
-# GitHub CLI — UI/UX 계획서 (v0.1 초안)
+# Branch Dock — UI/UX 계획서 (v0.1 초안)
 
 기능 범위는 [PLAN.md](PLAN.md)에 있다. 색, 모서리, 간격, 글꼴, 테마, 언어,
 공통 단축키, 상태 화면은

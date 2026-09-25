@@ -6,9 +6,9 @@
 
 abstract final class AppIdentity {
   /// 표시 이름. 번역하지 않는다 (conventions/localization.md §2).
-  static const displayName = 'GitHub CLI';
+  static const displayName = 'Branch Dock';
 
-  static const repositoryUrl = 'https://github.com/jejezz/github-cli-flutter';
+  static const repositoryUrl = 'https://github.com/jejezz/branch-dock-flutter';
 
   static const copyrightHolder = 'Jongyun Ahn';
 

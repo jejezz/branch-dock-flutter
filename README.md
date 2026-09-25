@@ -3,21 +3,21 @@
      Fill every {{TODO: …}}; tool/readme/check_readme.py fails while any is left. -->
 
 <p align="center">
-  <img src="assets/icon/app_icon.png" width="128" alt="GitHub CLI icon">
+  <img src="assets/icon/app_icon.png" width="128" alt="Branch Dock icon">
 </p>
 
-<h1 align="center">GitHub CLI</h1>
+<h1 align="center">Branch Dock</h1>
 
 <p align="center">
   A free, open-source <b>desktop GUI for the GitHub CLI (gh)</b> — run gh commands and see repositories, pull requests, issues and releases in one window instead of a terminal.
 </p>
 
 <p align="center">
-  <a href="https://github.com/jejezz/github-cli-flutter/releases/latest"><img src="https://img.shields.io/github/v/release/jejezz/github-cli-flutter?style=flat-square&color=4c9dff" alt="Latest release"></a>
-  <a href="https://github.com/jejezz/github-cli-flutter/releases"><img src="https://img.shields.io/github/downloads/jejezz/github-cli-flutter/total?style=flat-square&color=7c5cff" alt="Downloads"></a>
+  <a href="https://github.com/jejezz/branch-dock-flutter/releases/latest"><img src="https://img.shields.io/github/v/release/jejezz/branch-dock-flutter?style=flat-square&color=4c9dff" alt="Latest release"></a>
+  <a href="https://github.com/jejezz/branch-dock-flutter/releases"><img src="https://img.shields.io/github/downloads/jejezz/branch-dock-flutter/total?style=flat-square&color=7c5cff" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/platform-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-34d399?style=flat-square" alt="macOS · Windows · Linux">
   <img src="https://img.shields.io/badge/built%20with-Flutter-02569b?style=flat-square" alt="Flutter">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/jejezz/github-cli-flutter?style=flat-square" alt="MIT license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/jejezz/branch-dock-flutter?style=flat-square" alt="MIT license"></a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="GitHub CLI demo: {{TODO: what the GIF shows, e.g. open, scan, clean}}">
+  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: {{TODO: what the GIF shows, e.g. open, scan, clean}}">
 </p>
 
 ## Features
@@ -42,13 +42,13 @@
 
 ## Install
 
-Download from [**Releases**](https://github.com/jejezz/github-cli-flutter/releases/latest):
+Download from [**Releases**](https://github.com/jejezz/branch-dock-flutter/releases/latest):
 
 | OS | File |
 |---|---|
-| macOS 12.0+ | `GitHubCLI-<version>-macos-universal.dmg` — open it and drag GitHub CLI to Applications |
-| Windows 10/11 (x64) | `GitHubCLI-<version>-windows-x64-setup.exe` |
-| Linux (x64) | `GitHubCLI-<version>-linux-x64.tar.gz` — extract and run `./install.sh` (`--remove` to uninstall) |
+| macOS 12.0+ | `BranchDock-<version>-macos-universal.dmg` — open it and drag Branch Dock to Applications |
+| Windows 10/11 (x64) | `BranchDock-<version>-windows-x64-setup.exe` |
+| Linux (x64) | `BranchDock-<version>-linux-x64.tar.gz` — extract and run `./install.sh` (`--remove` to uninstall) |
 
 **Windows:** the installer isn't code-signed yet, so SmartScreen says "Windows protected your PC" — choose **More info → Run anyway**.
 
