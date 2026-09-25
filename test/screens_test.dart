@@ -24,7 +24,7 @@ import 'package:branch_dock/git/tags.dart';
 import 'package:branch_dock/release/release_flow.dart';
 import 'package:branch_dock/ui/onboarding.dart';
 import 'package:branch_dock/github/onboarding.dart';
-import 'package:branch_dock/ui/tabs/release_list.dart' show showRollbackDialog;
+import 'package:branch_dock/ui/tabs/release_list.dart' show ReleaseAssets, showRollbackDialog;
 import 'package:branch_dock/git/diff.dart';
 import 'package:branch_dock/git/history.dart';
 import 'package:branch_dock/git/commands.dart';
@@ -173,7 +173,7 @@ void main() {
         '"statusCheckRollup":[{"name":"test","status":"COMPLETED","conclusion":"SUCCESS"},'
         '{"name":"lint","status":"IN_PROGRESS","conclusion":""}],'
         '"headRefName":"release/v0.2.0","baseRefName":"main"}')!;
-    await pump(tester, ListView(children: [PrCard(pr: pr, repo: repo, onChanged: () {})]));
+    await pump(tester, ListView(children: [PrCard(pr: pr, repo: repo, onChanged: () {}, activity: const [])]));
     expect(find.text('#12'), findsOneWidget);
 
     late MergePreview preview;
@@ -280,7 +280,7 @@ void main() {
         '"state":"OPEN","isDraft":false,"mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviewDecision":"",'
         '"statusCheckRollup":[],"headRefName":"feat/other","baseRefName":"main"}')!;
     await pump(tester, Builder(builder: (context) {
-      return TextButton(onPressed: () => showPrSheetWith(context, repo, pr), child: const Text('open'));
+      return TextButton(onPressed: () => showPrSheetWith(context, repo, pr, activity: const []), child: const Text('open'));
     }));
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
@@ -596,5 +596,62 @@ void main() {
     expect(button().onPressed, isNotNull);
     await tester.tap(find.text('취소'));
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('v0.7 screens: PR review, release assets', (tester) async {
+    PullRequest prBy(String author) => PullRequest.parse('{"number":30,"title":"feat: review me","url":"https://github.com/me/repo/pull/30",'
+        '"state":"OPEN","isDraft":false,"mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviewDecision":"REVIEW_REQUIRED",'
+        '"statusCheckRollup":[],"headRefName":"feat/x","baseRefName":"main","author":{"login":"$author"}}')!;
+    final activity = PrActivity.parse('{"reviews":[{"author":{"login":"kim"},"state":"CHANGES_REQUESTED",'
+        '"body":"이름을 바꿔 주세요","submittedAt":"2026-09-20T10:00:00Z"},'
+        '{"author":{"login":"lee"},"state":"APPROVED","body":"","submittedAt":"2026-09-22T10:00:00Z"}],'
+        '"comments":[{"author":{"login":"park"},"body":"좋아요","createdAt":"2026-09-21T10:00:00Z"},'
+        '{"author":{"login":"choi"},"body":"확인","createdAt":"2026-09-19T10:00:00Z"}]}');
+    expect(activity.map((a) => a.author), ['lee', 'park', 'kim', 'choi']);
+    expect(activity.first.kind, PrActivityKind.approved);
+
+    // 남의 PR: 승인·변경 요청·코멘트, 최근 3건 + 모두 보기
+    await pump(tester, ListView(children: [PrCard(pr: prBy('someone'), repo: repo, onChanged: () {}, activity: activity)]));
+    expect(find.text('승인'), findsOneWidget);
+    expect(find.text('변경 요청'), findsOneWidget);
+    expect(find.textContaining('choi'), findsNothing);
+    await tester.tap(find.text('모두 보기 (4)'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('choi'), findsOneWidget);
+
+    // 변경 요청은 내용을 적어야 보낼 수 있다.
+    await tester.tap(find.text('변경 요청'));
+    await tester.pumpAndSettle();
+    expect(find.text('gh pr review 30 --request-changes --body-file -'), findsOneWidget);
+    FilledButton send() => tester.widget<FilledButton>(find.widgetWithText(FilledButton, '보내기'));
+    expect(send().onPressed, isNull);
+    await tester.enterText(find.byType(TextField).last, '테스트를 더해 주세요');
+    await tester.pump();
+    expect(send().onPressed, isNotNull);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    // 내 PR: 코멘트만
+    await pump(tester, ListView(children: [PrCard(pr: prBy('me'), repo: repo, onChanged: () {}, activity: const [])]));
+    expect(find.text('승인'), findsNothing);
+    expect(find.text('코멘트'), findsOneWidget);
+    expect(find.textContaining('스스로 승인'), findsOneWidget);
+
+    // 릴리스 산출물
+    final release = GitHubRelease.parse('{"tagName":"v0.7.0","name":"Branch Dock 0.7.0","url":"https://github.com/me/repo/releases/tag/v0.7.0",'
+        '"isPrerelease":false,"isDraft":false,"body":"notes","assets":['
+        '{"name":"BranchDock-0.7.0-macos-universal-with-a-long-name.dmg","size":31457280,"downloadCount":12},'
+        '{"name":"SHA256SUMS.txt","size":512,"downloadCount":1}]}')!;
+    expect(release.assets.first.downloads, 12);
+    await pump(tester, ListView(children: [ReleaseAssets(repo: repo, release: release)]));
+    expect(find.text('첨부 파일 2개'), findsOneWidget);
+    expect(find.text('30.0 MB · 받은 횟수 12'), findsOneWidget);
+    await tester.tap(find.byTooltip('삭제').last);
+    await tester.pumpAndSettle();
+    expect(find.text('gh release delete-asset v0.7.0 SHA256SUMS.txt --yes'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+    expect(GhCommands.releaseUpload('v0.7.0', ['/a/b.zip'], replace: true), ['gh', 'release', 'upload', 'v0.7.0', '/a/b.zip', '--clobber']);
+    expect(GhCommands.prReview(3, PrReviewKind.approve), ['gh', 'pr', 'review', '3', '--approve', '--body-file', '-']);
   });
 }

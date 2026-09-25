@@ -4051,6 +4051,156 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'그래도 push'**
   String get tagsPushAnyway;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In ko, this message translates to:
+  /// **'삭제'**
+  String get commonDelete;
+
+  /// No description provided for @prReviewTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'리뷰와 코멘트'**
+  String get prReviewTitle;
+
+  /// No description provided for @prReviewShowAll.
+  ///
+  /// In ko, this message translates to:
+  /// **'모두 보기 ({count})'**
+  String prReviewShowAll(int count);
+
+  /// No description provided for @prReviewShowLess.
+  ///
+  /// In ko, this message translates to:
+  /// **'접기'**
+  String get prReviewShowLess;
+
+  /// No description provided for @prReviewApprove.
+  ///
+  /// In ko, this message translates to:
+  /// **'승인'**
+  String get prReviewApprove;
+
+  /// No description provided for @prReviewRequestChanges.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 요청'**
+  String get prReviewRequestChanges;
+
+  /// No description provided for @prReviewComment.
+  ///
+  /// In ko, this message translates to:
+  /// **'코멘트'**
+  String get prReviewComment;
+
+  /// No description provided for @prReviewOwnPr.
+  ///
+  /// In ko, this message translates to:
+  /// **'내가 만든 PR은 스스로 승인하거나 변경을 요청할 수 없습니다. 코멘트는 남길 수 있습니다.'**
+  String get prReviewOwnPr;
+
+  /// No description provided for @prReviewSend.
+  ///
+  /// In ko, this message translates to:
+  /// **'보내기'**
+  String get prReviewSend;
+
+  /// No description provided for @prReviewBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'내용 (Markdown)'**
+  String get prReviewBody;
+
+  /// No description provided for @prReviewBodyOptional.
+  ///
+  /// In ko, this message translates to:
+  /// **'내용 (선택, Markdown)'**
+  String get prReviewBodyOptional;
+
+  /// No description provided for @donePrReview.
+  ///
+  /// In ko, this message translates to:
+  /// **'#{number}에 리뷰를 남겼습니다'**
+  String donePrReview(int number);
+
+  /// No description provided for @assetTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'첨부 파일 {count}개'**
+  String assetTitle(int count);
+
+  /// No description provided for @assetEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'첨부 파일이 없습니다. CI가 올린 빌드 결과물이 여기에 보입니다.'**
+  String get assetEmpty;
+
+  /// No description provided for @assetMeta.
+  ///
+  /// In ko, this message translates to:
+  /// **'{size} · 받은 횟수 {count}'**
+  String assetMeta(String size, int count);
+
+  /// No description provided for @assetUpload.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 올리기'**
+  String get assetUpload;
+
+  /// No description provided for @assetDownload.
+  ///
+  /// In ko, this message translates to:
+  /// **'받기'**
+  String get assetDownload;
+
+  /// No description provided for @assetReplace.
+  ///
+  /// In ko, this message translates to:
+  /// **'덮어쓰기'**
+  String get assetReplace;
+
+  /// No description provided for @assetReplaceTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'같은 이름의 파일을 덮어쓸까요?'**
+  String get assetReplaceTitle;
+
+  /// No description provided for @assetReplaceMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{names} — 이미 받아 간 사람이 있다면 내용이 서로 달라집니다. 가능하면 새 버전으로 릴리스하세요.'**
+  String assetReplaceMessage(String names);
+
+  /// No description provided for @assetDeleteTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}을(를) 삭제할까요?'**
+  String assetDeleteTitle(String name);
+
+  /// No description provided for @assetDeleteMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 페이지에서 이 파일을 지웁니다. 되돌릴 수 없고, 이 파일로 연결된 다운로드 주소도 끊깁니다.'**
+  String get assetDeleteMessage;
+
+  /// No description provided for @doneAssetDownloaded.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}을(를) 받았습니다'**
+  String doneAssetDownloaded(String name);
+
+  /// No description provided for @doneAssetUploaded.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 {count}개를 올렸습니다'**
+  String doneAssetUploaded(int count);
+
+  /// No description provided for @doneAssetDeleted.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}을(를) 삭제했습니다'**
+  String doneAssetDeleted(String name);
 }
 
 class _AppLocalizationsDelegate

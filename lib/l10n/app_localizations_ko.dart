@@ -2354,4 +2354,99 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tagsPushAnyway => '그래도 push';
+
+  @override
+  String get commonDelete => '삭제';
+
+  @override
+  String get prReviewTitle => '리뷰와 코멘트';
+
+  @override
+  String prReviewShowAll(int count) {
+    return '모두 보기 ($count)';
+  }
+
+  @override
+  String get prReviewShowLess => '접기';
+
+  @override
+  String get prReviewApprove => '승인';
+
+  @override
+  String get prReviewRequestChanges => '변경 요청';
+
+  @override
+  String get prReviewComment => '코멘트';
+
+  @override
+  String get prReviewOwnPr =>
+      '내가 만든 PR은 스스로 승인하거나 변경을 요청할 수 없습니다. 코멘트는 남길 수 있습니다.';
+
+  @override
+  String get prReviewSend => '보내기';
+
+  @override
+  String get prReviewBody => '내용 (Markdown)';
+
+  @override
+  String get prReviewBodyOptional => '내용 (선택, Markdown)';
+
+  @override
+  String donePrReview(int number) {
+    return '#$number에 리뷰를 남겼습니다';
+  }
+
+  @override
+  String assetTitle(int count) {
+    return '첨부 파일 $count개';
+  }
+
+  @override
+  String get assetEmpty => '첨부 파일이 없습니다. CI가 올린 빌드 결과물이 여기에 보입니다.';
+
+  @override
+  String assetMeta(String size, int count) {
+    return '$size · 받은 횟수 $count';
+  }
+
+  @override
+  String get assetUpload => '파일 올리기';
+
+  @override
+  String get assetDownload => '받기';
+
+  @override
+  String get assetReplace => '덮어쓰기';
+
+  @override
+  String get assetReplaceTitle => '같은 이름의 파일을 덮어쓸까요?';
+
+  @override
+  String assetReplaceMessage(String names) {
+    return '$names — 이미 받아 간 사람이 있다면 내용이 서로 달라집니다. 가능하면 새 버전으로 릴리스하세요.';
+  }
+
+  @override
+  String assetDeleteTitle(String name) {
+    return '$name을(를) 삭제할까요?';
+  }
+
+  @override
+  String get assetDeleteMessage =>
+      '릴리스 페이지에서 이 파일을 지웁니다. 되돌릴 수 없고, 이 파일로 연결된 다운로드 주소도 끊깁니다.';
+
+  @override
+  String doneAssetDownloaded(String name) {
+    return '$name을(를) 받았습니다';
+  }
+
+  @override
+  String doneAssetUploaded(int count) {
+    return '파일 $count개를 올렸습니다';
+  }
+
+  @override
+  String doneAssetDeleted(String name) {
+    return '$name을(를) 삭제했습니다';
+  }
 }

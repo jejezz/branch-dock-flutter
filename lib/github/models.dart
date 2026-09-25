@@ -78,7 +78,10 @@ class PullRequest {
   });
 
   static const jsonFields =
-      'number,title,url,state,isDraft,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,headRefName,baseRefName,mergeCommit';
+      'number,title,url,state,isDraft,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,headRefName,baseRefName,mergeCommit,author';
+
+  /// 리뷰와 코멘트 (PLAN.md 3.9 P2).
+  static const activityFields = 'reviews,comments';
 
   /// 목록용 (mergeable은 목록에서 계산 비용이 커서 뺀다).
   static const listFields =
@@ -232,10 +235,11 @@ class WorkflowRun {
 }
 
 class ReleaseAsset {
-  const ReleaseAsset(this.name, this.size);
+  const ReleaseAsset(this.name, this.size, {this.downloads = 0});
 
   final String name;
   final int size;
+  final int downloads;
 }
 
 class GitHubRelease {
@@ -271,7 +275,7 @@ class GitHubRelease {
       body: (m['body'] ?? '') as String,
       assets: [
         for (final a in ((m['assets'] ?? const []) as List<dynamic>).whereType<Map<String, dynamic>>())
-          ReleaseAsset((a['name'] ?? '') as String, (a['size'] ?? 0) as int),
+          ReleaseAsset((a['name'] ?? '') as String, (a['size'] ?? 0) as int, downloads: (a['downloadCount'] ?? 0) as int),
       ],
     );
   }
@@ -335,4 +339,45 @@ class Workflow {
             active: m['state'] == 'active',
           ),
       ];
+}
+
+
+enum PrActivityKind { approved, changesRequested, reviewed, comment }
+
+/// PR의 리뷰·코멘트 한 건 (PLAN.md 3.9 P2). 시간순으로 합친다.
+class PrActivity {
+  const PrActivity({required this.author, required this.kind, this.body = '', this.date});
+
+  final String author;
+  final PrActivityKind kind;
+  final String body;
+  final DateTime? date;
+
+  /// `gh pr view --json reviews,comments`. 최근 것이 먼저.
+  static List<PrActivity> parse(String json) {
+    final m = _obj(json);
+    if (m == null) return const [];
+    final list = <PrActivity>[
+      for (final r in ((m['reviews'] ?? const []) as List<dynamic>).whereType<Map<String, dynamic>>())
+        PrActivity(
+          author: ((r['author'] as Map<String, dynamic>?)?['login'] ?? '') as String,
+          kind: switch (r['state']) {
+            'APPROVED' => PrActivityKind.approved,
+            'CHANGES_REQUESTED' => PrActivityKind.changesRequested,
+            _ => PrActivityKind.reviewed,
+          },
+          body: (r['body'] ?? '') as String,
+          date: _date(r['submittedAt']),
+        ),
+      for (final c in ((m['comments'] ?? const []) as List<dynamic>).whereType<Map<String, dynamic>>())
+        PrActivity(
+          author: ((c['author'] as Map<String, dynamic>?)?['login'] ?? '') as String,
+          kind: PrActivityKind.comment,
+          body: (c['body'] ?? '') as String,
+          date: _date(c['createdAt']),
+        ),
+    ];
+    list.sort((a, b) => (b.date ?? DateTime(0)).compareTo(a.date ?? DateTime(0)));
+    return list;
+  }
 }

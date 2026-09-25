@@ -1,3 +1,4 @@
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -258,17 +259,139 @@ class _NotesSheetState extends State<_NotesSheet> {
               if (ok) widget.onSaved?.call();
             },
       children: [
-        if (r.assets.isNotEmpty) ...[
-          for (final a in r.assets)
-            Text('${a.name}  ${(a.size / 1024 / 1024).toStringAsFixed(1)} MB', style: AppFonts.mono.copyWith(fontSize: 11.5)),
-          const SizedBox(height: AppSpacing.md),
-        ],
+        ReleaseAssets(repo: widget.repo, release: r),
+        const SizedBox(height: AppSpacing.md),
         MarkdownEditor(controller: _notes, label: l10n.notesLabel),
       ],
     );
   }
 }
 
+/// 릴리스 산출물 (PLAN.md 3.8 P2): 파일 목록과 받기 · 올리기 · 삭제.
+/// CI가 올린 빌드 결과물 옆에 손으로 파일을 더하거나 잘못 올린 것을 지울 때 쓴다.
+class ReleaseAssets extends StatefulWidget {
+  const ReleaseAssets({super.key, required this.repo, required this.release});
+
+  final RepoController repo;
+  final GitHubRelease release;
+
+  @override
+  State<ReleaseAssets> createState() => _ReleaseAssetsState();
+}
+
+class _ReleaseAssetsState extends State<ReleaseAssets> {
+  late List<ReleaseAsset> _assets = widget.release.assets;
+
+  String get _tag => widget.release.tag;
+
+  Future<void> _reload() async {
+    final r = await widget.repo.read(GhCommands.releaseView(_tag));
+    final release = r.ok ? GitHubRelease.parse(r.stdout) : null;
+    if (mounted && release != null) setState(() => _assets = release.assets);
+  }
+
+  Future<void> _download(ReleaseAsset a) async {
+    final l10n = AppLocalizations.of(context);
+    final dir = await getDirectoryPath(confirmButtonText: l10n.assetDownload);
+    if (dir == null || !mounted) return;
+    await RepoActions.report(
+      context,
+      widget.repo.execute(GhCommands.releaseDownload(_tag, a.name, dir)),
+      done: l10n.doneAssetDownloaded(a.name),
+    );
+  }
+
+  Future<void> _upload() async {
+    final l10n = AppLocalizations.of(context);
+    final files = await openFiles(confirmButtonText: l10n.assetUpload);
+    if (files.isEmpty || !mounted) return;
+    final paths = [for (final f in files) f.path];
+    final names = {for (final a in _assets) a.name};
+    final clashes = [for (final f in files) if (names.contains(f.name)) f.name];
+    final command = GhCommands.releaseUpload(_tag, paths, replace: clashes.isNotEmpty);
+    // 같은 이름을 덮어쓰면 이미 받아 간 사람과 내용이 달라진다. 한 번 더 묻는다.
+    if (clashes.isNotEmpty) {
+      final ok = await confirmDanger(
+        context,
+        title: l10n.assetReplaceTitle,
+        message: l10n.assetReplaceMessage(clashes.join(', ')),
+        confirm: l10n.assetReplace,
+        commands: [command],
+      );
+      if (!ok || !mounted) return;
+    }
+    final ok = await RepoActions.report(
+      context,
+      widget.repo.execute(command),
+      done: l10n.doneAssetUploaded(files.length),
+    );
+    if (ok) await _reload();
+  }
+
+  Future<void> _delete(ReleaseAsset a) async {
+    final l10n = AppLocalizations.of(context);
+    final command = GhCommands.releaseDeleteAsset(_tag, a.name);
+    final ok = await confirmDanger(
+      context,
+      title: l10n.assetDeleteTitle(a.name),
+      message: l10n.assetDeleteMessage,
+      confirm: l10n.commonDelete,
+      commands: [command],
+    );
+    if (!ok || !mounted) return;
+    final done = await RepoActions.report(context, widget.repo.execute(command), done: l10n.doneAssetDeleted(a.name));
+    if (done) await _reload();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    // 시트는 탭과 따로 그려지므로 실행 중 여부를 직접 듣는다.
+    return ListenableBuilder(listenable: widget.repo, builder: (context, _) => _build(context, l10n, theme));
+  }
+
+  Widget _build(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    final busy = widget.repo.busy;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Row(children: [
+        Expanded(child: Text(l10n.assetTitle(_assets.length), style: theme.textTheme.labelMedium)),
+        TextButton.icon(
+          onPressed: busy ? null : _upload,
+          icon: const Icon(Icons.upload_rounded, size: 16),
+          label: Text(l10n.assetUpload),
+        ),
+      ]),
+      if (_assets.isEmpty) Text(l10n.assetEmpty, style: theme.textTheme.bodySmall),
+      for (final a in _assets)
+        Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(a.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppFonts.mono.copyWith(fontSize: 11.5)),
+              Text(l10n.assetMeta(formatSize(a.size), a.downloads), style: theme.textTheme.labelSmall),
+            ]),
+          ),
+          IconButton(
+            tooltip: l10n.assetDownload,
+            onPressed: busy ? null : () => _download(a),
+            icon: const Icon(Icons.download_rounded, size: 18),
+          ),
+          IconButton(
+            tooltip: l10n.commonDelete,
+            onPressed: busy ? null : () => _delete(a),
+            icon: Icon(Icons.delete_outline_rounded, size: 18, color: theme.colorScheme.error),
+          ),
+        ]),
+    ]);
+  }
+}
+
+/// 1.2 MB, 340 KB처럼 읽기 쉬운 크기.
+String formatSize(int bytes) {
+  if (bytes >= 1024 * 1024) return '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB';
+  if (bytes >= 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+  return '$bytes B';
+}
 
 /// 잘못 단 릴리스 되돌리기 (PLAN.md 3.8.7 P1): GitHub 릴리스 → 원격 태그 →
 /// 로컬 태그를 한 번에 지운다. 이미 받아 간 사람이 있을 수 있으니 같은 번호를

@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import 'help/concepts.dart';
+import 'repo_scope.dart';
 import 'widgets.dart';
 
 /// 아래에서 올라오는 양식 (UI_UX.md §5). 버튼 바로 위에 "실행될 명령".
+/// 시트는 앱 최상위 경로에 뜨므로, 부른 곳의 저장소·환경을 시트 안에도 다시 넣어 준다.
 Future<T?> showActionSheet<T>(BuildContext context, WidgetBuilder builder) {
+  final scope = context.getInheritedWidgetOfExactType<RepoScope>();
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
@@ -15,7 +18,9 @@ Future<T?> showActionSheet<T>(BuildContext context, WidgetBuilder builder) {
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet))),
     builder: (context) => Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: builder(context),
+      child: scope == null
+          ? builder(context)
+          : RepoScope(repo: scope.notifier!, environment: scope.environment, child: Builder(builder: builder)),
     ),
   );
 }
