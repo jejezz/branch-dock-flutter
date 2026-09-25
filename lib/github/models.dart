@@ -73,10 +73,16 @@ class PullRequest {
     this.reviewDecision = '',
     this.checks = const CheckSummary(),
     this.mergeCommit,
+    this.author = '',
+    this.updated,
   });
 
   static const jsonFields =
       'number,title,url,state,isDraft,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,headRefName,baseRefName,mergeCommit';
+
+  /// 목록용 (mergeable은 목록에서 계산 비용이 커서 뺀다).
+  static const listFields =
+      'number,title,url,state,isDraft,reviewDecision,statusCheckRollup,headRefName,baseRefName,author,updatedAt';
 
   final int number;
   final String title;
@@ -96,6 +102,8 @@ class PullRequest {
   final String reviewDecision;
   final CheckSummary checks;
   final String? mergeCommit;
+  final String author;
+  final DateTime? updated;
 
   bool get open => state == PrState.open;
   bool get merged => state == PrState.merged;
@@ -131,6 +139,8 @@ class PullRequest {
         reviewDecision: (m['reviewDecision'] ?? '') as String,
         checks: CheckSummary.parse((m['statusCheckRollup'] ?? const []) as List<dynamic>),
         mergeCommit: (m['mergeCommit'] as Map<String, dynamic>?)?['oid'] as String?,
+        author: ((m['author'] as Map<String, dynamic>?)?['login'] ?? '') as String,
+        updated: _date(m['updatedAt']),
       );
 }
 
@@ -168,10 +178,11 @@ class WorkflowRun {
     this.headBranch = '',
     this.created,
     this.jobs = const [],
+    this.title = '',
   });
 
-  static const listFields = 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt';
-  static const viewFields = 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,jobs';
+  static const listFields = 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,displayTitle';
+  static const viewFields = 'databaseId,workflowName,status,conclusion,url,event,headBranch,createdAt,jobs,displayTitle';
 
   final int id;
   final String name;
@@ -181,6 +192,9 @@ class WorkflowRun {
   final String headBranch;
   final DateTime? created;
   final List<RunJob> jobs;
+
+  /// 커밋 제목 등 실행을 알아볼 수 있는 한 줄.
+  final String title;
 
   bool get done => state != RunState.queued && state != RunState.running;
 
@@ -200,6 +214,7 @@ class WorkflowRun {
         event: (m['event'] ?? '') as String,
         headBranch: (m['headBranch'] ?? '') as String,
         created: _date(m['createdAt']),
+        title: (m['displayTitle'] ?? '') as String,
         jobs: [
           for (final j in ((m['jobs'] ?? const []) as List<dynamic>).whereType<Map<String, dynamic>>())
             RunJob(
@@ -260,4 +275,64 @@ class GitHubRelease {
       ],
     );
   }
+}
+
+
+/// `gh release list --json` 한 줄 (PLAN.md 3.8.6).
+class ReleaseSummary {
+  const ReleaseSummary({
+    required this.tag,
+    required this.name,
+    this.latest = false,
+    this.prerelease = false,
+    this.draft = false,
+    this.published,
+  });
+
+  static const fields = 'tagName,name,isLatest,isPrerelease,isDraft,publishedAt';
+
+  final String tag;
+  final String name;
+  final bool latest;
+  final bool prerelease;
+  final bool draft;
+  final DateTime? published;
+
+  static List<ReleaseSummary> parseList(String json) => [
+        for (final m in _list(json).whereType<Map<String, dynamic>>())
+          ReleaseSummary(
+            tag: (m['tagName'] ?? '') as String,
+            name: (m['name'] ?? '') as String,
+            latest: (m['isLatest'] ?? false) as bool,
+            prerelease: (m['isPrerelease'] ?? false) as bool,
+            draft: (m['isDraft'] ?? false) as bool,
+            published: _date(m['publishedAt']),
+          ),
+      ];
+}
+
+/// `gh workflow list --json` 한 줄 (PLAN.md 3.10).
+class Workflow {
+  const Workflow({required this.id, required this.name, required this.path, this.active = true});
+
+  static const fields = 'id,name,path,state';
+
+  final int id;
+  final String name;
+
+  /// `.github/workflows/release.yml`
+  final String path;
+  final bool active;
+
+  String get file => path.split('/').last;
+
+  static List<Workflow> parseList(String json) => [
+        for (final m in _list(json).whereType<Map<String, dynamic>>())
+          Workflow(
+            id: (m['id'] ?? 0) as int,
+            name: (m['name'] ?? '') as String,
+            path: (m['path'] ?? '') as String,
+            active: m['state'] == 'active',
+          ),
+      ];
 }

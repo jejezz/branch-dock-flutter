@@ -35,6 +35,17 @@ List<ReleaseWorkflow> detectReleaseWorkflows(String root) {
   return result;
 }
 
+/// 수동 실행(`workflow_dispatch`)을 받는 워크플로 파일 이름 (PLAN.md 3.10).
+List<String> detectDispatchWorkflows(String root) {
+  final dir = Directory('$root/.github/workflows');
+  if (!dir.existsSync()) return const [];
+  return [
+    for (final f in dir.listSync().whereType<File>())
+      if ((f.path.endsWith('.yml') || f.path.endsWith('.yaml')) && parseWorkflowTriggers(f.readAsStringSync()).$2)
+        f.uri.pathSegments.last,
+  ]..sort();
+}
+
 (bool tags, bool dispatch) parseWorkflowTriggers(String yaml) {
   final lines = yaml.split('\n');
   var inOn = false;

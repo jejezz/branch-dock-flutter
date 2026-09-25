@@ -111,6 +111,8 @@ class _PrTabState extends State<PrTab> {
                 label: Text(l10n.prCreate),
               ),
             ),
+          const Divider(height: AppSpacing.xl),
+          PrList(repo: repo),
         ],
       ),
     );
@@ -518,4 +520,188 @@ class _CreatePrSheetState extends State<_CreatePrSheet> {
       ],
     );
   }
+}
+
+/// 열린 PR 목록 (PLAN.md 3.9 P1): 내가 만든 것 / 리뷰 요청받은 것 / 전체.
+class PrList extends StatefulWidget {
+  const PrList({super.key, required this.repo});
+
+  final RepoController repo;
+
+  @override
+  State<PrList> createState() => _PrListState();
+}
+
+class _PrListState extends State<PrList> {
+  PrFilter _filter = PrFilter.mine;
+  List<PullRequest>? _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _items = null);
+    final r = await widget.repo.read(GhCommands.prList(_filter, PullRequest.listFields));
+    if (!mounted) return;
+    setState(() => _items = r.ok ? PullRequest.parseList(r.stdout) : const []);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final items = _items;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.sm, AppSpacing.sm),
+        child: Row(children: [
+          Expanded(
+            child: SegmentedButton<PrFilter>(
+              showSelectedIcon: false,
+              style: const ButtonStyle(visualDensity: VisualDensity.compact),
+              segments: [
+                ButtonSegment(value: PrFilter.mine, label: Text(l10n.prFilterMine)),
+                ButtonSegment(value: PrFilter.reviewRequested, label: Text(l10n.prFilterReview)),
+                ButtonSegment(value: PrFilter.open, label: Text(l10n.prFilterOpen)),
+              ],
+              selected: {_filter},
+              onSelectionChanged: (s) {
+                _filter = s.first;
+                _load();
+              },
+            ),
+          ),
+          IconButton(tooltip: l10n.appBarRefresh, iconSize: 16, icon: const Icon(Icons.refresh_rounded), onPressed: _load),
+        ]),
+      ),
+      if (items == null)
+        const Padding(padding: EdgeInsets.all(AppSpacing.lg), child: Center(child: CircularProgressIndicator()))
+      else if (items.isEmpty)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Text(l10n.prListEmpty, style: theme.textTheme.bodySmall),
+        )
+      else
+        for (final pr in items) _PrRow(pr: pr, repo: widget.repo, onChanged: _load),
+    ]);
+  }
+}
+
+class _PrRow extends StatelessWidget {
+  const _PrRow({required this.pr, required this.repo, required this.onChanged});
+
+  final PullRequest pr;
+  final RepoController repo;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final c = pr.checks;
+    final current = repo.status.head == pr.headRef;
+    return InkWell(
+      onTap: () => showPrSheet(context, repo, pr.number, onChanged: onChanged),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 6, 4, 6),
+        child: Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: '#${pr.number}  ', style: theme.textTheme.labelMedium),
+                  TextSpan(text: pr.title),
+                ]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.merge(AppFonts.userContent),
+              ),
+              const SizedBox(height: 2),
+              Wrap(spacing: 4, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                Text('${pr.headRef} → ${pr.baseRef}',
+                    style: AppFonts.mono.copyWith(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+                if (pr.draft) StatusPill(label: l10n.prStateDraft),
+                if (c.failed > 0) StatusPill(label: l10n.prChecksFailed(c.failed), tone: Tone.danger),
+                if (c.pending > 0) StatusPill(label: l10n.prChecksPending(c.pending), tone: Tone.warning),
+                if (c.total > 0 && c.failed == 0 && c.pending == 0)
+                  StatusPill(label: l10n.prChecksPassed(c.passed), tone: Tone.success),
+                if (pr.reviewDecision == 'APPROVED') StatusPill(label: l10n.prApproved, tone: Tone.success),
+                if (current) StatusPill(label: l10n.prCurrentBranch, tone: Tone.primary),
+              ]),
+            ]),
+          ),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(pr.author, style: theme.textTheme.labelSmall),
+            Text(relativeTime(l10n, pr.updated), style: theme.textTheme.labelSmall),
+          ]),
+          const SizedBox(width: 4),
+        ]),
+      ),
+    );
+  }
+}
+
+/// PR 하나: 카드 + 체크아웃 (`gh pr checkout`) + 병합.
+Future<void> showPrSheet(BuildContext context, RepoController repo, int number, {VoidCallback? onChanged}) async {
+  final r = await repo.read(GhCommands.prView('$number', PullRequest.jsonFields));
+  if (!context.mounted) return;
+  final pr = r.ok ? PullRequest.parse(r.stdout) : null;
+  if (pr == null) {
+    showCommandError(context, r);
+    return;
+  }
+  await showPrSheetWith(context, repo, pr, onChanged: onChanged);
+}
+
+Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequest pr, {VoidCallback? onChanged}) {
+  return showActionSheet<void>(context, (context) {
+    final l10n = AppLocalizations.of(context);
+    final current = repo.status.head == pr.headRef;
+    final checkout = GhCommands.prCheckout(pr.number);
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          PrCard(
+            pr: pr,
+            repo: repo,
+            onChanged: () {
+              Navigator.pop(context);
+              onChanged?.call();
+            },
+          ),
+          if (!current && pr.open) ...[
+            const SizedBox(height: AppSpacing.md),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text(l10n.prCheckoutWhy, style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: AppSpacing.sm),
+                CommandPreview(commands: [checkout]),
+                const SizedBox(height: AppSpacing.sm),
+                OutlinedButton.icon(
+                  onPressed: repo.busy
+                      ? null
+                      : () async {
+                          Navigator.pop(context);
+                          final ok = await RepoActions.report(
+                            context,
+                            repo.execute(checkout),
+                            done: l10n.donePrCheckout(pr.number, pr.headRef),
+                          );
+                          if (ok) onChanged?.call();
+                        },
+                  icon: const Icon(Icons.download_rounded, size: 16),
+                  label: Text(l10n.prCheckout),
+                ),
+              ]),
+            ),
+          ],
+        ]),
+      ),
+    );
+  });
 }

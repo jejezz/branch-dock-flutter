@@ -64,6 +64,15 @@ class ReleaseFlow extends ChangeNotifier {
 
   Timer? _poll;
 
+  /// CI 실행(태그 릴리스, 태그 전 수동 빌드)이 끝나면 한 번 부른다 — 알림용.
+  void Function(WorkflowRun run, {required bool manualBuild})? onRunFinished;
+  final Set<int> _notified = {};
+
+  void _finished(WorkflowRun? run, {required bool manualBuild}) {
+    if (run == null || !run.done || !_notified.add(run.id)) return;
+    onRunFinished?.call(run, manualBuild: manualBuild);
+  }
+
   List<String> get buildRisks => _risks;
   bool get ciMode => workflow?.onTags ?? false;
   bool get checksPassed => ReleaseCheck.values.every((c) => checks[c] ?? false);
@@ -206,6 +215,7 @@ class ReleaseFlow extends ChangeNotifier {
     if (id != null && !(buildRun?.done ?? false)) {
       final v = await repo.read(GhCommands.runView(id));
       buildRun = WorkflowRun.parse(v.stdout) ?? buildRun;
+      _finished(buildRun, manualBuild: true);
     }
   }
 
@@ -397,6 +407,7 @@ class ReleaseFlow extends ChangeNotifier {
       await _loadRun(run!.id);
     }
     if (run != null && run!.done) {
+      _finished(run, manualBuild: false);
       if (run!.state == RunState.success) {
         await _loadRelease();
         if (release != null || !ciMode) step = ReleaseStep.done;

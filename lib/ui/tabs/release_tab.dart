@@ -14,7 +14,9 @@ import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../shortcut_label.dart';
 import '../widgets.dart';
+import '../markdown_editor.dart';
 import 'pr_tab.dart';
+import 'release_list.dart';
 import 'remotes_tab.dart';
 
 /// 릴리스 탭과 마법사 (UI_UX.md §4.5, PLAN.md 3.8). PR 경유가 기본.
@@ -82,6 +84,8 @@ class _Overview extends StatelessWidget {
             label: Text('${l10n.releaseStart}  ${shortcutLabel('R', shift: true)}'),
           ),
         ),
+        // 릴리스 관리 (PLAN.md 3.8.6)
+        if (reason == null) ReleaseList(repo: repo),
       ],
     );
   }
@@ -704,13 +708,7 @@ class _NotesStepState extends State<_NotesStep> {
     final l10n = AppLocalizations.of(context);
     final flow = widget.flow;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      TextField(
-        controller: _notes,
-        minLines: 6,
-        maxLines: 16,
-        style: AppFonts.mono.copyWith(fontSize: 12),
-        decoration: InputDecoration(labelText: l10n.notesLabel),
-      ),
+      MarkdownEditor(controller: _notes, label: l10n.notesLabel),
       const SizedBox(height: AppSpacing.md),
       CommandPreview(commands: [flow.releaseCreateCommand]),
       const SizedBox(height: AppSpacing.sm),
@@ -888,13 +886,7 @@ class _DoneState extends State<_Done> {
                 ),
               )
             else ...[
-              TextField(
-                controller: _notes,
-                minLines: 6,
-                maxLines: 16,
-                style: AppFonts.mono.copyWith(fontSize: 12),
-                decoration: InputDecoration(labelText: l10n.notesLabel),
-              ),
+              MarkdownEditor(controller: _notes!, label: l10n.notesLabel),
               const SizedBox(height: AppSpacing.sm),
               CommandPreview(commands: [GhCommands.releaseEditNotes(flow.tag ?? '')]),
               const SizedBox(height: AppSpacing.sm),

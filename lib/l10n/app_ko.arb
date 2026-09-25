@@ -1035,5 +1035,156 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tabCi": "CI",
+  "ciTitle": "CI 실행",
+  "ciNotGitHubMessage": "Actions는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.",
+  "ciEmptyTitle": "{branch}에는 아직 실행이 없습니다",
+  "@ciEmptyTitle": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "ciEmptyMessage": "push나 PR, 태그로 워크플로가 돌면 여기에 나옵니다.",
+  "ciRerun": "다시 실행",
+  "ciCancel": "취소",
+  "ciDispatch": "수동 실행",
+  "ciDispatchNeedsPush": "수동 실행은 원격에 있는 브랜치에서만 할 수 있습니다. 먼저 게시하세요.",
+  "ciDispatchTitle": "{file} 수동 실행",
+  "@ciDispatchTitle": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "ciDispatchMessage": "{branch} 브랜치로 워크플로를 실행합니다. 입력이 필요한 워크플로는 브라우저에서 실행하세요.",
+  "@ciDispatchMessage": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "ciDispatchConfirm": "실행",
+  "doneDispatched": "{file}을(를) 실행했습니다",
+  "@doneDispatched": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "doneRunCancelled": "실행을 취소했습니다",
+  "notifyRunTitle": "{name} {state}",
+  "@notifyRunTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyReleaseRun": "{tag} 릴리스 CI {state}",
+  "@notifyReleaseRun": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyManualBuild": "태그 전 수동 빌드 {state}",
+  "@notifyManualBuild": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "prFilterMine": "내 PR",
+  "prFilterReview": "리뷰 요청",
+  "prFilterOpen": "전체",
+  "prListEmpty": "열린 PR이 없습니다",
+  "prCurrentBranch": "현재 브랜치",
+  "prCheckout": "이 PR 브랜치로 체크아웃",
+  "prCheckoutWhy": "PR 브랜치를 내 컴퓨터로 가져와 전환합니다. 직접 실행해 보거나 고칠 때 씁니다.",
+  "donePrCheckout": "PR #{number}의 {branch}(으)로 전환했습니다",
+  "@donePrCheckout": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "releasesTitle": "릴리스",
+  "releasesEmpty": "GitHub 릴리스가 없습니다",
+  "releasesLoadFailed": "릴리스 목록을 불러오지 못했습니다",
+  "releaseLatestPill": "최신",
+  "releaseDraft": "초안",
+  "releaseMakeFinal": "정식 릴리스로 바꾸기",
+  "releaseMakePrerelease": "프리릴리스로 바꾸기",
+  "releasePublishDraft": "초안 게시",
+  "releaseDelete": "릴리스 삭제",
+  "releaseDeleteTitle": "{tag} 릴리스를 삭제할까요?",
+  "@releaseDeleteTitle": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "releaseDeleteMessage": "GitHub 릴리스와 올라간 파일이 사라집니다. 이미 받아 간 사람이 있을 수 있습니다.",
+  "releaseDeleteTagToo": "GitHub의 {tag} 태그도 삭제 (로컬 태그는 남음)",
+  "@releaseDeleteTagToo": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "doneReleaseDeleted": "{tag} 릴리스를 삭제했습니다",
+  "@doneReleaseDeleted": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "doneReleaseMadeFinal": "{tag}을(를) 정식 릴리스로 바꿨습니다",
+  "@doneReleaseMadeFinal": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "doneReleaseMadePrerelease": "{tag}을(를) 프리릴리스로 바꿨습니다",
+  "@doneReleaseMadePrerelease": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "doneReleasePublished": "{tag} 초안을 게시했습니다",
+  "@doneReleasePublished": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "notesEditTab": "편집",
+  "notesPreviewTab": "미리 보기",
+  "notesEmpty": "내용이 없습니다"
 }

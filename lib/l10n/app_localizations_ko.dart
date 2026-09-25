@@ -1459,4 +1459,166 @@ class AppLocalizationsKo extends AppLocalizations {
   String prBaseNotDefault(String base) {
     return '기본 브랜치($base)가 아닌 곳으로 합칩니다. 다른 기능 브랜치 위에 쌓는 PR일 때 씁니다.';
   }
+
+  @override
+  String get tabCi => 'CI';
+
+  @override
+  String get ciTitle => 'CI 실행';
+
+  @override
+  String get ciNotGitHubMessage =>
+      'Actions는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
+
+  @override
+  String ciEmptyTitle(String branch) {
+    return '$branch에는 아직 실행이 없습니다';
+  }
+
+  @override
+  String get ciEmptyMessage => 'push나 PR, 태그로 워크플로가 돌면 여기에 나옵니다.';
+
+  @override
+  String get ciRerun => '다시 실행';
+
+  @override
+  String get ciCancel => '취소';
+
+  @override
+  String get ciDispatch => '수동 실행';
+
+  @override
+  String get ciDispatchNeedsPush => '수동 실행은 원격에 있는 브랜치에서만 할 수 있습니다. 먼저 게시하세요.';
+
+  @override
+  String ciDispatchTitle(String file) {
+    return '$file 수동 실행';
+  }
+
+  @override
+  String ciDispatchMessage(String branch) {
+    return '$branch 브랜치로 워크플로를 실행합니다. 입력이 필요한 워크플로는 브라우저에서 실행하세요.';
+  }
+
+  @override
+  String get ciDispatchConfirm => '실행';
+
+  @override
+  String doneDispatched(String file) {
+    return '$file을(를) 실행했습니다';
+  }
+
+  @override
+  String get doneRunCancelled => '실행을 취소했습니다';
+
+  @override
+  String notifyRunTitle(String name, String state) {
+    return '$name $state';
+  }
+
+  @override
+  String notifyReleaseRun(String tag, String state) {
+    return '$tag 릴리스 CI $state';
+  }
+
+  @override
+  String notifyManualBuild(String state) {
+    return '태그 전 수동 빌드 $state';
+  }
+
+  @override
+  String get prFilterMine => '내 PR';
+
+  @override
+  String get prFilterReview => '리뷰 요청';
+
+  @override
+  String get prFilterOpen => '전체';
+
+  @override
+  String get prListEmpty => '열린 PR이 없습니다';
+
+  @override
+  String get prCurrentBranch => '현재 브랜치';
+
+  @override
+  String get prCheckout => '이 PR 브랜치로 체크아웃';
+
+  @override
+  String get prCheckoutWhy => 'PR 브랜치를 내 컴퓨터로 가져와 전환합니다. 직접 실행해 보거나 고칠 때 씁니다.';
+
+  @override
+  String donePrCheckout(int number, String branch) {
+    return 'PR #$number의 $branch(으)로 전환했습니다';
+  }
+
+  @override
+  String get releasesTitle => '릴리스';
+
+  @override
+  String get releasesEmpty => 'GitHub 릴리스가 없습니다';
+
+  @override
+  String get releasesLoadFailed => '릴리스 목록을 불러오지 못했습니다';
+
+  @override
+  String get releaseLatestPill => '최신';
+
+  @override
+  String get releaseDraft => '초안';
+
+  @override
+  String get releaseMakeFinal => '정식 릴리스로 바꾸기';
+
+  @override
+  String get releaseMakePrerelease => '프리릴리스로 바꾸기';
+
+  @override
+  String get releasePublishDraft => '초안 게시';
+
+  @override
+  String get releaseDelete => '릴리스 삭제';
+
+  @override
+  String releaseDeleteTitle(String tag) {
+    return '$tag 릴리스를 삭제할까요?';
+  }
+
+  @override
+  String get releaseDeleteMessage =>
+      'GitHub 릴리스와 올라간 파일이 사라집니다. 이미 받아 간 사람이 있을 수 있습니다.';
+
+  @override
+  String releaseDeleteTagToo(String tag) {
+    return 'GitHub의 $tag 태그도 삭제 (로컬 태그는 남음)';
+  }
+
+  @override
+  String doneReleaseDeleted(String tag) {
+    return '$tag 릴리스를 삭제했습니다';
+  }
+
+  @override
+  String doneReleaseMadeFinal(String tag) {
+    return '$tag을(를) 정식 릴리스로 바꿨습니다';
+  }
+
+  @override
+  String doneReleaseMadePrerelease(String tag) {
+    return '$tag을(를) 프리릴리스로 바꿨습니다';
+  }
+
+  @override
+  String doneReleasePublished(String tag) {
+    return '$tag 초안을 게시했습니다';
+  }
+
+  @override
+  String get notesEditTab => '편집';
+
+  @override
+  String get notesPreviewTab => '미리 보기';
+
+  @override
+  String get notesEmpty => '내용이 없습니다';
 }
