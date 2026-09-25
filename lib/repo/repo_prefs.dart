@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../git/commands.dart';
+import '../release/version_files.dart';
 
 /// 저장소별 기억할 값과 앱 설정 (PLAN.md §5 저장).
 class RepoPrefs {
@@ -39,6 +40,16 @@ class RepoPrefs {
   /// Push할 때 태그도 함께 (--follow-tags). 저장소별, 기본은 끔.
   bool followTags(String repo) => _prefs.getBool('push_follow_tags:$repo') ?? false;
   Future<void> setFollowTags(String repo, bool value) => _prefs.setBool('push_follow_tags:$repo', value);
+
+  /// 저장소별로 정한 버전 파일 (PLAN.md 3.8.2a). 없으면 자동 감지.
+  CustomVersionFile? customVersionFile(String repo) {
+    final v = _prefs.getStringList('version_file:$repo');
+    return v == null || v.length != 2 ? null : CustomVersionFile(v[0], v[1]);
+  }
+
+  Future<void> setCustomVersionFile(String repo, CustomVersionFile? f) => f == null
+      ? _prefs.remove('version_file:$repo')
+      : _prefs.setStringList('version_file:$repo', [f.path, f.pattern]);
 
   int lastTab(String repo) => _prefs.getInt('last_tab:$repo') ?? 0;
   Future<void> setLastTab(String repo, int tab) => _prefs.setInt('last_tab:$repo', tab);

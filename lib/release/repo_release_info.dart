@@ -96,7 +96,10 @@ List<String> buildRiskFiles(List<String> changedFiles) => changedFiles
         f.endsWith('/pubspec.lock') ||
         f == 'Cargo.lock' ||
         RegExp(r'^(macos|windows|linux|ios|android)/').hasMatch(f) ||
-        f.startsWith('installer/'))
+        f.startsWith('installer/') ||
+        // 다른 언어의 의존성·빌드 설정 (PLAN.md 3.8.2a)
+        RegExp(r'(^|/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|go\.sum|Podfile\.lock|Dockerfile)$').hasMatch(f) ||
+        RegExp(r'\.(gradle|gradle\.kts|csproj)$').hasMatch(f))
     .toList();
 
 /// 릴리스 노트 초안 (PLAN.md 3.8.4): 종류별로 묶은 목록.

@@ -34,6 +34,23 @@ class ReleaseFlow extends ChangeNotifier {
   bool ghReady;
 
   ReleaseStep step = ReleaseStep.check;
+
+  /// 바로 커밋 방식 (PLAN.md 3.8.3 P1): 기본 브랜치에 버전 올림을 커밋하고
+  /// 커밋과 태그를 함께 push한다. GitHub가 아닌 저장소는 이 방식만 쓸 수 있다.
+  bool direct = false;
+
+  /// 저장소별로 정한 버전 파일 (PLAN.md 3.8.2a). 없으면 자동 감지.
+  CustomVersionFile? customVersionFile;
+
+  /// 저장소에 conventions `scripts/bump-version.sh`가 있고 pubspec 앱이면
+  /// 그 스크립트로 올린다 — 규약 앱과 결과(lock 파일 포함)가 같아진다.
+  bool get usesBumpScript =>
+      customVersionFile == null &&
+      File('${repo.root}/scripts/bump-version.sh').existsSync() &&
+      files.any((f) => f.kind == VersionFileKind.pubspec);
+
+  /// GitHub 기능(PR·릴리스·CI)을 쓸 수 있는가.
+  bool get github => ghReady && repo.githubRemote != null;
   bool loading = false;
   bool _disposed = false;
 
@@ -75,7 +92,8 @@ class ReleaseFlow extends ChangeNotifier {
 
   List<String> get buildRisks => _risks;
   bool get ciMode => workflow?.onTags ?? false;
-  bool get checksPassed => ReleaseCheck.values.every((c) => checks[c] ?? false);
+  bool get checksPassed =>
+      ReleaseCheck.values.every((c) => (direct && c == ReleaseCheck.github) || (checks[c] ?? false));
   bool get tagChecksPassed => TagCheck.values.every((c) => tagChecks[c] ?? false);
   String get defaultBranch => repo.defaultBranch ?? 'main';
   String get remote => repo.githubRemote?.name ?? repo.defaultRemote ?? 'origin';
@@ -111,7 +129,7 @@ class ReleaseFlow extends ChangeNotifier {
     }
     await prefs.setString(
       _key,
-      jsonEncode({'step': step.name, 'next': next.toString(), 'pr': pr?.number, 'run': run?.id, 'lastTag': lastTag}),
+      jsonEncode({'step': step.name, 'next': next.toString(), 'pr': pr?.number, 'run': run?.id, 'lastTag': lastTag, 'direct': direct}),
     );
   }
 
@@ -124,8 +142,9 @@ class ReleaseFlow extends ChangeNotifier {
       final m = jsonDecode(raw) as Map<String, dynamic>;
       next = SemVer.tryParse(m['next'] as String);
       lastTag = m['lastTag'] as String?;
+      direct = (m['direct'] ?? false) as bool;
       step = ReleaseStep.values.asNameMap()[m['step']] ?? ReleaseStep.check;
-      files = detectVersionFiles(repo.root);
+      files = detectVersionFiles(repo.root, custom: customVersionFile);
       final workflows = detectReleaseWorkflows(repo.root);
       workflow = workflows.isEmpty ? null : workflows.first;
       final number = m['pr'] as int?;
@@ -168,7 +187,7 @@ class ReleaseFlow extends ChangeNotifier {
     } else {
       _risks = const [];
     }
-    files = detectVersionFiles(repo.root);
+    files = detectVersionFiles(repo.root, custom: customVersionFile);
     final workflows = detectReleaseWorkflows(repo.root);
     workflow = workflows.isEmpty ? null : workflows.first;
 
@@ -232,32 +251,60 @@ class ReleaseFlow extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// release/vX.Y.Z 브랜치를 만들고 버전 파일을 고쳐 커밋한다.
+  /// 버전 올림 커밋. PR 경유면 release/vX.Y.Z 브랜치에, 바로 커밋이면 기본
+  /// 브랜치에 만든다. bump-version.sh가 있으면 그것을, 없으면 버전 파일과
+  /// lock 파일을 직접 고친다.
   Future<CommandResult> createReleaseCommit() async {
     final n = next!;
-    var r = await repo.execute(GitCommands.createBranch(releaseBranch));
-    if (!r.ok) return r;
-    for (final f in files) {
-      final file = File('${repo.root}/${f.path}');
-      file.writeAsStringSync(writeVersion(f.kind, file.readAsStringSync(), f.hasBuild ? n : SemVer(n.major, n.minor, n.patch, pre: n.pre)));
+    var r = const CommandResult(0, '', '');
+    if (!direct) {
+      r = await repo.execute(GitCommands.createBranch(releaseBranch));
+      if (!r.ok) return r;
     }
-    if (files.isNotEmpty) {
+    if (usesBumpScript) {
+      r = await repo.execute(bumpScriptCommand);
+      if (!r.ok) return r;
+    } else if (files.isNotEmpty) {
+      for (final f in files) {
+        final file = File('${repo.root}/${f.path}');
+        file.writeAsStringSync(bumpFile(f, file.readAsStringSync(), n));
+      }
+      final locks = bumpLockFiles(repo.root, files, n);
       r = await repo.executeAll([
-        GitCommands.add(files.map((f) => f.path).toList()),
+        GitCommands.add([...files.map((f) => f.path), ...locks]),
         GitCommands.commit('chore(release): ${n.tag}'),
       ]);
       if (!r.ok) return r;
     }
-    step = ReleaseStep.pr;
+    step = direct ? ReleaseStep.tag : ReleaseStep.pr;
     await _save();
+    if (direct) await runTagChecks(fetch: false);
     notifyListeners();
     return r;
   }
 
+  /// `bash scripts/bump-version.sh X.Y.Z` — 스크립트가 build number를 +1 하고 커밋한다.
+  List<String> get bumpScriptCommand => ['bash', 'scripts/bump-version.sh', next?.name ?? 'X.Y.Z'];
+
+  /// 함께 고칠 lock 파일 (미리 보기용).
+  List<String> get lockFiles {
+    final out = <String>[];
+    for (final f in files) {
+      final dir = f.path.contains('/') ? f.path.substring(0, f.path.lastIndexOf('/') + 1) : '';
+      if (f.kind == VersionFileKind.cargo && File('${repo.root}/${dir}Cargo.lock').existsSync()) out.add('${dir}Cargo.lock');
+      if (f.kind == VersionFileKind.packageJson && File('${repo.root}/${dir}package-lock.json').existsSync()) {
+        out.add('${dir}package-lock.json');
+      }
+    }
+    return out;
+  }
+
   List<List<String>> get versionCommands => [
-        GitCommands.createBranch(releaseBranch),
-        if (files.isNotEmpty) ...[
-          GitCommands.add(files.map((f) => f.path).toList()),
+        if (!direct) GitCommands.createBranch(releaseBranch),
+        if (usesBumpScript)
+          bumpScriptCommand
+        else if (files.isNotEmpty) ...[
+          GitCommands.add([...files.map((f) => f.path), ...lockFiles]),
           GitCommands.commit('chore(release): ${next?.tag ?? ''}'),
         ],
       ];
@@ -325,15 +372,19 @@ class ReleaseFlow extends ChangeNotifier {
 
   // --- ⑤ 태그 -------------------------------------------------------------
 
-  Future<void> runTagChecks() async {
-    await repo.fetch();
+  Future<void> runTagChecks({bool fetch = true}) async {
+    if (fetch) await repo.fetch();
     await repo.loadRemoteTags();
     final s = repo.status;
-    final onDisk = detectVersionFiles(repo.root);
+    final onDisk = detectVersionFiles(repo.root, custom: customVersionFile);
     final t = tag ?? '';
     tagChecks
-      ..[TagCheck.prMerged] = pr?.merged ?? false
-      ..[TagCheck.synced] = s.head == defaultBranch && s.hasUpstream && s.ahead == 0 && s.behind == 0
+      // 바로 커밋 방식에는 PR이 없다. 버전 올림 커밋은 태그와 함께 push하므로
+      // ahead는 괜찮고, 원격에 내가 없는 커밋(behind)만 없으면 된다.
+      ..[TagCheck.prMerged] = direct || (pr?.merged ?? false)
+      ..[TagCheck.synced] = direct
+          ? s.head == defaultBranch && s.behind == 0
+          : s.head == defaultBranch && s.hasUpstream && s.ahead == 0 && s.behind == 0
       ..[TagCheck.versionMatches] = onDisk.isEmpty || onDisk.every((f) => f.version.name == next?.name)
       ..[TagCheck.tagFree] =
           !repo.tags.any((x) => x.name == t) && !(repo.remoteTagNames?.contains(t) ?? false);
@@ -342,13 +393,15 @@ class ReleaseFlow extends ChangeNotifier {
 
   /// 태그 전 점검에서 본 기본 브랜치의 버전 (다를 때 이유에 쓴다).
   String get defaultBranchVersion {
-    final onDisk = detectVersionFiles(repo.root);
+    final onDisk = detectVersionFiles(repo.root, custom: customVersionFile);
     return onDisk.isEmpty ? '' : onDisk.first.version.name;
   }
 
   String get tagMessage => '$displayName ${next?.name ?? ''}';
 
   List<List<String>> get tagCommands => [
+        // 바로 커밋 방식은 버전 올림 커밋을 태그와 함께 올린다.
+        if (direct) GitCommands.publish(remote, defaultBranch),
         GitCommands.createTag(tag ?? '', message: tagMessage),
         GitCommands.pushTags(remote, [tag ?? '']),
       ];
@@ -357,7 +410,8 @@ class ReleaseFlow extends ChangeNotifier {
     final r = await repo.executeAll(tagCommands);
     if (!r.ok) return r;
     await repo.loadRemoteTags();
-    step = ciMode ? ReleaseStep.ci : ReleaseStep.notes;
+    // GitHub가 아니면 릴리스·CI를 볼 수 없으니 여기서 끝난다.
+    step = !github ? ReleaseStep.done : (ciMode ? ReleaseStep.ci : ReleaseStep.notes);
     notes = _draftNotes;
     await _save();
     _schedulePoll();
