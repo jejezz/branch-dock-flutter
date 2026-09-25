@@ -1,0 +1,37 @@
+{
+  "@@locale": "ko",
+  "aboutTooltip": "정보",
+  "aboutVersion": "버전 {version} (빌드 {build})",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutOpenSourceLicenses": "오픈소스 라이선스",
+  "aboutRepository": "GitHub",
+  "commonClose": "닫기",
+  "aboutMenuItem": "{appName} 정보",
+  "@aboutMenuItem": {
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      }
+    }
+  },
+  "themeMenuTooltip": "테마",
+  "themeSystem": "시스템 설정 따르기",
+  "themeLight": "라이트",
+  "themeDark": "다크",
+  "languageMenuTooltip": "언어",
+  "languageSystem": "시스템 설정 따르기 / System",
+  "languageSystemShort": "시스템",
+  "aboutTagline": "GitHub CLI(gh)를 위한 데스크톱 GUI",
+  "aboutDescription": "gh 명령을 터미널 대신 창에서 실행하고 결과를 봅니다. 저장소, 풀 리퀘스트, 이슈, 릴리스를 한 화면에서 다룹니다.",
+  "homeEmptyTitle": "시작하려면 저장소를 선택하세요",
+  "homeEmptyAction": "저장소 열기"
+}
