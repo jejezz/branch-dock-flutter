@@ -3,8 +3,9 @@
 // 새 앱의 시작점. 규약이 요구하는 연결을 한곳에 모았다:
 //   창 크기(window_manager) · 추가 라이선스 · 설정 로드 · 라이트/다크 ·
 //   언어 해석 · macOS 앱 메뉴 About · 앱 바 [테마 | 언어 | 정보] · 빈 상태.
-// 기존 앱에는 통째로 덮어쓰지 말고 필요한 부분만 옮긴다.
+// Branch Dock: 창은 편집기 옆 세로 창(UI_UX.md §2), 화면은 lib/ui/main_screen.dart.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -14,34 +15,74 @@ import 'about/about_dialog.dart';
 import 'about/app_menu_bar.dart';
 import 'about/extra_licenses.dart';
 import 'app_identity.dart';
+import 'core/command_log.dart';
+import 'core/command_runner.dart';
 import 'l10n/app_localizations.dart';
+import 'repo/repo_prefs.dart';
 import 'settings/app_settings.dart';
-import 'settings/settings_menus.dart';
 import 'theme/app_theme.dart';
+import 'ui/main_screen.dart';
+import 'ui/services.dart';
 
 final bool _isDesktop = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+
+/// UI_UX.md §2 — 규약 §5와 다르게 편집기 옆 세로 창.
+const _defaultSize = Size(440, 960);
+const _minimumSize = Size(380, 560);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerExtraLicenses();
 
+  final prefs = await RepoPrefs.load();
   if (_isDesktop) {
     await windowManager.ensureInitialized();
-    // ui-ux.md §5: 최소 크기는 960×600 이하 (1366×768 노트북).
+    final saved = prefs.windowBounds;
     const options = WindowOptions(
-      size: Size(1200, 720),
-      minimumSize: Size(960, 600),
-      center: true,
+      size: _defaultSize,
+      minimumSize: _minimumSize,
       title: AppIdentity.displayName,
     );
     await windowManager.waitUntilReadyToShow(options, () async {
+      // 사용자가 편집기 옆에 맞춰 둔 크기와 위치를 되살린다.
+      if (saved != null && saved.width >= _minimumSize.width && saved.height >= _minimumSize.height) {
+        await windowManager.setBounds(saved);
+      } else {
+        await windowManager.center();
+      }
       await windowManager.show();
       await windowManager.focus();
     });
+    windowManager.addListener(_BoundsSaver(prefs));
   }
 
+  final services = AppServices(
+    runner: CommandRunner(log: CommandLog(), path: await resolvePath()),
+    prefs: prefs,
+  );
   final settings = await AppSettings.load();
-  runApp(App(settings: settings));
+  runApp(ServicesScope(services: services, child: App(settings: settings)));
+}
+
+/// 창을 옮기거나 크기를 바꾸면 잠시 뒤 저장한다.
+class _BoundsSaver with WindowListener {
+  _BoundsSaver(this.prefs);
+
+  final RepoPrefs prefs;
+  Timer? _timer;
+
+  void _schedule() {
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 500), () async {
+      prefs.setWindowBounds(await windowManager.getBounds());
+    });
+  }
+
+  @override
+  void onWindowResized() => _schedule();
+
+  @override
+  void onWindowMoved() => _schedule();
 }
 
 class App extends StatefulWidget {
@@ -110,48 +151,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           supportedLocales: AppLocalizations.supportedLocales,
           localeResolutionCallback: AppSettings.resolveLocale,
           builder: (context, child) => AppMenuBar(onAbout: _showAbout, child: child!),
-          home: HomeScreen(onAbout: _showAbout),
-        ),
-      ),
-    );
-  }
-}
-
-/// 기능이 들어오기 전의 자리 표시 화면 — 빈 상태 패턴 (ui-ux.md §6).
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.onAbout});
-
-  final VoidCallback onAbout;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppIdentity.displayName),
-        actions: [
-          const ThemeMenuButton(),
-          const LanguageMenuButton(),
-          IconButton(
-            tooltip: l10n.aboutTooltip,
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: onAbout,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(AppIdentity.iconAsset, width: 48, height: 48),
-            const SizedBox(height: AppSpacing.lg),
-            Text(l10n.homeEmptyTitle, style: theme.textTheme.titleMedium),
-            const SizedBox(height: AppSpacing.lg),
-            // 기능이 생기면 주 행동을 연결한다. 그 전까지는 비활성.
-            FilledButton(onPressed: null, child: Text(l10n.homeEmptyAction)),
-          ],
+          home: MainScreen(onAbout: _showAbout),
         ),
       ),
     );
