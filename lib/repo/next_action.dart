@@ -2,7 +2,7 @@ import '../git/remotes.dart';
 import '../git/status.dart';
 
 /// 추천 행동 배너 (UI_UX.md §3 C). 우선순위 순서대로 하나만 고른다.
-enum NextActionKind { resolveConflicts, pull, switchToDefault, publish, push, createPr, publishToGitHub }
+enum NextActionKind { resolveConflicts, detached, pull, switchToDefault, publish, push, createPr, publishToGitHub }
 
 class NextAction {
   const NextAction(this.kind, [this.count = 0]);
@@ -28,6 +28,8 @@ NextAction? suggestNextAction({
 }) {
   final conflicts = status.conflicts.length;
   if (conflicts > 0) return NextAction(NextActionKind.resolveConflicts, conflicts);
+  // 분리된 HEAD: 여기서 커밋하면 어느 브랜치에도 속하지 않는다 (PLAN.md 3.7 P1).
+  if (status.detached && !status.unborn) return const NextAction(NextActionKind.detached);
   if (status.behind > 0) return NextAction(NextActionKind.pull, status.behind);
   // 병합되어 원격에서 지워진 브랜치: 게시하면 지운 브랜치가 되살아난다.
   if (headMergedAndGone) return const NextAction(NextActionKind.switchToDefault);

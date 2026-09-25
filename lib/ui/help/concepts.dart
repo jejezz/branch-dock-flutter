@@ -2,7 +2,7 @@ import '../../l10n/app_localizations.dart';
 
 /// 개념 도움말 카드 (PLAN.md 3.13). v0.1.0은 동기화와 Pull 방식에 필요한
 /// 카드로 시작했고, v0.2.0에서 병합(squash)과 태그 카드를 더했다.
-enum Concept { fetchVsPull, upstream, fastForward, mergeCommit, rebase, squash, annotatedTag }
+enum Concept { fetchVsPull, upstream, fastForward, mergeCommit, rebase, squash, annotatedTag, stash, detachedHead, forceWithLease }
 
 /// 커밋 그래프 한 장면. 커밋은 왼쪽(오래됨) → 오른쪽(최신), 줄(lane)은 위에서 아래.
 class GraphScene {
@@ -90,6 +90,7 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
     ko ? '$book/Git-%EB%B8%8C%EB%9E%9C%EC%B9%98-Rebase-%ED%95%98%EA%B8%B0' : '$book/Git-Branching-Rebasing',
   );
   const gitMerge = ConceptLink('git-merge', 'https://git-scm.com/docs/git-merge');
+  const gitPush = ConceptLink('git-push --force-with-lease', 'https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-leaseltrefnamegt');
   const gitPull = ConceptLink('git-pull', 'https://git-scm.com/docs/git-pull');
 
   // 갈라진 기록: main은 E를, feature는 C·D를 가졌다.
@@ -263,6 +264,77 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
             ko ? '$book/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%ED%83%9C%EA%B7%B8' : '$book/Git-Basics-Tagging',
           ),
         ],
+      ),
+    Concept.stash => ConceptCard(
+        title: l10n.helpStashTitle,
+        word: l10n.helpStashWord,
+        inGit: l10n.helpStashInGit,
+        why: l10n.helpStashWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionStash,
+            commits: const [_a, _b, GraphCommit('W', 2, 1, highlight: true)],
+            edges: const [('A', 'B'), ('B', 'W')],
+            labels: const [GraphLabel('main', 'B'), GraphLabel('stash@{0}', 'W', highlight: true)],
+          ),
+        ],
+        links: [
+          ConceptLink(
+            l10n.helpLinkStashing,
+            ko ? '$book/Git-%EB%8F%84%EA%B5%AC-Stashing%EA%B3%BC-Cleaning' : '$book/Git-Tools-Stashing-and-Cleaning',
+          ),
+        ],
+      ),
+    Concept.detachedHead => ConceptCard(
+        title: l10n.helpDetachedTitle,
+        word: l10n.helpDetachedWord,
+        inGit: l10n.helpDetachedInGit,
+        why: l10n.helpDetachedWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionDetached,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit('D', 3, 0)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D')],
+            labels: const [
+              GraphLabel('HEAD', 'B', highlight: true),
+              GraphLabel('v1.0.0', 'B'),
+              GraphLabel('main', 'D'),
+            ],
+          ),
+        ],
+        links: [
+          ConceptLink(
+            l10n.helpLinkTagging,
+            ko ? '$book/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%ED%83%9C%EA%B7%B8' : '$book/Git-Basics-Tagging',
+          ),
+        ],
+      ),
+    Concept.forceWithLease => ConceptCard(
+        title: l10n.helpForceTitle,
+        word: l10n.helpForceWord,
+        inGit: l10n.helpForceInGit,
+        why: l10n.helpForceWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionBefore,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit("C'", 2, 1, highlight: true)],
+            edges: const [('A', 'B'), ('B', 'C'), ('B', "C'")],
+            labels: const [
+              GraphLabel('origin/feature', 'C', remote: true),
+              GraphLabel('feature', "C'", highlight: true),
+            ],
+          ),
+          GraphScene(
+            caption: l10n.helpCaptionAfter,
+            commits: const [_a, _b, GraphCommit("C'", 2, 0, highlight: true)],
+            edges: const [('A', 'B'), ('B', "C'")],
+            labels: const [
+              GraphLabel('origin/feature', "C'", remote: true, highlight: true),
+              GraphLabel('feature', "C'"),
+            ],
+          ),
+        ],
+        links: [gitPush],
       ),
   };
 }

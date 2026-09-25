@@ -1752,4 +1752,321 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagOpenReleaseWizard => 'Open the release wizard';
+
+  @override
+  String get tabHistory => 'History';
+
+  @override
+  String get menuAutoFetch => 'Auto fetch (every 5 min and on return)';
+
+  @override
+  String get changesAmendToggle => 'Amend the last commit';
+
+  @override
+  String get changesAmend => 'Amend';
+
+  @override
+  String get changesAmendPushedWarning =>
+      'This commit is already on the remote. Amending splits the history and needs a force push (force-with-lease).';
+
+  @override
+  String get doneAmend => 'Amended the last commit';
+
+  @override
+  String get changesDiscard => 'Discard changes';
+
+  @override
+  String changesDiscardMessage(String path) {
+    return 'Throws away the uncommitted changes in $path and goes back to the last staged (or committed) version. This can\'t be undone.';
+  }
+
+  @override
+  String get changesDeleteUntracked => 'Delete file';
+
+  @override
+  String changesDeleteUntrackedMessage(String path) {
+    return 'Deletes $path, which git doesn\'t track. It doesn\'t go to the trash.';
+  }
+
+  @override
+  String get conflictUseMine => 'Use mine';
+
+  @override
+  String get conflictUseIncoming => 'Use incoming';
+
+  @override
+  String doneFileAction(String name) {
+    return '$name: done';
+  }
+
+  @override
+  String get stashTitle => 'Stashes';
+
+  @override
+  String get stashSave => 'Stash changes';
+
+  @override
+  String stashWhy(int count) {
+    return 'Puts your $count changes aside without committing, including untracked files. Bring them back later with Apply.';
+  }
+
+  @override
+  String get stashMessageLabel => 'Note (optional)';
+
+  @override
+  String get stashPop => 'Apply and remove (pop)';
+
+  @override
+  String get stashApply => 'Apply and keep (apply)';
+
+  @override
+  String get stashDrop => 'Delete';
+
+  @override
+  String get stashDropTitle => 'Delete this stash?';
+
+  @override
+  String stashDropMessage(String text) {
+    return 'The changes saved in \'$text\' will be lost.';
+  }
+
+  @override
+  String get stashAndRetry => 'Stash and retry';
+
+  @override
+  String get stashAutoMessage => 'Branch Dock: auto stash';
+
+  @override
+  String get doneStashSaved => 'Stashed';
+
+  @override
+  String get doneStashApplied => 'Stash applied';
+
+  @override
+  String get doneStashDropped => 'Stash deleted';
+
+  @override
+  String get doneStashAndRetry =>
+      'Stashed your changes and ran it again. Restore them from Stashes in Changes.';
+
+  @override
+  String get pushOptionsTooltip => 'Push options';
+
+  @override
+  String get pushOptionsTitle => 'Push options';
+
+  @override
+  String get pushFollowTags => 'Push tags too (--follow-tags)';
+
+  @override
+  String get pushFollowTagsWhy =>
+      'Also pushes annotated tags on the commits you push. Applies to this repository only.';
+
+  @override
+  String get pushForceTitle => 'Force push (force-with-lease)';
+
+  @override
+  String get pushForceWhy =>
+      'Only after amending or rebasing commits you already pushed. git refuses if the remote has commits you haven\'t seen, so nobody else\'s work is overwritten.';
+
+  @override
+  String pushForceBlockedDefault(String branch) {
+    return 'Force push is blocked on the default branch ($branch) — it could overwrite other people\'s history.';
+  }
+
+  @override
+  String get pushForce => 'Force push';
+
+  @override
+  String pushForceConfirmTitle(String branch) {
+    return 'Force push $branch?';
+  }
+
+  @override
+  String pushForceConfirmMessage(String branch, String upstream) {
+    return 'Replaces $upstream with your $branch. If someone pushed since your last fetch, git refuses.';
+  }
+
+  @override
+  String get operationSkip => 'Skip';
+
+  @override
+  String get operationSkipTooltip =>
+      'Drops the conflicting commit and continues the rebase';
+
+  @override
+  String get doneSkip => 'Skipped the commit';
+
+  @override
+  String get branchesSetUpstream => 'Set upstream';
+
+  @override
+  String branchesSetUpstreamWhy(String branch) {
+    return 'Chooses the remote branch $branch pushes to and pulls from.';
+  }
+
+  @override
+  String get branchesUpstreamLabel => 'Remote branch';
+
+  @override
+  String doneSetUpstream(String branch, String upstream) {
+    return '$branch now tracks $upstream';
+  }
+
+  @override
+  String get branchesCleanup => 'Clean up merged branches';
+
+  @override
+  String cleanupWhy(String base) {
+    return 'Local branches already merged into $base, or deleted on the remote. Remote branches aren\'t touched.';
+  }
+
+  @override
+  String get cleanupMerged => 'Merged';
+
+  @override
+  String get cleanupGoneNotMerged =>
+      'Gone on remote · not merged — its commits get hard to find';
+
+  @override
+  String cleanupConfirm(int count) {
+    return 'Delete $count';
+  }
+
+  @override
+  String cleanupNothing(String base) {
+    return 'Nothing to clean up (no branches merged into $base)';
+  }
+
+  @override
+  String doneCleanup(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count branches',
+      one: '1 branch',
+    );
+    return 'Cleaned up $_temp0';
+  }
+
+  @override
+  String get tagsCommitsSince => 'Commits since previous tag';
+
+  @override
+  String tagsCommitsBetween(String from, String to) {
+    return '$from → $to';
+  }
+
+  @override
+  String tagsCommitsUpTo(String tag) {
+    return 'Up to $tag';
+  }
+
+  @override
+  String tagsCommitsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count commits',
+      one: '1 commit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get tagsCheckout => 'Check out this tag';
+
+  @override
+  String tagsCheckoutTitle(String tag) {
+    return 'Check out $tag?';
+  }
+
+  @override
+  String get tagsCheckoutMessage =>
+      'You\'ll see the files exactly as they were at the tag. You won\'t be on any branch (\'detached HEAD\'), so create a branch before committing here.';
+
+  @override
+  String doneCheckoutTag(String tag) {
+    return 'Checked out $tag';
+  }
+
+  @override
+  String get bannerDetached =>
+      'You\'re not on a branch. Create one before committing here';
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String historyUnpushed(int count) {
+    return '↑ $count not pushed';
+  }
+
+  @override
+  String get historyNotPushed => 'not pushed';
+
+  @override
+  String get historyCopyHash => 'Copy hash';
+
+  @override
+  String get historyBranchHere => 'Create branch here';
+
+  @override
+  String get historyTagHere => 'Tag this commit';
+
+  @override
+  String get helpLinkStashing => 'Pro Git — Stashing and Cleaning';
+
+  @override
+  String get helpCaptionStash =>
+      'Uncommitted changes W put aside at the top of the stash list — main is unchanged';
+
+  @override
+  String get helpStashTitle => 'Stash';
+
+  @override
+  String get helpStashWord =>
+      'To stash is to put something away for later, like into a drawer.';
+
+  @override
+  String get helpStashInGit =>
+      'Saves your uncommitted changes outside the branch history and resets the working tree to clean. Stashes pile up in a list (newest on top) and can be applied later on any branch.';
+
+  @override
+  String get helpStashWhy =>
+      'Use it when it\'s too early to commit but you need to switch branches or pull. \'pop\' applies and removes it; \'apply\' keeps it in the list. Add a note — old stashes are easy to forget.';
+
+  @override
+  String get helpCaptionDetached =>
+      'HEAD points straight at the v1.0.0 commit, not at a branch';
+
+  @override
+  String get helpDetachedTitle => 'Detached HEAD';
+
+  @override
+  String get helpDetachedWord =>
+      'Detached means separated. HEAD means \'where you are now\'.';
+
+  @override
+  String get helpDetachedInGit =>
+      'Normally HEAD points at a branch label, and committing moves that label forward. Checking out a tag or commit makes HEAD point straight at the commit, detached from any branch.';
+
+  @override
+  String get helpDetachedWhy =>
+      'Safe for trying out or comparing an old version. Commits made here belong to no branch and are hard to find once you move away — create a branch first if you want to commit.';
+
+  @override
+  String get helpForceTitle => 'Force push (force-with-lease)';
+
+  @override
+  String get helpForceWord =>
+      'Force means by force; a lease is an agreement — here, \'only if it\'s still how I last saw it\'.';
+
+  @override
+  String get helpForceInGit =>
+      'After amending or rebasing commits you already pushed, your history has split from the remote and a normal push is rejected. A force push replaces the remote branch with yours. --force-with-lease only does so if the remote is exactly as you last fetched it, and refuses if someone pushed in between.';
+
+  @override
+  String get helpForceWhy =>
+      'Only on a work branch you use alone, after tidying its history. Never on shared branches, especially main. This app doesn\'t offer plain --force, and blocks force push on the default branch.';
 }

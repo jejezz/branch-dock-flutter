@@ -8,6 +8,7 @@ import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../help/concepts.dart';
 import '../merge_sheet.dart';
 import 'pr_tab.dart';
 import '../repo_actions.dart';
@@ -59,7 +60,15 @@ class _BranchesTabState extends State<BranchesTab> {
       children: [
         SectionHeader(
           title: l10n.branchesTitle,
-          trailing: FilledButton.tonalIcon(
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            // 병합·삭제된 브랜치 정리 (PLAN.md 3.4 P1)
+            IconButton(
+              tooltip: l10n.branchesCleanup,
+              iconSize: 18,
+              icon: const Icon(Icons.cleaning_services_outlined),
+              onPressed: repo.busy ? null : () => showCleanupSheet(context, repo),
+            ),
+            Flexible(child: FilledButton.tonalIcon(
             onPressed: repo.busy || repo.status.unborn
                 ? null
                 : () => showCreateBranchSheet(context, repo),
@@ -68,7 +77,8 @@ class _BranchesTabState extends State<BranchesTab> {
               '${l10n.branchesNew}  ${shortcutLabel('B')}',
               overflow: TextOverflow.ellipsis,
             ),
-          ),
+          )),
+          ]),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -118,6 +128,7 @@ enum _BranchMenu {
   mergeIntoCurrent,
   publish,
   createPr,
+  setUpstream,
   rename,
   delete,
   deleteRemote,
@@ -144,9 +155,10 @@ class _BranchRowState extends State<_BranchRow> {
   Future<void> _switch(BuildContext context) async {
     if (branch.current || repo.busy) return;
     final l10n = AppLocalizations.of(context);
-    await RepoActions.report(
+    await RepoActions.withStashRetry(
       context,
-      repo.switchTo(branch),
+      repo,
+      () => repo.switchTo(branch),
       done: l10n.doneSwitch(branch.shortName),
     );
   }
@@ -177,6 +189,8 @@ class _BranchRowState extends State<_BranchRow> {
           repo.githubRemote != null &&
           RepoScope.environmentOf(context).ghReady)
         PopupMenuItem(value: _BranchMenu.createPr, child: Text(l10n.prCreate)),
+      if (!branch.remote && repo.remoteBranches.isNotEmpty)
+        PopupMenuItem(value: _BranchMenu.setUpstream, child: Text(l10n.branchesSetUpstream)),
       if (!branch.remote)
         PopupMenuItem(
           value: _BranchMenu.rename,
@@ -226,6 +240,8 @@ class _BranchRowState extends State<_BranchRow> {
         );
       case _BranchMenu.createPr:
         await showCreatePrSheet(context, repo, head: branch.name);
+      case _BranchMenu.setUpstream:
+        await showSetUpstreamSheet(context, repo, branch);
       case _BranchMenu.rename:
         await showRenameBranchSheet(context, repo, branch);
       case _BranchMenu.delete:
@@ -406,17 +422,19 @@ class _BranchRowState extends State<_BranchRow> {
 }
 
 /// 새 브랜치 (PLAN.md 3.4): 이름 검사, 접두어 제안, 기준, 만든 뒤 전환.
-Future<void> showCreateBranchSheet(BuildContext context, RepoController repo) {
+/// [base]: 시작 커밋을 정해서 열 때 (기록 탭의 "여기서 브랜치 만들기").
+Future<void> showCreateBranchSheet(BuildContext context, RepoController repo, {String? base}) {
   return showActionSheet<void>(
     context,
-    (context) => _CreateBranchSheet(repo: repo),
+    (context) => _CreateBranchSheet(repo: repo, base: base),
   );
 }
 
 class _CreateBranchSheet extends StatefulWidget {
-  const _CreateBranchSheet({required this.repo});
+  const _CreateBranchSheet({required this.repo, this.base});
 
   final RepoController repo;
+  final String? base;
 
   @override
   State<_CreateBranchSheet> createState() => _CreateBranchSheetState();
@@ -424,7 +442,7 @@ class _CreateBranchSheet extends StatefulWidget {
 
 class _CreateBranchSheetState extends State<_CreateBranchSheet> {
   final _name = TextEditingController();
-  String? _base;
+  late String? _base = widget.base;
   bool _switchAfter = true;
 
   @override
@@ -522,6 +540,11 @@ class _CreateBranchSheetState extends State<_CreateBranchSheet> {
               value: null,
               child: Text(l10n.branchBaseCurrent(repo.status.head ?? 'HEAD')),
             ),
+            if (widget.base != null && !repo.branches.any((b) => b.name == widget.base))
+              DropdownMenuItem(
+                value: widget.base,
+                child: Text(widget.base!, style: AppFonts.mono.copyWith(fontSize: 12)),
+              ),
             for (final b in repo.branches.where((b) => !b.current))
               DropdownMenuItem(
                 value: b.name,
@@ -639,4 +662,104 @@ class _RenameBranchSheetState extends State<_RenameBranchSheet> {
       ],
     );
   }
+}
+
+
+/// 추적 브랜치 설정 (PLAN.md 3.4 P1): `git branch -u <원격 브랜치> <브랜치>`.
+Future<void> showSetUpstreamSheet(BuildContext context, RepoController repo, Branch branch) {
+  return showActionSheet<void>(context, (context) {
+    String? chosen = branch.upstreamGone ? null : branch.upstream;
+    final options = repo.remoteBranches.map((b) => b.name).toList();
+    chosen ??= options.where((o) => o.endsWith('/${branch.name}')).firstOrNull ?? options.firstOrNull;
+    return StatefulBuilder(builder: (context, setState) {
+      final l10n = AppLocalizations.of(context);
+      final command = GitCommands.setUpstream(branch.name, chosen ?? '<remote>/<branch>');
+      return ActionSheetBody(
+        title: l10n.branchesSetUpstream,
+        help: Concept.upstream,
+        commands: [command],
+        confirmLabel: l10n.commonSave,
+        onConfirm: chosen == null
+            ? null
+            : () async {
+                Navigator.pop(context);
+                await RepoActions.report(context, repo.execute(command), done: l10n.doneSetUpstream(branch.name, chosen!));
+              },
+        children: [
+          Text(l10n.branchesSetUpstreamWhy(branch.name), style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.md),
+          DropdownButtonFormField<String>(
+            initialValue: chosen,
+            isExpanded: true,
+            decoration: InputDecoration(labelText: l10n.branchesUpstreamLabel),
+            items: [
+              for (final o in options) DropdownMenuItem(value: o, child: Text(o, style: AppFonts.mono.copyWith(fontSize: 12))),
+            ],
+            onChanged: (v) => setState(() => chosen = v),
+          ),
+        ],
+      );
+    });
+  });
+}
+
+/// 병합된 브랜치 정리 (PLAN.md 3.4 P1): 원격 기본 브랜치에 병합됐거나 원격에서
+/// 사라진 로컬 브랜치를 골라 지운다. 병합되지 않은 것은 강제 삭제라 따로 표시한다.
+Future<void> showCleanupSheet(BuildContext context, RepoController repo) async {
+  final candidates = await repo.cleanupCandidates();
+  if (!context.mounted) return;
+  await showCleanupSheetWith(context, repo, candidates);
+}
+
+Future<void> showCleanupSheetWith(
+  BuildContext context,
+  RepoController repo,
+  List<({Branch branch, bool merged})> candidates,
+) {
+  final l10n = AppLocalizations.of(context);
+  if (candidates.isEmpty) {
+    showDone(context, l10n.cleanupNothing(repo.defaultBranch ?? 'main'));
+    return Future.value();
+  }
+  // 병합된 것만 기본으로 고른다. 병합 안 된(원격에서만 사라진) 것은 사용자가 고른다.
+  final selected = {for (final c in candidates) if (c.merged) c.branch.name};
+  return showActionSheet<void>(context, (context) {
+    return StatefulBuilder(builder: (context, setState) {
+      final l10n = AppLocalizations.of(context);
+      final theme = Theme.of(context);
+      final commands = [
+        for (final c in candidates)
+          if (selected.contains(c.branch.name)) GitCommands.deleteBranch(c.branch.name, force: !c.merged),
+      ];
+      return ActionSheetBody(
+        title: l10n.branchesCleanup,
+        commands: commands,
+        confirmLabel: l10n.cleanupConfirm(commands.length),
+        danger: true,
+        onConfirm: commands.isEmpty
+            ? null
+            : () async {
+                Navigator.pop(context);
+                await RepoActions.report(context, repo.executeAll(commands), done: l10n.doneCleanup(commands.length));
+              },
+        children: [
+          Text(l10n.cleanupWhy(repo.defaultBranch ?? 'main'), style: theme.textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.sm),
+          for (final c in candidates)
+            CheckboxListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              value: selected.contains(c.branch.name),
+              onChanged: (v) => setState(() => v == true ? selected.add(c.branch.name) : selected.remove(c.branch.name)),
+              title: Text(c.branch.name, style: AppFonts.mono.copyWith(fontSize: 12.5)),
+              subtitle: Text(
+                c.merged ? l10n.cleanupMerged : l10n.cleanupGoneNotMerged,
+                style: TextStyle(color: c.merged ? null : toneColor(context, Tone.warning)),
+              ),
+            ),
+        ],
+      );
+    });
+  });
 }

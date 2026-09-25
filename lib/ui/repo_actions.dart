@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/command_runner.dart';
+import '../git/commands.dart';
 import '../git/error_hints.dart';
 import '../git/status.dart';
 import '../l10n/app_localizations.dart';
@@ -39,19 +40,54 @@ abstract final class RepoActions {
   static Future<void> pull(BuildContext context, RepoController repo) async {
     final l10n = AppLocalizations.of(context);
     final mode = ServicesScope.of(context).prefs.pullMode(repo.root);
-    final result = await repo.pull(mode);
-    if (!context.mounted) return;
+    await withStashRetry(context, repo, () => repo.pull(mode), done: l10n.donePull);
+  }
+
+  /// 커밋하지 않은 변경 때문에 막히면 "임시 저장하고 다시"를 제안한다
+  /// (PLAN.md 3.2 P1: 브랜치 전환이나 pull이 변경 때문에 막힐 때).
+  static Future<bool> withStashRetry(
+    BuildContext context,
+    RepoController repo,
+    Future<CommandResult> Function() run, {
+    required String done,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final result = await run();
+    if (!context.mounted) return result.ok;
     if (result.ok) {
-      showDone(context, l10n.donePull);
-    } else {
-      showCommandError(context, result);
+      showDone(context, done);
+      return true;
     }
+    final blocked = classifyError(result.combined, exitCode: result.exitCode) == GitErrorKind.localChangesWouldBeOverwritten;
+    showCommandError(
+      context,
+      result,
+      action: blocked ? l10n.stashAndRetry : null,
+      onAction: blocked
+          ? () async {
+              final stash = await repo.execute(GitCommands.stashPush(l10n.stashAutoMessage));
+              if (!context.mounted) return;
+              if (!stash.ok) {
+                showCommandError(context, stash);
+                return;
+              }
+              final again = await run();
+              if (!context.mounted) return;
+              if (again.ok) {
+                showDone(context, l10n.doneStashAndRetry);
+              } else {
+                showCommandError(context, again);
+              }
+            }
+          : null,
+    );
+    return false;
   }
 
   static Future<void> push(BuildContext context, RepoController repo) async {
     final l10n = AppLocalizations.of(context);
     final publishing = repo.needsPublish;
-    final result = await repo.push();
+    final result = await repo.push(followTags: ServicesScope.of(context).prefs.followTags(repo.root));
     if (!context.mounted) return;
     if (result.ok) {
       showDone(context, publishing ? l10n.donePublish(repo.status.head ?? '') : l10n.donePush);
