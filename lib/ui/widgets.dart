@@ -351,3 +351,104 @@ class SmallChip extends StatelessWidget {
     return tooltip == null ? chip : Tooltip(message: tooltip!, child: chip);
   }
 }
+
+/// 되돌릴 수 없고 공개된 것을 지우는 작업의 확인 (v0.6.1): [expected]를 그대로
+/// 입력해야 위험 버튼이 켜진다. 릴리스 삭제·되돌리기에 쓴다.
+Future<bool> confirmTyped(
+  BuildContext context, {
+  required String title,
+  required String message,
+  required String expected,
+  required String confirm,
+  List<List<String>> commands = const [],
+  Widget? extra,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) => _TypedConfirmDialog(
+      title: title,
+      message: message,
+      expected: expected,
+      confirm: confirm,
+      commands: commands,
+      extra: extra,
+    ),
+  );
+  return result ?? false;
+}
+
+/// 입력 상자의 컨트롤러는 대화상자 State가 가진다 — 닫히는 애니메이션이
+/// 끝난 뒤에 버려야 한다.
+class _TypedConfirmDialog extends StatefulWidget {
+  const _TypedConfirmDialog({
+    required this.title,
+    required this.message,
+    required this.expected,
+    required this.confirm,
+    required this.commands,
+    this.extra,
+  });
+
+  final String title;
+  final String message;
+  final String expected;
+  final String confirm;
+  final List<List<String>> commands;
+  final Widget? extra;
+
+  @override
+  State<_TypedConfirmDialog> createState() => _TypedConfirmDialogState();
+}
+
+class _TypedConfirmDialogState extends State<_TypedConfirmDialog> {
+  final _typed = TextEditingController();
+
+  @override
+  void dispose() {
+    _typed.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return AlertDialog(
+      title: Text(widget.title),
+      content: SizedBox(
+        width: 360,
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(widget.message),
+            ?widget.extra,
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.confirmTypeToContinue(widget.expected), style: theme.textTheme.bodySmall),
+            const SizedBox(height: 4),
+            TextField(
+              controller: _typed,
+              autofocus: true,
+              style: AppFonts.mono.copyWith(fontSize: 13),
+              decoration: InputDecoration(isDense: true, hintText: widget.expected),
+              onChanged: (_) => setState(() {}),
+            ),
+            if (widget.commands.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              CommandPreview(commands: widget.commands),
+            ],
+          ]),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: theme.colorScheme.error,
+            foregroundColor: theme.colorScheme.onError,
+          ),
+          onPressed: _typed.text.trim() == widget.expected ? () => Navigator.pop(context, true) : null,
+          child: Text(widget.confirm),
+        ),
+      ],
+    );
+  }
+}

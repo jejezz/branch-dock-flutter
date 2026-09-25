@@ -67,11 +67,15 @@ class _TagsTabState extends State<TagsTab> {
               child: OutlinedButton.icon(
                 onPressed: repo.busy
                     ? null
-                    : () => RepoActions.report(
+                    : () async {
+                        final names = localOnly.map((t) => t.name).toList();
+                        if (!await confirmTagPush(context, repo, names) || !context.mounted) return;
+                        await RepoActions.report(
                           context,
-                          _pushTags(repo, remote, localOnly.map((t) => t.name).toList()),
+                          _pushTags(repo, remote, names),
                           done: l10n.donePushTags(localOnly.length),
-                        ),
+                        );
+                      },
                 icon: const Icon(Icons.cloud_upload_outlined, size: 16),
                 label: Text(l10n.tagsPushAll(localOnly.length)),
               ),
@@ -84,6 +88,23 @@ class _TagsTabState extends State<TagsTab> {
       ],
     );
   }
+}
+
+/// 태그 push (v0.6.1): 태그 push로 CI가 릴리스를 만드는 저장소에서 버전 태그를
+/// 올리면 태그마다 릴리스가 새로 만들어진다. 지운 옛 릴리스가 되살아날 수 있어
+/// 먼저 알린다. 확인했으면(또는 경고가 필요 없으면) true.
+Future<bool> confirmTagPush(BuildContext context, RepoController repo, List<String> names) async {
+  final versions = names.where((n) => SemVer.tryParse(n) != null).toList();
+  final workflow = detectReleaseWorkflows(repo.root).where((w) => w.onTags).firstOrNull;
+  if (workflow == null || versions.isEmpty) return true;
+  final l10n = AppLocalizations.of(context);
+  return confirmDanger(
+    context,
+    title: l10n.tagsPushCiTitle(versions.length),
+    message: l10n.tagsPushCiMessage(workflow.file, versions.join(', ')),
+    confirm: l10n.tagsPushAnyway,
+    commands: [GitCommands.pushTags(repo.defaultRemote ?? 'origin', names)],
+  );
 }
 
 Future<CommandResult> _pushTags(RepoController repo, String remote, List<String> names) async {
@@ -205,32 +226,54 @@ class _TagRow extends StatelessWidget {
       case _TagMenu.rollback:
         await showRollbackDialog(context, repo, tag.name);
       case _TagMenu.push:
+        if (!await confirmTagPush(context, repo, [tag.name]) || !context.mounted) return;
         await RepoActions.report(context, _pushTags(repo, remote!, [tag.name]), done: l10n.donePushTags(1));
       case _TagMenu.delete:
         await RepoActions.report(context, repo.execute(GitCommands.deleteTag(tag.name)),
             done: l10n.doneDeleteTag(tag.name));
       case _TagMenu.deleteRemote:
-        final command = GitCommands.deleteRemoteTag(remote!, tag.name);
-        final target = repo.remotes.where((r) => r.name == remote).firstOrNull?.location?.webUrl ?? remote;
-        final ok = await confirmDanger(
-          context,
-          title: l10n.tagsDeleteRemoteTitle,
-          message: l10n.tagsDeleteRemoteMessage(tag.name, target),
-          confirm: l10n.tagsDeleteRemote,
-          commands: [command],
-        );
-        if (ok && context.mounted) {
-          await RepoActions.report(
-            context,
-            () async {
-              final r = await repo.execute(command);
-              await repo.loadRemoteTags();
-              return r;
-            }(),
-            done: l10n.doneDeleteRemoteTag(tag.name),
-          );
-        }
+        await deleteRemoteTag(context, repo, tag.name);
     }
+  }
+}
+
+/// 원격 태그 삭제 (v0.6.1). GitHub는 릴리스가 달린 태그를 지우면 그 릴리스를
+/// **초안으로 바꾼다** — 전에는 "릴리스는 그대로 남습니다"라고 잘못 안내했다.
+/// 릴리스가 있으면 그 사실을 알리고 '릴리스 되돌리기'를 권한다.
+Future<void> deleteRemoteTag(BuildContext context, RepoController repo, String tag, {bool? hasRelease}) async {
+  var release = hasRelease ?? false;
+  if (hasRelease == null && repo.githubRemote != null) {
+    release = (await repo.read(GhCommands.releaseView(tag))).ok;
+    if (!context.mounted) return;
+  }
+  await showDeleteRemoteTagDialog(context, repo, tag, hasRelease: release);
+}
+
+Future<void> showDeleteRemoteTagDialog(BuildContext context, RepoController repo, String tag, {required bool hasRelease}) async {
+  final l10n = AppLocalizations.of(context);
+  final remote = repo.defaultRemote!;
+  final command = GitCommands.deleteRemoteTag(remote, tag);
+  final target = repo.remotes.where((r) => r.name == remote).firstOrNull?.location?.webUrl ?? remote;
+  final ok = await confirmDanger(
+    context,
+    title: l10n.tagsDeleteRemoteTitle,
+    message: [
+      l10n.tagsDeleteRemoteMessage(tag, target),
+      if (hasRelease) l10n.tagsDeleteRemoteReleaseDraft(tag),
+    ].join('\n\n'),
+    confirm: l10n.tagsDeleteRemote,
+    commands: [command],
+  );
+  if (ok && context.mounted) {
+    await RepoActions.report(
+      context,
+      () async {
+        final r = await repo.execute(command);
+        await repo.loadRemoteTags();
+        return r;
+      }(),
+      done: l10n.doneDeleteRemoteTag(tag),
+    );
   }
 }
 
