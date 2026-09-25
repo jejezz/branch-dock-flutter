@@ -1621,4 +1621,24 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notesEmpty => '내용이 없습니다';
+
+  @override
+  String tagVersionMismatch(String file, String version, String tag) {
+    return '$file의 버전은 $version인데 태그는 $tag입니다.';
+  }
+
+  @override
+  String get tagVersionMismatchWhy =>
+      '릴리스 태그는 버전을 먼저 올린 커밋에 달아야 합니다 — 릴리스 마법사가 버전 올림 PR부터 태그까지 차례로 합니다.';
+
+  @override
+  String get tagVersionMismatchCi =>
+      '이 저장소는 태그를 push하면 CI가 릴리스를 만드는데, 버전이 다르면 CI가 멈춥니다.';
+
+  @override
+  String get tagVersionMismatchBlocked =>
+      '그래서 push는 막았습니다. 로컬에만 만들려면 push를 끄세요.';
+
+  @override
+  String get tagOpenReleaseWizard => '릴리스 마법사 열기';
 }

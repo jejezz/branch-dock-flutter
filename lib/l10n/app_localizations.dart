@@ -2851,6 +2851,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'내용이 없습니다'**
   String get notesEmpty;
+
+  /// No description provided for @tagVersionMismatch.
+  ///
+  /// In ko, this message translates to:
+  /// **'{file}의 버전은 {version}인데 태그는 {tag}입니다.'**
+  String tagVersionMismatch(String file, String version, String tag);
+
+  /// No description provided for @tagVersionMismatchWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 태그는 버전을 먼저 올린 커밋에 달아야 합니다 — 릴리스 마법사가 버전 올림 PR부터 태그까지 차례로 합니다.'**
+  String get tagVersionMismatchWhy;
+
+  /// No description provided for @tagVersionMismatchCi.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 저장소는 태그를 push하면 CI가 릴리스를 만드는데, 버전이 다르면 CI가 멈춥니다.'**
+  String get tagVersionMismatchCi;
+
+  /// No description provided for @tagVersionMismatchBlocked.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래서 push는 막았습니다. 로컬에만 만들려면 push를 끄세요.'**
+  String get tagVersionMismatchBlocked;
+
+  /// No description provided for @tagOpenReleaseWizard.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 마법사 열기'**
+  String get tagOpenReleaseWizard;
 }
 
 class _AppLocalizationsDelegate

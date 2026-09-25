@@ -1732,4 +1732,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notesEmpty => 'Nothing to preview';
+
+  @override
+  String tagVersionMismatch(String file, String version, String tag) {
+    return '$file says $version, but the tag is $tag.';
+  }
+
+  @override
+  String get tagVersionMismatchWhy =>
+      'A release tag goes on the commit that bumps the version — the release wizard does the bump PR through the tag in order.';
+
+  @override
+  String get tagVersionMismatchCi =>
+      'In this repository pushing a tag makes CI build the release, and CI stops when the versions differ.';
+
+  @override
+  String get tagVersionMismatchBlocked =>
+      'So pushing is blocked. Turn off push to create it only locally.';
+
+  @override
+  String get tagOpenReleaseWizard => 'Open the release wizard';
 }

@@ -1186,5 +1186,23 @@
   },
   "notesEditTab": "편집",
   "notesPreviewTab": "미리 보기",
-  "notesEmpty": "내용이 없습니다"
+  "notesEmpty": "내용이 없습니다",
+  "tagVersionMismatch": "{file}의 버전은 {version}인데 태그는 {tag}입니다.",
+  "@tagVersionMismatch": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagVersionMismatchWhy": "릴리스 태그는 버전을 먼저 올린 커밋에 달아야 합니다 — 릴리스 마법사가 버전 올림 PR부터 태그까지 차례로 합니다.",
+  "tagVersionMismatchCi": "이 저장소는 태그를 push하면 CI가 릴리스를 만드는데, 버전이 다르면 CI가 멈춥니다.",
+  "tagVersionMismatchBlocked": "그래서 push는 막았습니다. 로컬에만 만들려면 push를 끄세요.",
+  "tagOpenReleaseWizard": "릴리스 마법사 열기"
 }
