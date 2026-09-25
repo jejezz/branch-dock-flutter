@@ -13,8 +13,8 @@
   "languageMenuTooltip": "Language",
   "languageSystem": "System / 시스템 설정 따르기",
   "languageSystemShort": "System",
-  "aboutTagline": "A desktop GUI for the GitHub CLI (gh)",
-  "aboutDescription": "Run gh commands in a window instead of a terminal and see the results. Work with repositories, pull requests, issues and releases in one place.",
+  "aboutTagline": "A desktop companion for Git and the GitHub CLI",
+  "aboutDescription": "Dock it beside your editor and handle branches, tags, merges, pull/push, remotes and releases with buttons that show the exact git and gh commands they run.",
   "homeEmptyTitle": "Choose a repository to get started",
   "homeEmptyAction": "Open repository"
 }

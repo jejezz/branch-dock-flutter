@@ -1,5 +1,5 @@
 name: branch_dock
-description: "A desktop GUI for the GitHub CLI (gh)."
+description: "A desktop companion for Git and the GitHub CLI."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

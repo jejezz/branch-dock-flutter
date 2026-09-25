@@ -53,11 +53,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languageSystemShort => '시스템';
 
   @override
-  String get aboutTagline => 'GitHub CLI(gh)를 위한 데스크톱 GUI';
+  String get aboutTagline => 'Git과 GitHub CLI를 위한 데스크톱 도우미';
 
   @override
   String get aboutDescription =>
-      'gh 명령을 터미널 대신 창에서 실행하고 결과를 봅니다. 저장소, 풀 리퀘스트, 이슈, 릴리스를 한 화면에서 다룹니다.';
+      '편집기 옆에 세워 두고 브랜치, 태그, 병합, Pull/Push, 원격, 릴리스를 버튼으로 다룹니다. 버튼마다 실제로 실행되는 git·gh 명령을 보여 줍니다.';
 
   @override
   String get homeEmptyTitle => '시작하려면 저장소를 선택하세요';

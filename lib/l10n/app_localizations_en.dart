@@ -53,11 +53,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSystemShort => 'System';
 
   @override
-  String get aboutTagline => 'A desktop GUI for the GitHub CLI (gh)';
+  String get aboutTagline => 'A desktop companion for Git and the GitHub CLI';
 
   @override
   String get aboutDescription =>
-      'Run gh commands in a window instead of a terminal and see the results. Work with repositories, pull requests, issues and releases in one place.';
+      'Dock it beside your editor and handle branches, tags, merges, pull/push, remotes and releases with buttons that show the exact git and gh commands they run.';
 
   @override
   String get homeEmptyTitle => 'Choose a repository to get started';

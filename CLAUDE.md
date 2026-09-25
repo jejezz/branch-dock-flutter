@@ -1,8 +1,9 @@
 # Branch Dock
 
-GitHub CLI(`gh`)를 위한 데스크톱 GUI (macOS / Windows / Linux). `gh` 명령을
-터미널 대신 창에서 실행하고, 저장소·풀 리퀘스트·이슈·릴리스를 한 화면에서
-다룬다.
+Git과 GitHub CLI(`gh`)를 위한 데스크톱 도우미 (macOS / Windows / Linux).
+편집기 옆에 세로로 세워 두고 브랜치·태그·병합·Pull/Push·원격·릴리스를 버튼으로
+다루며, 버튼마다 실제로 실행되는 `git`/`gh` 명령을 보여 준다. GitHub 저장소에
+가장 알맞고, GitLab 등 다른 호스팅에서는 git 동작만 쓸 수 있다.
 
 릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
 https://github.com/jejezz/application-release-templates/tree/main/conventions

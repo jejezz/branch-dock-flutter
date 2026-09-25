@@ -179,13 +179,13 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTagline.
   ///
   /// In ko, this message translates to:
-  /// **'GitHub CLI(gh)를 위한 데스크톱 GUI'**
+  /// **'Git과 GitHub CLI를 위한 데스크톱 도우미'**
   String get aboutTagline;
 
   /// No description provided for @aboutDescription.
   ///
   /// In ko, this message translates to:
-  /// **'gh 명령을 터미널 대신 창에서 실행하고 결과를 봅니다. 저장소, 풀 리퀘스트, 이슈, 릴리스를 한 화면에서 다룹니다.'**
+  /// **'편집기 옆에 세워 두고 브랜치, 태그, 병합, Pull/Push, 원격, 릴리스를 버튼으로 다룹니다. 버튼마다 실제로 실행되는 git·gh 명령을 보여 줍니다.'**
   String get aboutDescription;
 
   /// No description provided for @homeEmptyTitle.
