@@ -32,6 +32,14 @@ class RepoPrefs {
 
   Future<void> setPullMode(String repo, PullMode mode) => _prefs.setString('pull_mode:$repo', mode.name);
 
+  /// 자동 fetch (PLAN.md 3.3 P1). 기본은 켬.
+  bool get autoFetch => _prefs.getBool('auto_fetch') ?? true;
+  Future<void> setAutoFetch(bool value) => _prefs.setBool('auto_fetch', value);
+
+  /// Push할 때 태그도 함께 (--follow-tags). 저장소별, 기본은 끔.
+  bool followTags(String repo) => _prefs.getBool('push_follow_tags:$repo') ?? false;
+  Future<void> setFollowTags(String repo, bool value) => _prefs.setBool('push_follow_tags:$repo', value);
+
   int lastTab(String repo) => _prefs.getInt('last_tab:$repo') ?? 0;
   Future<void> setLastTab(String repo, int tab) => _prefs.setInt('last_tab:$repo', tab);
 
