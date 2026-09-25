@@ -2881,6 +2881,498 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'릴리스 마법사 열기'**
   String get tagOpenReleaseWizard;
+
+  /// No description provided for @tabHistory.
+  ///
+  /// In ko, this message translates to:
+  /// **'기록'**
+  String get tabHistory;
+
+  /// No description provided for @menuAutoFetch.
+  ///
+  /// In ko, this message translates to:
+  /// **'자동 fetch (5분마다·돌아올 때)'**
+  String get menuAutoFetch;
+
+  /// No description provided for @changesAmendToggle.
+  ///
+  /// In ko, this message translates to:
+  /// **'직전 커밋 고치기'**
+  String get changesAmendToggle;
+
+  /// No description provided for @changesAmend.
+  ///
+  /// In ko, this message translates to:
+  /// **'직전 커밋 고치기'**
+  String get changesAmend;
+
+  /// No description provided for @changesAmendPushedWarning.
+  ///
+  /// In ko, this message translates to:
+  /// **'이미 원격에 올린 커밋입니다. 고치면 기록이 갈라져 강제 push(force-with-lease)가 필요합니다.'**
+  String get changesAmendPushedWarning;
+
+  /// No description provided for @doneAmend.
+  ///
+  /// In ko, this message translates to:
+  /// **'직전 커밋을 고쳤습니다'**
+  String get doneAmend;
+
+  /// No description provided for @changesDiscard.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 취소'**
+  String get changesDiscard;
+
+  /// No description provided for @changesDiscardMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}의 커밋하지 않은 변경을 버리고 마지막으로 스테이징(또는 커밋)한 상태로 되돌립니다. 되돌릴 수 없습니다.'**
+  String changesDiscardMessage(String path);
+
+  /// No description provided for @changesDeleteUntracked.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 삭제'**
+  String get changesDeleteUntracked;
+
+  /// No description provided for @changesDeleteUntrackedMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'git이 추적하지 않는 {path}을(를) 지웁니다. 휴지통으로 가지 않습니다.'**
+  String changesDeleteUntrackedMessage(String path);
+
+  /// No description provided for @conflictUseMine.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 것 사용'**
+  String get conflictUseMine;
+
+  /// No description provided for @conflictUseIncoming.
+  ///
+  /// In ko, this message translates to:
+  /// **'들어오는 것 사용'**
+  String get conflictUseIncoming;
+
+  /// No description provided for @doneFileAction.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}: 완료'**
+  String doneFileAction(String name);
+
+  /// No description provided for @stashTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장 (stash)'**
+  String get stashTitle;
+
+  /// No description provided for @stashSave.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장'**
+  String get stashSave;
+
+  /// No description provided for @stashWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 {count}개를 커밋하지 않고 따로 치워 둡니다. 추적하지 않는 파일도 함께 저장합니다. 나중에 \'다시 적용\'으로 되살립니다.'**
+  String stashWhy(int count);
+
+  /// No description provided for @stashMessageLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'메모 (선택)'**
+  String get stashMessageLabel;
+
+  /// No description provided for @stashPop.
+  ///
+  /// In ko, this message translates to:
+  /// **'적용하고 지우기 (pop)'**
+  String get stashPop;
+
+  /// No description provided for @stashApply.
+  ///
+  /// In ko, this message translates to:
+  /// **'적용만 하기 (apply)'**
+  String get stashApply;
+
+  /// No description provided for @stashDrop.
+  ///
+  /// In ko, this message translates to:
+  /// **'삭제'**
+  String get stashDrop;
+
+  /// No description provided for @stashDropTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장을 삭제할까요?'**
+  String get stashDropTitle;
+
+  /// No description provided for @stashDropMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'{text}\'에 저장한 변경이 사라집니다.'**
+  String stashDropMessage(String text);
+
+  /// No description provided for @stashAndRetry.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장하고 다시'**
+  String get stashAndRetry;
+
+  /// No description provided for @stashAutoMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'Branch Dock: 자동 임시 저장'**
+  String get stashAutoMessage;
+
+  /// No description provided for @doneStashSaved.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장했습니다'**
+  String get doneStashSaved;
+
+  /// No description provided for @doneStashApplied.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장을 적용했습니다'**
+  String get doneStashApplied;
+
+  /// No description provided for @doneStashDropped.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장을 삭제했습니다'**
+  String get doneStashDropped;
+
+  /// No description provided for @doneStashAndRetry.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경을 임시 저장하고 다시 실행했습니다. 변경 탭의 임시 저장에서 되살릴 수 있습니다.'**
+  String get doneStashAndRetry;
+
+  /// No description provided for @pushOptionsTooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'Push 옵션'**
+  String get pushOptionsTooltip;
+
+  /// No description provided for @pushOptionsTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Push 옵션'**
+  String get pushOptionsTitle;
+
+  /// No description provided for @pushFollowTags.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그도 함께 push (--follow-tags)'**
+  String get pushFollowTags;
+
+  /// No description provided for @pushFollowTagsWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'올리는 커밋에 달린 주석 태그를 함께 올립니다. 이 저장소에만 적용됩니다.'**
+  String get pushFollowTagsWhy;
+
+  /// No description provided for @pushForceTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'강제 push (force-with-lease)'**
+  String get pushForceTitle;
+
+  /// No description provided for @pushForceWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'amend나 rebase로 이미 올린 커밋을 고쳤을 때만 씁니다. 내가 모르는 원격 커밋이 있으면 git이 거부해서 다른 사람의 작업을 덮어쓰지 않습니다.'**
+  String get pushForceWhy;
+
+  /// No description provided for @pushForceBlockedDefault.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 브랜치({branch})에서는 강제 push를 막았습니다 — 다른 사람의 기록을 덮어쓸 수 있습니다.'**
+  String pushForceBlockedDefault(String branch);
+
+  /// No description provided for @pushForce.
+  ///
+  /// In ko, this message translates to:
+  /// **'강제 push'**
+  String get pushForce;
+
+  /// No description provided for @pushForceConfirmTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}을(를) 강제 push할까요?'**
+  String pushForceConfirmTitle(String branch);
+
+  /// No description provided for @pushForceConfirmMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{upstream}의 기록을 내 {branch}로 바꿉니다. 내가 fetch한 뒤 누가 push했다면 git이 거부합니다.'**
+  String pushForceConfirmMessage(String branch, String upstream);
+
+  /// No description provided for @operationSkip.
+  ///
+  /// In ko, this message translates to:
+  /// **'건너뛰기'**
+  String get operationSkip;
+
+  /// No description provided for @operationSkipTooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 난 이 커밋을 빼고 rebase를 계속합니다'**
+  String get operationSkipTooltip;
+
+  /// No description provided for @doneSkip.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋을 건너뛰었습니다'**
+  String get doneSkip;
+
+  /// No description provided for @branchesSetUpstream.
+  ///
+  /// In ko, this message translates to:
+  /// **'추적 브랜치 설정'**
+  String get branchesSetUpstream;
+
+  /// No description provided for @branchesSetUpstreamWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}이(가) Push·Pull할 원격 브랜치를 정합니다.'**
+  String branchesSetUpstreamWhy(String branch);
+
+  /// No description provided for @branchesUpstreamLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격 브랜치'**
+  String get branchesUpstreamLabel;
+
+  /// No description provided for @doneSetUpstream.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}의 추적 브랜치를 {upstream}(으)로 정했습니다'**
+  String doneSetUpstream(String branch, String upstream);
+
+  /// No description provided for @branchesCleanup.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합된 브랜치 정리'**
+  String get branchesCleanup;
+
+  /// No description provided for @cleanupWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'{base}에 이미 병합됐거나 원격에서 지워진 로컬 브랜치입니다. 원격 브랜치는 건드리지 않습니다.'**
+  String cleanupWhy(String base);
+
+  /// No description provided for @cleanupMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합됨'**
+  String get cleanupMerged;
+
+  /// No description provided for @cleanupGoneNotMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에서 삭제됨 · 병합 안 됨 — 지우면 커밋을 찾기 어려워집니다'**
+  String get cleanupGoneNotMerged;
+
+  /// No description provided for @cleanupConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'{count}개 삭제'**
+  String cleanupConfirm(int count);
+
+  /// No description provided for @cleanupNothing.
+  ///
+  /// In ko, this message translates to:
+  /// **'정리할 브랜치가 없습니다 ({base}에 병합된 브랜치 없음)'**
+  String cleanupNothing(String base);
+
+  /// No description provided for @doneCleanup.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치 {count}개를 정리했습니다'**
+  String doneCleanup(int count);
+
+  /// No description provided for @tagsCommitsSince.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 태그 이후 커밋'**
+  String get tagsCommitsSince;
+
+  /// No description provided for @tagsCommitsBetween.
+  ///
+  /// In ko, this message translates to:
+  /// **'{from} → {to}'**
+  String tagsCommitsBetween(String from, String to);
+
+  /// No description provided for @tagsCommitsUpTo.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}까지'**
+  String tagsCommitsUpTo(String tag);
+
+  /// No description provided for @tagsCommitsCount.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 {count}개'**
+  String tagsCommitsCount(int count);
+
+  /// No description provided for @tagsCheckout.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 태그로 이동'**
+  String get tagsCheckout;
+
+  /// No description provided for @tagsCheckoutTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}(으)로 이동할까요?'**
+  String tagsCheckoutTitle(String tag);
+
+  /// No description provided for @tagsCheckoutMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 위치의 파일을 그대로 볼 수 있습니다. 이때는 어느 브랜치에도 있지 않은 \'분리된 HEAD\' 상태라, 여기서 커밋하려면 먼저 브랜치를 만드세요.'**
+  String get tagsCheckoutMessage;
+
+  /// No description provided for @doneCheckoutTag.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag}(으)로 이동했습니다'**
+  String doneCheckoutTag(String tag);
+
+  /// No description provided for @bannerDetached.
+  ///
+  /// In ko, this message translates to:
+  /// **'어느 브랜치에도 있지 않습니다. 여기서 커밋하려면 브랜치를 만드세요'**
+  String get bannerDetached;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'기록'**
+  String get historyTitle;
+
+  /// No description provided for @historyUnpushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'↑ 올리지 않은 커밋 {count}'**
+  String historyUnpushed(int count);
+
+  /// No description provided for @historyNotPushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 올리지 않음'**
+  String get historyNotPushed;
+
+  /// No description provided for @historyCopyHash.
+  ///
+  /// In ko, this message translates to:
+  /// **'해시 복사'**
+  String get historyCopyHash;
+
+  /// No description provided for @historyBranchHere.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기서 브랜치 만들기'**
+  String get historyBranchHere;
+
+  /// No description provided for @historyTagHere.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기에 태그 달기'**
+  String get historyTagHere;
+
+  /// No description provided for @helpLinkStashing.
+  ///
+  /// In ko, this message translates to:
+  /// **'Pro Git — Stashing과 Cleaning'**
+  String get helpLinkStashing;
+
+  /// No description provided for @helpCaptionStash.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋하지 않은 변경 W를 stash 목록 맨 위에 치워 둠 — main은 그대로'**
+  String get helpCaptionStash;
+
+  /// No description provided for @helpStashTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Stash (임시 저장)'**
+  String get helpStashTitle;
+
+  /// No description provided for @helpStashWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'stash는 \'넣어 두다, 숨겨 두다\'. 잠깐 서랍에 치워 두는 것.'**
+  String get helpStashWord;
+
+  /// No description provided for @helpStashInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋하지 않은 변경을 브랜치 기록에 남기지 않고 따로 저장한 뒤, 작업 트리를 깨끗하게 되돌립니다. 저장한 변경은 목록에 쌓이고(가장 최근 것이 맨 위), 나중에 어느 브랜치에서든 다시 적용할 수 있습니다.'**
+  String get helpStashInGit;
+
+  /// No description provided for @helpStashWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'하던 일을 커밋하기엔 이른데 브랜치를 바꾸거나 Pull해야 할 때 씁니다. \'pop\'은 적용하고 목록에서 지우고, \'apply\'는 목록에 남겨 둡니다. 오래 두면 무엇이었는지 잊기 쉬우니 메모를 남기세요.'**
+  String get helpStashWhy;
+
+  /// No description provided for @helpCaptionDetached.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD가 브랜치가 아니라 v1.0.0 커밋을 직접 가리킴'**
+  String get helpCaptionDetached;
+
+  /// No description provided for @helpDetachedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'분리된 HEAD (detached HEAD)'**
+  String get helpDetachedTitle;
+
+  /// No description provided for @helpDetachedWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'detached는 \'떨어진, 분리된\'. HEAD는 \'지금 보고 있는 곳\'.'**
+  String get helpDetachedWord;
+
+  /// No description provided for @helpDetachedInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'보통 HEAD는 브랜치 이름표를 가리키고, 커밋하면 그 이름표가 앞으로 갑니다. 태그나 커밋으로 직접 이동하면 HEAD가 브랜치에서 떨어져 커밋을 직접 가리킵니다.'**
+  String get helpDetachedInGit;
+
+  /// No description provided for @helpDetachedWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'옛 버전을 실행해 보거나 비교할 때 안전하게 쓸 수 있습니다. 여기서 커밋하면 어느 브랜치에도 속하지 않아 다른 곳으로 옮기면 찾기 어려워지니, 커밋하려면 먼저 \'여기서 브랜치 만들기\'를 하세요.'**
+  String get helpDetachedWhy;
+
+  /// No description provided for @helpForceTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'강제 push (force-with-lease)'**
+  String get helpForceTitle;
+
+  /// No description provided for @helpForceWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'force는 \'억지로\', lease는 \'임대 계약\' — 내가 본 상태 그대로일 때만 바꾼다는 조건.'**
+  String get helpForceWord;
+
+  /// No description provided for @helpForceInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'amend나 rebase로 이미 올린 커밋을 고치면 원격 기록과 갈라져 보통 push가 거부됩니다. 강제 push는 원격 브랜치를 내 기록으로 바꿉니다. --force-with-lease는 원격이 내가 마지막으로 fetch한 상태 그대로일 때만 바꾸고, 그 사이 누가 push했으면 거부합니다.'**
+  String get helpForceInGit;
+
+  /// No description provided for @helpForceWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.'**
+  String get helpForceWhy;
 }
 
 class _AppLocalizationsDelegate

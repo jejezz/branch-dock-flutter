@@ -27,6 +27,7 @@ import 'status_header.dart';
 import 'tabs/actions_tab.dart';
 import 'tabs/branches_tab.dart';
 import 'tabs/changes_tab.dart';
+import 'tabs/history_tab.dart';
 import 'tabs/pr_tab.dart';
 import 'tabs/release_tab.dart';
 import 'tabs/remotes_tab.dart';
@@ -59,8 +60,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   final _commitFocus = FocusNode();
   late final TabController _tabs = TabController(length: _tabCount, vsync: this);
 
-  /// 변경 · 브랜치 · 태그 · 원격 · 릴리스 · PR · CI (UI_UX.md §3 D).
-  static const _tabCount = 7;
+  /// 변경 · 브랜치 · 태그 · 원격 · 릴리스 · PR · CI · 기록 (UI_UX.md §3 D).
+  /// 기록은 v0.4.0에 더해 맨 뒤에 둔다 — 기존 ⌘1–7이 바뀌지 않게.
+  static const _tabCount = 8;
+
+  /// 자동 fetch (PLAN.md 3.3 P1): 5분마다, 그리고 창으로 돌아올 때.
+  Timer? _autoFetch;
   static const _tabChanges = 0, _tabBranches = 1, _tabTags = 2, _tabRemotes = 3, _tabRelease = 4;
   bool _started = false;
 
@@ -83,6 +88,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
       if (repo != null && !_tabs.indexIsChanging) _services.prefs.setLastTab(repo.root, _tabs.index);
     });
     await _checkEnvironment();
+    _autoFetch = Timer.periodic(const Duration(minutes: 5), (_) {
+      if (_services.prefs.autoFetch) _repo?.backgroundFetch();
+    });
     // 편집기 옆에 띄워 두고 쓰는 앱이라 마지막 저장소를 다시 연다.
     final recent = _services.prefs.recent;
     if (_env.hasGit && recent.isNotEmpty) await _open(recent.first, quietFailure: true);
@@ -91,6 +99,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   @override
   void dispose() {
     if (_isDesktop) windowManager.removeListener(this);
+    _autoFetch?.cancel();
     _flow?.dispose();
     _repo?.dispose();
     _tabs.dispose();
@@ -183,6 +192,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     // 다른 앱(편집기, 터미널, 브라우저)에서 돌아오면 상태를 다시 읽는다.
     _repo?.refresh();
     _repo?.loadHeadPr();
+    if (_services.prefs.autoFetch) _repo?.backgroundFetch();
     _flow?.poll();
   }
 
@@ -327,6 +337,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
               case ':editor':
                 final cmd = await showEditorCommandSheet(context, _services.prefs.editorCommand);
                 if (cmd != null) await _services.prefs.setEditorCommand(cmd);
+              case ':autofetch':
+                await _services.prefs.setAutoFetch(!_services.prefs.autoFetch);
+                setState(() {});
               case ':env':
                 if (context.mounted) await showEnvironmentSheet(context, _env, _checkEnvironment);
               case ':close':
@@ -345,6 +358,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
             if (others.isNotEmpty) const PopupMenuDivider(),
             PopupMenuItem(value: ':open', child: Text('${l10n.menuOpenFolder}  ${shortcutLabel('O')}')),
             PopupMenuItem(value: ':editor', child: Text(l10n.menuEditor)),
+            CheckedPopupMenuItem(value: ':autofetch', checked: _services.prefs.autoFetch, child: Text(l10n.menuAutoFetch)),
             PopupMenuItem(value: ':env', child: Text(l10n.menuEnvironment)),
             PopupMenuItem(value: ':close', child: Text(l10n.menuCloseRepo)),
           ],
@@ -413,8 +427,9 @@ class _RepoView extends StatelessWidget {
       TabBar(
         controller: state._tabs,
         // 380–439px에서는 탭을 가로로 스크롤한다 (UI_UX.md §2).
-        isScrollable: MediaQuery.sizeOf(context).width < 440,
-        tabAlignment: MediaQuery.sizeOf(context).width < 440 ? TabAlignment.start : TabAlignment.fill,
+        // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
+        isScrollable: MediaQuery.sizeOf(context).width < 560,
+        tabAlignment: MediaQuery.sizeOf(context).width < 560 ? TabAlignment.start : TabAlignment.fill,
         labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
         unselectedLabelStyle: theme.textTheme.labelMedium,
@@ -446,6 +461,7 @@ class _RepoView extends StatelessWidget {
           ),
           Tab(height: 48, icon: const Icon(Icons.merge_rounded, size: 20), text: l10n.tabPr),
           Tab(height: 48, icon: const Icon(Icons.bolt_rounded, size: 20), text: l10n.tabCi),
+          Tab(height: 48, icon: const Icon(Icons.history_rounded, size: 20), text: l10n.tabHistory),
         ],
       ),
       Expanded(
@@ -459,6 +475,7 @@ class _RepoView extends StatelessWidget {
             ReleaseTab(flow: state._flow!, onShowChanges: () => state._tabs.animateTo(_MainScreenState._tabChanges)),
             const PrTab(),
             const ActionsTab(),
+            const HistoryTab(),
           ],
         ),
       ),

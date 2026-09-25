@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/command_runner.dart';
 import '../../git/commands.dart';
+import '../../git/commits.dart';
 import '../../git/tags.dart';
 import '../../l10n/app_localizations.dart';
 import '../../release/repo_release_info.dart';
@@ -90,7 +91,7 @@ Future<CommandResult> _pushTags(RepoController repo, String remote, List<String>
   return r;
 }
 
-enum _TagMenu { push, delete, deleteRemote }
+enum _TagMenu { commits, checkout, push, delete, deleteRemote }
 
 class _TagRow extends StatelessWidget {
   const _TagRow({required this.tag, required this.repo, required this.remoteKnown});
@@ -147,6 +148,8 @@ class _TagRow extends StatelessWidget {
             onSelected: (m) => _onMenu(context, m),
             itemBuilder: (context) => [
               if (remote != null && !t.pushed) PopupMenuItem(value: _TagMenu.push, child: Text(l10n.tagsPush)),
+              PopupMenuItem(value: _TagMenu.commits, child: Text(l10n.tagsCommitsSince)),
+              PopupMenuItem(value: _TagMenu.checkout, child: Text(l10n.tagsCheckout)),
               PopupMenuItem(value: _TagMenu.delete, child: Text(l10n.tagsDelete)),
               if (remote != null && t.pushed)
                 PopupMenuItem(
@@ -164,6 +167,35 @@ class _TagRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final remote = repo.defaultRemote;
     switch (m) {
+      case _TagMenu.commits:
+        await showTagCommitsSheet(context, repo, tag);
+      case _TagMenu.checkout:
+        // 태그 위치로 이동 = 분리된 HEAD. 무엇을 뜻하는지 먼저 알린다 (PLAN.md 3.7 P1).
+        final command = GitCommands.switchDetach(tag.name);
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.tagsCheckoutTitle(tag.name)),
+            content: SizedBox(
+              width: 360,
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Expanded(child: Text(l10n.tagsCheckoutMessage)),
+                  const HelpButton(concept: Concept.detachedHead),
+                ]),
+                const SizedBox(height: AppSpacing.md),
+                CommandPreview(commands: [command]),
+              ]),
+            ),
+            actions: [
+              TextButton(autofocus: true, onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
+              FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.tagsCheckout)),
+            ],
+          ),
+        );
+        if (ok == true && context.mounted) {
+          await RepoActions.withStashRetry(context, repo, () => repo.execute(command), done: l10n.doneCheckoutTag(tag.name));
+        }
       case _TagMenu.push:
         await RepoActions.report(context, _pushTags(repo, remote!, [tag.name]), done: l10n.donePushTags(1));
       case _TagMenu.delete:
@@ -203,10 +235,16 @@ Future<void> showCreateTagSheet(
   RepoController repo, {
   VoidCallback? onOpenReleaseWizard,
   SemVer? headVersion,
+  String? target,
 }) =>
     showActionSheet<void>(
       context,
-      (context) => _CreateTagSheet(repo: repo, onOpenReleaseWizard: onOpenReleaseWizard, headVersion: headVersion),
+      (context) => _CreateTagSheet(
+        repo: repo,
+        onOpenReleaseWizard: onOpenReleaseWizard,
+        headVersion: headVersion,
+        target: target,
+      ),
     );
 
 /// [ref] 커밋에 커밋된 버전 파일의 버전. 버전 파일이 없으면 null.
@@ -219,11 +257,14 @@ Future<SemVer?> loadCommittedVersion(RepoController repo, String ref) async {
 }
 
 class _CreateTagSheet extends StatefulWidget {
-  const _CreateTagSheet({required this.repo, this.onOpenReleaseWizard, this.headVersion});
+  const _CreateTagSheet({required this.repo, this.onOpenReleaseWizard, this.headVersion, this.target});
 
   final RepoController repo;
   final VoidCallback? onOpenReleaseWizard;
   final SemVer? headVersion;
+
+  /// 태그를 달 커밋을 정해서 열 때 (기록 탭의 "여기에 태그 달기").
+  final String? target;
 
   @override
   State<_CreateTagSheet> createState() => _CreateTagSheetState();
@@ -234,7 +275,7 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
   late final _message = TextEditingController();
   bool _annotated = true;
   bool _push = true;
-  String? _target;
+  late String? _target = widget.target;
 
   /// 메시지를 직접 고치기 전까지는 태그 이름을 따라간다 (`<표시 이름> <버전>`).
   bool _messageEdited = false;
@@ -382,6 +423,8 @@ class _CreateTagSheetState extends State<_CreateTagSheet> {
           decoration: InputDecoration(labelText: l10n.tagTargetLabel),
           items: [
             DropdownMenuItem(value: null, child: Text(l10n.tagTargetHead(repo.status.head ?? 'HEAD'))),
+            if (widget.target != null && !repo.localBranches.any((b) => b.name == widget.target))
+              DropdownMenuItem(value: widget.target, child: Text(widget.target!, style: AppFonts.mono.copyWith(fontSize: 12))),
             for (final b in repo.localBranches.where((b) => !b.current))
               DropdownMenuItem(value: b.name, child: Text(b.name, style: AppFonts.userContent)),
           ],
@@ -459,4 +502,41 @@ class _VersionMismatch extends StatelessWidget {
       ]),
     );
   }
+}
+
+
+/// 이전 버전 태그부터 이 태그까지의 커밋 (PLAN.md 3.7 P1).
+Future<void> showTagCommitsSheet(BuildContext context, RepoController repo, Tag tag) async {
+  final versions = repo.tags.where((t) => t.version != null).toList();
+  final i = versions.indexWhere((t) => t.name == tag.name);
+  final previous = i >= 0 && i + 1 < versions.length ? versions[i + 1].name : null;
+  final r = await repo.read(GitCommands.log(since: previous, until: tag.name));
+  if (!context.mounted) return;
+  final commits = r.ok ? Commit.parse(r.stdout) : const <Commit>[];
+  await showActionSheet<void>(context, (context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.lg),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(previous == null ? l10n.tagsCommitsUpTo(tag.name) : l10n.tagsCommitsBetween(previous, tag.name),
+              style: theme.textTheme.titleLarge),
+          Text(l10n.tagsCommitsCount(commits.length), style: theme.textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.md),
+          for (final c in commits)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: '${c.shortHash}  ', style: AppFonts.mono.copyWith(fontSize: 11.5)),
+                  TextSpan(text: c.subject),
+                ]),
+                style: theme.textTheme.bodySmall?.merge(AppFonts.userContent),
+              ),
+            ),
+        ]),
+      ),
+    );
+  });
 }

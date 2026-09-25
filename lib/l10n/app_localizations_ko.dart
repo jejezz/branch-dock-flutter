@@ -1641,4 +1641,302 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tagOpenReleaseWizard => '릴리스 마법사 열기';
+
+  @override
+  String get tabHistory => '기록';
+
+  @override
+  String get menuAutoFetch => '자동 fetch (5분마다·돌아올 때)';
+
+  @override
+  String get changesAmendToggle => '직전 커밋 고치기';
+
+  @override
+  String get changesAmend => '직전 커밋 고치기';
+
+  @override
+  String get changesAmendPushedWarning =>
+      '이미 원격에 올린 커밋입니다. 고치면 기록이 갈라져 강제 push(force-with-lease)가 필요합니다.';
+
+  @override
+  String get doneAmend => '직전 커밋을 고쳤습니다';
+
+  @override
+  String get changesDiscard => '변경 취소';
+
+  @override
+  String changesDiscardMessage(String path) {
+    return '$path의 커밋하지 않은 변경을 버리고 마지막으로 스테이징(또는 커밋)한 상태로 되돌립니다. 되돌릴 수 없습니다.';
+  }
+
+  @override
+  String get changesDeleteUntracked => '파일 삭제';
+
+  @override
+  String changesDeleteUntrackedMessage(String path) {
+    return 'git이 추적하지 않는 $path을(를) 지웁니다. 휴지통으로 가지 않습니다.';
+  }
+
+  @override
+  String get conflictUseMine => '내 것 사용';
+
+  @override
+  String get conflictUseIncoming => '들어오는 것 사용';
+
+  @override
+  String doneFileAction(String name) {
+    return '$name: 완료';
+  }
+
+  @override
+  String get stashTitle => '임시 저장 (stash)';
+
+  @override
+  String get stashSave => '임시 저장';
+
+  @override
+  String stashWhy(int count) {
+    return '변경 $count개를 커밋하지 않고 따로 치워 둡니다. 추적하지 않는 파일도 함께 저장합니다. 나중에 \'다시 적용\'으로 되살립니다.';
+  }
+
+  @override
+  String get stashMessageLabel => '메모 (선택)';
+
+  @override
+  String get stashPop => '적용하고 지우기 (pop)';
+
+  @override
+  String get stashApply => '적용만 하기 (apply)';
+
+  @override
+  String get stashDrop => '삭제';
+
+  @override
+  String get stashDropTitle => '임시 저장을 삭제할까요?';
+
+  @override
+  String stashDropMessage(String text) {
+    return '\'$text\'에 저장한 변경이 사라집니다.';
+  }
+
+  @override
+  String get stashAndRetry => '임시 저장하고 다시';
+
+  @override
+  String get stashAutoMessage => 'Branch Dock: 자동 임시 저장';
+
+  @override
+  String get doneStashSaved => '임시 저장했습니다';
+
+  @override
+  String get doneStashApplied => '임시 저장을 적용했습니다';
+
+  @override
+  String get doneStashDropped => '임시 저장을 삭제했습니다';
+
+  @override
+  String get doneStashAndRetry =>
+      '변경을 임시 저장하고 다시 실행했습니다. 변경 탭의 임시 저장에서 되살릴 수 있습니다.';
+
+  @override
+  String get pushOptionsTooltip => 'Push 옵션';
+
+  @override
+  String get pushOptionsTitle => 'Push 옵션';
+
+  @override
+  String get pushFollowTags => '태그도 함께 push (--follow-tags)';
+
+  @override
+  String get pushFollowTagsWhy => '올리는 커밋에 달린 주석 태그를 함께 올립니다. 이 저장소에만 적용됩니다.';
+
+  @override
+  String get pushForceTitle => '강제 push (force-with-lease)';
+
+  @override
+  String get pushForceWhy =>
+      'amend나 rebase로 이미 올린 커밋을 고쳤을 때만 씁니다. 내가 모르는 원격 커밋이 있으면 git이 거부해서 다른 사람의 작업을 덮어쓰지 않습니다.';
+
+  @override
+  String pushForceBlockedDefault(String branch) {
+    return '기본 브랜치($branch)에서는 강제 push를 막았습니다 — 다른 사람의 기록을 덮어쓸 수 있습니다.';
+  }
+
+  @override
+  String get pushForce => '강제 push';
+
+  @override
+  String pushForceConfirmTitle(String branch) {
+    return '$branch을(를) 강제 push할까요?';
+  }
+
+  @override
+  String pushForceConfirmMessage(String branch, String upstream) {
+    return '$upstream의 기록을 내 $branch로 바꿉니다. 내가 fetch한 뒤 누가 push했다면 git이 거부합니다.';
+  }
+
+  @override
+  String get operationSkip => '건너뛰기';
+
+  @override
+  String get operationSkipTooltip => '충돌 난 이 커밋을 빼고 rebase를 계속합니다';
+
+  @override
+  String get doneSkip => '커밋을 건너뛰었습니다';
+
+  @override
+  String get branchesSetUpstream => '추적 브랜치 설정';
+
+  @override
+  String branchesSetUpstreamWhy(String branch) {
+    return '$branch이(가) Push·Pull할 원격 브랜치를 정합니다.';
+  }
+
+  @override
+  String get branchesUpstreamLabel => '원격 브랜치';
+
+  @override
+  String doneSetUpstream(String branch, String upstream) {
+    return '$branch의 추적 브랜치를 $upstream(으)로 정했습니다';
+  }
+
+  @override
+  String get branchesCleanup => '병합된 브랜치 정리';
+
+  @override
+  String cleanupWhy(String base) {
+    return '$base에 이미 병합됐거나 원격에서 지워진 로컬 브랜치입니다. 원격 브랜치는 건드리지 않습니다.';
+  }
+
+  @override
+  String get cleanupMerged => '병합됨';
+
+  @override
+  String get cleanupGoneNotMerged => '원격에서 삭제됨 · 병합 안 됨 — 지우면 커밋을 찾기 어려워집니다';
+
+  @override
+  String cleanupConfirm(int count) {
+    return '$count개 삭제';
+  }
+
+  @override
+  String cleanupNothing(String base) {
+    return '정리할 브랜치가 없습니다 ($base에 병합된 브랜치 없음)';
+  }
+
+  @override
+  String doneCleanup(int count) {
+    return '브랜치 $count개를 정리했습니다';
+  }
+
+  @override
+  String get tagsCommitsSince => '이전 태그 이후 커밋';
+
+  @override
+  String tagsCommitsBetween(String from, String to) {
+    return '$from → $to';
+  }
+
+  @override
+  String tagsCommitsUpTo(String tag) {
+    return '$tag까지';
+  }
+
+  @override
+  String tagsCommitsCount(int count) {
+    return '커밋 $count개';
+  }
+
+  @override
+  String get tagsCheckout => '이 태그로 이동';
+
+  @override
+  String tagsCheckoutTitle(String tag) {
+    return '$tag(으)로 이동할까요?';
+  }
+
+  @override
+  String get tagsCheckoutMessage =>
+      '태그 위치의 파일을 그대로 볼 수 있습니다. 이때는 어느 브랜치에도 있지 않은 \'분리된 HEAD\' 상태라, 여기서 커밋하려면 먼저 브랜치를 만드세요.';
+
+  @override
+  String doneCheckoutTag(String tag) {
+    return '$tag(으)로 이동했습니다';
+  }
+
+  @override
+  String get bannerDetached => '어느 브랜치에도 있지 않습니다. 여기서 커밋하려면 브랜치를 만드세요';
+
+  @override
+  String get historyTitle => '기록';
+
+  @override
+  String historyUnpushed(int count) {
+    return '↑ 올리지 않은 커밋 $count';
+  }
+
+  @override
+  String get historyNotPushed => '아직 올리지 않음';
+
+  @override
+  String get historyCopyHash => '해시 복사';
+
+  @override
+  String get historyBranchHere => '여기서 브랜치 만들기';
+
+  @override
+  String get historyTagHere => '여기에 태그 달기';
+
+  @override
+  String get helpLinkStashing => 'Pro Git — Stashing과 Cleaning';
+
+  @override
+  String get helpCaptionStash => '커밋하지 않은 변경 W를 stash 목록 맨 위에 치워 둠 — main은 그대로';
+
+  @override
+  String get helpStashTitle => 'Stash (임시 저장)';
+
+  @override
+  String get helpStashWord => 'stash는 \'넣어 두다, 숨겨 두다\'. 잠깐 서랍에 치워 두는 것.';
+
+  @override
+  String get helpStashInGit =>
+      '커밋하지 않은 변경을 브랜치 기록에 남기지 않고 따로 저장한 뒤, 작업 트리를 깨끗하게 되돌립니다. 저장한 변경은 목록에 쌓이고(가장 최근 것이 맨 위), 나중에 어느 브랜치에서든 다시 적용할 수 있습니다.';
+
+  @override
+  String get helpStashWhy =>
+      '하던 일을 커밋하기엔 이른데 브랜치를 바꾸거나 Pull해야 할 때 씁니다. \'pop\'은 적용하고 목록에서 지우고, \'apply\'는 목록에 남겨 둡니다. 오래 두면 무엇이었는지 잊기 쉬우니 메모를 남기세요.';
+
+  @override
+  String get helpCaptionDetached => 'HEAD가 브랜치가 아니라 v1.0.0 커밋을 직접 가리킴';
+
+  @override
+  String get helpDetachedTitle => '분리된 HEAD (detached HEAD)';
+
+  @override
+  String get helpDetachedWord =>
+      'detached는 \'떨어진, 분리된\'. HEAD는 \'지금 보고 있는 곳\'.';
+
+  @override
+  String get helpDetachedInGit =>
+      '보통 HEAD는 브랜치 이름표를 가리키고, 커밋하면 그 이름표가 앞으로 갑니다. 태그나 커밋으로 직접 이동하면 HEAD가 브랜치에서 떨어져 커밋을 직접 가리킵니다.';
+
+  @override
+  String get helpDetachedWhy =>
+      '옛 버전을 실행해 보거나 비교할 때 안전하게 쓸 수 있습니다. 여기서 커밋하면 어느 브랜치에도 속하지 않아 다른 곳으로 옮기면 찾기 어려워지니, 커밋하려면 먼저 \'여기서 브랜치 만들기\'를 하세요.';
+
+  @override
+  String get helpForceTitle => '강제 push (force-with-lease)';
+
+  @override
+  String get helpForceWord =>
+      'force는 \'억지로\', lease는 \'임대 계약\' — 내가 본 상태 그대로일 때만 바꾼다는 조건.';
+
+  @override
+  String get helpForceInGit =>
+      'amend나 rebase로 이미 올린 커밋을 고치면 원격 기록과 갈라져 보통 push가 거부됩니다. 강제 push는 원격 브랜치를 내 기록으로 바꿉니다. --force-with-lease는 원격이 내가 마지막으로 fetch한 상태 그대로일 때만 바꾸고, 그 사이 누가 push했으면 거부합니다.';
+
+  @override
+  String get helpForceWhy =>
+      '혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.';
 }

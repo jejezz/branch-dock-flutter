@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../core/command_runner.dart';
 import '../git/commands.dart';
+import '../git/history.dart';
 import '../git/refs.dart';
 import '../git/remotes.dart';
 import '../git/status.dart';
@@ -32,6 +33,10 @@ class RepoController extends ChangeNotifier {
   List<Branch> branches = const [];
   List<Remote> remotes = const [];
   List<Tag> tags = const [];
+  List<Stash> stashes = const [];
+
+  /// 마지막으로 원격을 확인한 때 (Fetch 버튼이든 자동 fetch든).
+  DateTime? lastFetch;
 
   /// 기본 원격에 있는 태그 이름. 네트워크를 쓰므로 [loadRemoteTags]로만 읽는다.
   Set<String>? remoteTagNames;
@@ -132,9 +137,11 @@ class RepoController extends ChangeNotifier {
         runner.run(GitCommands.branches, workingDirectory: root, quiet: true),
         runner.run(GitCommands.remotes, workingDirectory: root, quiet: true),
         runner.run(GitCommands.tags, workingDirectory: root, quiet: true),
+        runner.run(GitCommands.stashList, workingDirectory: root, quiet: true),
       ]);
       if (_disposed) return;
       if (results[3].ok) tags = _withPushed(Tag.parse(results[3].stdout));
+      if (results[4].ok) stashes = Stash.parse(results[4].stdout);
       if (results[0].ok) status = RepoStatus.parse(results[0].stdout);
       if (results[1].ok) branches = Branch.parse(results[1].stdout);
       if (results[2].ok) remotes = Remote.parse(results[2].stdout);
@@ -287,29 +294,58 @@ class RepoController extends ChangeNotifier {
 
   Future<CommandResult> fetch({String? remote}) async {
     final r = await execute(GitCommands.fetch(remote: remote));
+    if (r.ok) lastFetch = DateTime.now();
     if (r.ok && remoteTagNames != null) await loadRemoteTags();
     return r;
+  }
+
+  /// 자동 fetch (PLAN.md 3.3 P1): 기록에 남기지 않고 조용히 원격을 확인한다.
+  /// 다른 명령이 도는 중이거나 [minInterval] 안에 확인했으면 건너뛴다.
+  /// 네트워크·인증 오류는 무시한다 — 사용자가 누른 Fetch만 오류를 알린다.
+  Future<void> backgroundFetch({Duration minInterval = const Duration(minutes: 1)}) async {
+    if (busy || remotes.isEmpty || _disposed) return;
+    final last = lastFetch;
+    if (last != null && DateTime.now().difference(last) < minInterval) return;
+    lastFetch = DateTime.now();
+    final r = await runner.run(GitCommands.fetch(), workingDirectory: root, quiet: true);
+    if (r.ok && !_disposed) {
+      await refresh();
+      if (remoteTagNames != null) await loadRemoteTags();
+    }
+  }
+
+  /// 지워도 되는 로컬 브랜치 (PLAN.md 3.4 P1): 원격 기본 브랜치에 병합됐거나
+  /// 원격에서 사라진 브랜치. 현재 브랜치와 기본 브랜치는 뺀다.
+  Future<List<({Branch branch, bool merged})>> cleanupCandidates() async {
+    final base = defaultBranch;
+    final remote = defaultRemote;
+    final merged = <String>{};
+    if (base != null) {
+      final r = await read(GitCommands.mergedInto(remote == null ? base : '$remote/$base'));
+      if (r.ok) merged.addAll(r.stdout.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty));
+    }
+    return [
+      for (final b in localBranches)
+        if (!b.current && b.name != base && (merged.contains(b.name) || b.upstreamGone))
+          (branch: b, merged: merged.contains(b.name)),
+    ];
   }
 
   /// 읽기 전용 명령 (로그에 남기지 않음, 바쁨 표시 없음).
   Future<CommandResult> read(List<String> args) => runner.run(args, workingDirectory: root, quiet: true);
   Future<CommandResult> pull(PullMode mode) => execute(GitCommands.pull(mode));
 
-  /// 추적 브랜치가 없으면 게시한다.
-  Future<CommandResult> push() {
-    final head = status.head;
-    if (head != null && !status.hasUpstream && defaultRemote != null) {
-      return execute(GitCommands.publish(defaultRemote!, head));
-    }
-    return execute(GitCommands.push);
-  }
+  /// 추적 브랜치가 없으면 게시한다. [followTags]면 태그도 함께 (PLAN.md 3.3 P1).
+  Future<CommandResult> push({bool followTags = false}) => execute(pushCommandWith(followTags: followTags));
 
-  List<String> get pushCommand {
+  List<String> get pushCommand => pushCommandWith();
+
+  List<String> pushCommandWith({bool followTags = false}) {
     final head = status.head;
     if (head != null && !status.hasUpstream && defaultRemote != null) {
-      return GitCommands.publish(defaultRemote!, head);
+      return [...GitCommands.publish(defaultRemote!, head), if (followTags) '--follow-tags'];
     }
-    return GitCommands.push;
+    return GitCommands.pushWith(followTags: followTags);
   }
 
   bool get needsPublish => !status.detached && !status.hasUpstream && remotes.isNotEmpty && !headMergedAndGone;

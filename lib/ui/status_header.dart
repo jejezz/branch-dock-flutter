@@ -11,6 +11,7 @@ import 'help/concepts.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
+import 'tabs/branches_tab.dart';
 import 'tabs/pr_tab.dart';
 import 'widgets.dart';
 
@@ -160,14 +161,26 @@ class _SyncButtons extends StatelessWidget {
       Expanded(
         child: tip(
           pushTooltip,
-          FilledButton.icon(
+          Row(children: [
+            Expanded(child: FilledButton.icon(
             onPressed: canPush ? () => RepoActions.push(context, repo) : null,
             icon: Icon(publish ? Icons.cloud_upload_rounded : Icons.north_rounded, size: 16),
             label: Text(
               publish ? l10n.headerPublish : (s.ahead > 0 ? '${l10n.headerPush} ↑${s.ahead}' : l10n.headerPush),
               overflow: TextOverflow.ellipsis,
             ),
-          ),
+          )),
+            SizedBox(
+              width: 24,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                tooltip: l10n.pushOptionsTooltip,
+                iconSize: 18,
+                icon: const Icon(Icons.arrow_drop_down_rounded),
+                onPressed: () => showPushOptionsSheet(context, repo),
+              ),
+            ),
+          ]),
         ),
       ),
     ]);
@@ -203,6 +216,20 @@ class _OperationButtons extends StatelessWidget {
           child: Text(l10n.operationAbort),
         ),
       ),
+      if (rebasing) ...[
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Tooltip(
+            message: l10n.operationSkipTooltip,
+            child: OutlinedButton(
+              onPressed: repo.busy
+                  ? null
+                  : () => RepoActions.report(context, repo.execute(GitCommands.rebaseSkip), done: l10n.doneSkip),
+              child: Text(l10n.operationSkip),
+            ),
+          ),
+        ),
+      ],
       const SizedBox(width: AppSpacing.sm),
       Expanded(
         child: Tooltip(
@@ -282,6 +309,11 @@ class NextActionBanner extends StatelessWidget {
     final theme = Theme.of(context);
     final (String text, String button, VoidCallback onPressed) = switch (action.kind) {
       NextActionKind.resolveConflicts => (l10n.bannerConflicts(action.count), l10n.bannerShow, onShowChanges),
+      NextActionKind.detached => (
+          l10n.bannerDetached,
+          l10n.historyBranchHere,
+          () => showCreateBranchSheet(context, repo),
+        ),
       NextActionKind.pull => (l10n.bannerPull(action.count), l10n.headerPull, () => RepoActions.pull(context, repo)),
       NextActionKind.switchToDefault => (
           l10n.bannerMergedAndGone(repo.defaultBranch ?? 'main'),
@@ -321,4 +353,81 @@ class NextActionBanner extends StatelessWidget {
       ]),
     );
   }
+}
+
+
+/// Push 옵션 (PLAN.md 3.3 P1): 태그 함께 push, 강제 push(force-with-lease).
+Future<void> showPushOptionsSheet(BuildContext context, RepoController repo) {
+  final prefs = ServicesScope.of(context).prefs;
+  return showActionSheet<void>(context, (context) {
+    return StatefulBuilder(builder: (context, setState) {
+      final l10n = AppLocalizations.of(context);
+      final theme = Theme.of(context);
+      final s = repo.status;
+      final head = s.head;
+      final remote = repo.defaultRemote;
+      final followTags = prefs.followTags(repo.root);
+      // 기본 브랜치에서는 강제 push를 막는다 — 다른 사람의 기록을 덮어쓸 수 있다.
+      final onDefault = head == repo.defaultBranch;
+      final canForce = head != null && remote != null && s.hasUpstream && !onDefault && !repo.busy;
+      final force = head == null || remote == null ? null : GitCommands.forcePush(remote, head);
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(l10n.pushOptionsTitle, style: theme.textTheme.titleLarge),
+            const SizedBox(height: AppSpacing.sm),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: followTags,
+              onChanged: (v) async {
+                await prefs.setFollowTags(repo.root, v);
+                setState(() {});
+              },
+              title: Text(l10n.pushFollowTags),
+              subtitle: Text(l10n.pushFollowTagsWhy),
+            ),
+            const Divider(),
+            Row(children: [
+              Expanded(child: Text(l10n.pushForceTitle, style: theme.textTheme.titleSmall)),
+              const HelpButton(concept: Concept.forceWithLease),
+            ]),
+            Text(
+              onDefault ? l10n.pushForceBlockedDefault(repo.defaultBranch ?? 'main') : l10n.pushForceWhy,
+              style: theme.textTheme.bodySmall?.copyWith(color: onDefault ? toneColor(context, Tone.warning) : null),
+            ),
+            if (force != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              CommandPreview(commands: [force]),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.error,
+                  foregroundColor: theme.colorScheme.onError,
+                ),
+                onPressed: !canForce
+                    ? null
+                    : () async {
+                        final ok = await confirmDanger(
+                          context,
+                          title: l10n.pushForceConfirmTitle(head),
+                          message: l10n.pushForceConfirmMessage(head, s.upstream ?? ''),
+                          confirm: l10n.pushForce,
+                          commands: [force!],
+                        );
+                        if (!ok || !context.mounted) return;
+                        Navigator.pop(context);
+                        await RepoActions.report(context, repo.execute(force), done: l10n.donePush);
+                      },
+                child: Text(l10n.pushForce),
+              ),
+            ),
+          ]),
+        ),
+      );
+    });
+  });
 }

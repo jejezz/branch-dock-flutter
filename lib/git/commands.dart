@@ -3,6 +3,7 @@
 library;
 
 import 'commits.dart';
+import 'history.dart';
 import 'refs.dart';
 import 'tags.dart';
 
@@ -76,6 +77,54 @@ abstract final class GitCommands {
   static const rebaseContinue = ['git', '-c', 'core.editor=true', 'rebase', '--continue'];
 
   static const init = ['git', 'init', '-b', 'main'];
+
+  // --- 변경 (3.2 P1) ------------------------------------------------------
+
+  /// 직전 커밋 고치기. 메시지가 비면 메시지는 그대로 두고 내용만 더한다.
+  static List<String> amend(String message) =>
+      message.trim().isEmpty ? ['git', 'commit', '--amend', '--no-edit'] : ['git', 'commit', '--amend', '-m', message];
+
+  /// 작업 트리의 변경을 버린다 (스테이징된 것은 그대로).
+  static List<String> discard(String path) => ['git', 'restore', '--', path];
+
+  /// 추적하지 않는 파일을 지운다.
+  static List<String> removeUntracked(String path) => ['git', 'clean', '-f', '--', path];
+
+  static List<String> stashPush(String message) =>
+      ['git', 'stash', 'push', '--include-untracked', if (message.trim().isNotEmpty) ...['-m', message.trim()]];
+  static const stashList = ['git', 'stash', 'list', '--format=$stashFormat'];
+  static List<String> stashApply(String ref) => ['git', 'stash', 'apply', ref];
+  static List<String> stashPop(String ref) => ['git', 'stash', 'pop', ref];
+  static List<String> stashDrop(String ref) => ['git', 'stash', 'drop', ref];
+
+  // --- 동기화·브랜치 (3.3·3.4 P1) ----------------------------------------
+
+  static List<String> pushWith({bool followTags = false}) => ['git', 'push', if (followTags) '--follow-tags'];
+
+  /// 강제 push는 --force-with-lease만 쓴다 — 내가 모르는 원격 커밋은 덮어쓰지 않는다.
+  static List<String> forcePush(String remote, String branch) =>
+      ['git', 'push', '--force-with-lease', remote, branch];
+
+  static List<String> setUpstream(String branch, String upstream) => ['git', 'branch', '-u', upstream, branch];
+  static List<String> mergedInto(String base) =>
+      ['git', 'branch', '--merged', base, '--format=%(refname:short)'];
+
+  // --- 충돌·rebase (3.5 P1) ----------------------------------------------
+
+  /// 충돌 파일을 한쪽 버전으로 고른다. rebase 중에는 git의 ours/theirs가
+  /// 뒤바뀌므로(ours = 옮겨 붙일 바탕, theirs = 내 커밋) 호출하는 쪽이 고른다.
+  static List<String> checkoutSide(String path, {required bool ours}) =>
+      ['git', 'checkout', ours ? '--ours' : '--theirs', '--', path];
+  static const rebaseSkip = ['git', '-c', 'core.editor=true', 'rebase', '--skip'];
+
+  // --- 태그·기록 (3.7·3.11 P1) -------------------------------------------
+
+  /// 태그나 커밋 위치로 이동 (분리된 HEAD).
+  static List<String> switchDetach(String ref) => ['git', 'switch', '--detach', ref];
+  static List<String> history({int limit = 200}) => ['git', 'log', '-n', '$limit', '--format=$historyFormat'];
+
+  /// 추적 브랜치에 없는 내 커밋 (올릴 커밋).
+  static const unpushed = ['git', 'rev-list', '@{u}..HEAD'];
 
   // --- 병합 (3.5) ---------------------------------------------------------
 

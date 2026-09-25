@@ -326,4 +326,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(wizardOpened, isTrue);
   });
+
+  testWidgets('v0.4 sheets: push options, stash, cleanup, set upstream; stash section', (tester) async {
+    await tester.runAsync(() async {
+      await git(repo.root, ['update-ref', 'refs/remotes/origin/main', 'HEAD']);
+      await git(repo.root, ['stash', 'push', '--include-untracked', '-m', '실험 중']);
+      File('${repo.root}/a.txt').writeAsStringSync('again\n');
+      await repo.refresh();
+    });
+    expect(repo.stashes.single.parts.text, '실험 중');
+
+    await pump(tester, ChangesTab(commitFocus: FocusNode()));
+    expect(find.text('실험 중'), findsOneWidget);
+    expect(find.text('직전 커밋 고치기'), findsOneWidget);
+
+    final branch = repo.localBranches.firstWhere((b) => !b.current);
+    await pump(tester, Builder(builder: (context) {
+      return Column(children: [
+        TextButton(onPressed: () => showPushOptionsSheet(context, repo), child: const Text('push')),
+        TextButton(onPressed: () => showStashSheet(context, repo), child: const Text('stash')),
+        TextButton(
+          onPressed: () => showCleanupSheetWith(context, repo, [(branch: branch, merged: false)]),
+          child: const Text('cleanup'),
+        ),
+        TextButton(onPressed: () => showSetUpstreamSheet(context, repo, branch), child: const Text('upstream')),
+      ]);
+    }));
+    for (final label in ['push', 'stash', 'cleanup', 'upstream']) {
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+      if (label == 'push') expect(find.textContaining('--follow-tags'), findsOneWidget);
+      if (label == 'stash') expect(find.textContaining('git stash push --include-untracked'), findsOneWidget);
+      // 병합 안 된 브랜치는 기본으로 고르지 않는다.
+      if (label == 'cleanup') expect(find.text('0개 삭제'), findsOneWidget);
+      if (label == 'upstream') expect(find.textContaining('git branch -u origin/main'), findsOneWidget);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+    }
+  });
 }
