@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/command_runner.dart';
 import '../git/commands.dart';
 import '../git/commits.dart';
+import '../git/status.dart';
 import '../git/tags.dart';
 import '../github/models.dart';
 import '../repo/repo_controller.dart';
@@ -22,6 +23,37 @@ enum ReleaseCheck { cleanTree, onDefaultBranch, synced, github, hasChanges }
 
 /// ⑤ 태그 전 점검 항목.
 enum TagCheck { prMerged, synced, versionMatches, tagFree }
+
+/// "원격과 같다"가 ✕인 이유. 화면이 이유와 알맞은 해결 버튼을 고르는 데 쓴다.
+enum SyncProblem {
+  /// 추적 브랜치가 없거나 원격에서 사라졌다.
+  noUpstream,
+
+  /// 원격에만 있는 커밋이 있다 → Pull.
+  behind,
+
+  /// 내게만 있는 커밋이 있다 → Push. PR 방식이면 PR 없이 올라간다.
+  ahead,
+
+  /// 양쪽에 서로 없는 커밋이 있다 → Pull.
+  diverged,
+
+  /// 커밋은 다르지만 파일 내용은 원격과 같다 → 원격에 맞추기. PR을 squash나
+  /// rebase로 병합한 뒤 로컬 기본 브랜치에 옛 커밋이 남으면 이렇게 된다.
+  /// Pull 하면 병합 커밋이 하나 더 생겨 ahead가 계속 남는다.
+  sameContent,
+}
+
+/// 원격과 같은지 판정한다. null이면 통과. [sameContent]는 HEAD와 추적 브랜치의
+/// 트리가 같은가 (`git diff --quiet @{u} HEAD`). [allowAhead]면 올릴 커밋은
+/// 괜찮다 — 바로 커밋 방식의 ⑤는 버전 올림 커밋을 태그와 함께 push한다.
+SyncProblem? syncProblem(RepoStatus s, {bool sameContent = false, bool allowAhead = false}) {
+  if (!allowAhead && !s.hasUpstream) return SyncProblem.noUpstream;
+  if (s.behind == 0 && (s.ahead == 0 || allowAhead)) return null;
+  if (s.ahead > 0 && sameContent) return SyncProblem.sameContent;
+  if (s.ahead > 0 && s.behind > 0) return SyncProblem.diverged;
+  return s.behind > 0 ? SyncProblem.behind : SyncProblem.ahead;
+}
 
 /// 릴리스 하나의 진행. 저장소마다 하나이고, 진행 상태를 저장해 앱을 다시
 /// 열어도 이어서 한다 (UI_UX.md §4.5 마지막 항목).
@@ -72,6 +104,9 @@ class ReleaseFlow extends ChangeNotifier {
   List<Commit> commits = const [];
   List<String> _risks = const [];
   List<VersionFile> files = const [];
+
+  /// 올릴 커밋이 있을 때, 그래도 파일 내용은 추적 브랜치와 같은가.
+  bool sameContentAsUpstream = false;
   ReleaseWorkflow? workflow;
   WorkflowRun? buildRun;
   DateTime? _buildRequested;
@@ -203,15 +238,31 @@ class ReleaseFlow extends ChangeNotifier {
     final workflows = detectReleaseWorkflows(repo.root);
     workflow = workflows.isEmpty ? null : workflows.first;
 
+    await _loadSameContent();
+
     final s = repo.status;
     checks
       ..[ReleaseCheck.cleanTree] = s.staged.isEmpty && s.unstaged.isEmpty && s.conflicts.isEmpty
       ..[ReleaseCheck.onDefaultBranch] = s.head == defaultBranch
-      ..[ReleaseCheck.synced] = s.hasUpstream && s.ahead == 0 && s.behind == 0
+      ..[ReleaseCheck.synced] = syncIssue() == null
       ..[ReleaseCheck.github] = ghReady && repo.githubRemote != null
       ..[ReleaseCheck.hasChanges] = releaseCommits.isNotEmpty;
     loading = false;
     notifyListeners();
+  }
+
+  /// 지금 상태로 본 "원격과 같다"의 ✕ 이유. null이면 통과.
+  SyncProblem? syncIssue({bool allowAhead = false}) =>
+      syncProblem(repo.status, sameContent: sameContentAsUpstream, allowAhead: allowAhead);
+
+  Future<void> _loadSameContent() async {
+    final s = repo.status;
+    if (!s.hasUpstream || s.ahead == 0) {
+      sameContentAsUpstream = false;
+      return;
+    }
+    final r = await repo.read(GitCommands.sameTreeAsUpstream);
+    sameContentAsUpstream = r.exitCode == 0;
   }
 
   Future<void> _loadCommits() async {
@@ -387,6 +438,7 @@ class ReleaseFlow extends ChangeNotifier {
   Future<void> runTagChecks({bool fetch = true}) async {
     if (fetch) await repo.fetch();
     await repo.loadRemoteTags();
+    await _loadSameContent();
     final s = repo.status;
     final onDisk = detectVersionFiles(repo.root, custom: customVersionFile);
     final t = tag ?? '';
@@ -394,9 +446,7 @@ class ReleaseFlow extends ChangeNotifier {
       // 바로 커밋 방식에는 PR이 없다. 버전 올림 커밋은 태그와 함께 push하므로
       // ahead는 괜찮고, 원격에 내가 없는 커밋(behind)만 없으면 된다.
       ..[TagCheck.prMerged] = direct || (pr?.merged ?? false)
-      ..[TagCheck.synced] = direct
-          ? s.head == defaultBranch && s.behind == 0
-          : s.head == defaultBranch && s.hasUpstream && s.ahead == 0 && s.behind == 0
+      ..[TagCheck.synced] = s.head == defaultBranch && syncIssue(allowAhead: direct) == null
       ..[TagCheck.versionMatches] = onDisk.isEmpty || onDisk.every((f) => f.version.name == next?.name)
       ..[TagCheck.tagFree] =
           !repo.tags.any((x) => x.name == t) && !(repo.remoteTagNames?.contains(t) ?? false);

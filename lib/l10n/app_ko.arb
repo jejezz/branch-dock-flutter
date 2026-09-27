@@ -813,7 +813,7 @@
       }
     }
   },
-  "checkSynced": "원격과 같다",
+  "checkSynced": "받을 커밋도 보낼 커밋도 없다",
   "checkGitHub": "GitHub 원격과 gh 로그인",
   "checkChangesSince": "{tag} 이후 커밋 {count}개",
   "@checkChangesSince": {
@@ -913,7 +913,7 @@
       }
     }
   },
-  "tagCheckSynced": "{branch}에 있고 원격과 같다",
+  "tagCheckSynced": "{branch}에 있고 받을 커밋도 보낼 커밋도 없다",
   "@tagCheckSynced": {
     "placeholders": {
       "branch": {
@@ -1840,6 +1840,132 @@
   "@doneAssetDeleted": {
     "placeholders": {
       "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncUpstreamCounts": "{upstream}  ↑{ahead} ↓{behind}",
+  "@syncUpstreamCounts": {
+    "placeholders": {
+      "upstream": {
+        "type": "String"
+      },
+      "ahead": {
+        "type": "int"
+      },
+      "behind": {
+        "type": "int"
+      }
+    }
+  },
+  "syncNoUpstream": "{branch}에 연결된 원격 브랜치가 없습니다",
+  "@syncNoUpstream": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncOnOtherBranch": "지금은 {branch}에 있습니다",
+  "@syncOnOtherBranch": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncBehind": "원격에 아직 받지 않은 커밋이 {count}개 있습니다. Pull 하세요.",
+  "@syncBehind": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncAhead": "push하지 않은 커밋이 {count}개 있습니다.",
+  "@syncAhead": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncAheadPr": "push하지 않은 커밋이 {count}개 있습니다. 여기서 Push하면 PR 없이 {branch}에 바로 올라갑니다.",
+  "@syncAheadPr": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncDiverged": "원격과 갈라졌습니다. 받을 커밋 {behind}개, 보낼 커밋 {ahead}개.",
+  "@syncDiverged": {
+    "placeholders": {
+      "behind": {
+        "type": "int"
+      },
+      "ahead": {
+        "type": "int"
+      }
+    }
+  },
+  "syncSameContent": "파일 내용은 원격과 같고 커밋만 다릅니다 (로컬 커밋 {count}개). PR을 squash나 rebase로 병합하면 로컬에 옛 커밋이 남아 이렇게 됩니다.",
+  "@syncSameContent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncMatchRemote": "원격에 맞추기",
+  "syncMatchRemoteTitle": "{branch}를 원격에 맞출까요?",
+  "@syncMatchRemoteTitle": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncMatchRemoteMessage": "로컬 커밋 {count}개를 버리고 {branch}를 {upstream}으로 옮깁니다. 파일 내용은 그대로이고 커밋하지 않은 변경도 지킵니다. 버린 커밋은 git reflog로 되찾을 수 있습니다.",
+  "@syncMatchRemoteMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "branch": {
+        "type": "String"
+      },
+      "upstream": {
+        "type": "String"
+      }
+    }
+  },
+  "doneMatchRemote": "{branch}를 원격에 맞췄습니다",
+  "@doneMatchRemote": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPushNoPrTitle": "PR 없이 {branch}에 push할까요?",
+  "@syncPushNoPrTitle": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPushNoPrMessage": "push하지 않은 커밋 {count}개가 PR을 거치지 않고 {branch}에 바로 올라갑니다. 보호된 브랜치면 거부됩니다. 작업 브랜치로 옮겨 PR을 올리는 편이 안전합니다.",
+  "@syncPushNoPrMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "branch": {
         "type": "String"
       }
     }

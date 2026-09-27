@@ -311,6 +311,110 @@ class _CheckRow extends StatelessWidget {
   }
 }
 
+/// "원격과 같다" 한 줄 (① 점검과 ⑤ 태그 전 점검). ✕면 ↑↓ 숫자 대신 이유를 적고
+/// 그 이유에 맞는 해결 버튼을 둔다. 기본 브랜치가 아니면 버튼을 두지 않는다 —
+/// 다른 브랜치를 맞춰 봐야 릴리스와 상관이 없다.
+class _SyncRow extends StatelessWidget {
+  const _SyncRow({
+    required this.flow,
+    required this.ok,
+    required this.label,
+    required this.onRecheck,
+    this.allowAhead = false,
+    this.showBranch = false,
+  });
+
+  final ReleaseFlow flow;
+  final bool? ok;
+  final String label;
+  final Future<void> Function() onRecheck;
+  final bool allowAhead;
+
+  /// 기본 브랜치에 있지 않다는 것도 이 줄에 적는다 (⑤에는 따로 줄이 없다).
+  final bool showBranch;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final repo = flow.repo;
+    final s = repo.status;
+    final branch = flow.defaultBranch;
+    final onDefault = s.head == branch;
+    final problem = ok == false ? flow.syncIssue(allowAhead: allowAhead) : null;
+
+    final detail = switch (problem) {
+      null when ok == false && showBranch && !onDefault => l10n.syncOnOtherBranch(s.head ?? 'HEAD'),
+      null => s.hasUpstream ? l10n.syncUpstreamCounts(s.upstream!, s.ahead, s.behind) : null,
+      SyncProblem.noUpstream => l10n.syncNoUpstream(s.head ?? 'HEAD'),
+      SyncProblem.behind => l10n.syncBehind(s.behind),
+      SyncProblem.ahead => flow.direct ? l10n.syncAhead(s.ahead) : l10n.syncAheadPr(s.ahead, branch),
+      SyncProblem.diverged => l10n.syncDiverged(s.behind, s.ahead),
+      SyncProblem.sameContent => l10n.syncSameContent(s.ahead),
+    };
+
+    Future<void> Function()? fix;
+    String? fixLabel;
+    if (onDefault) {
+      switch (problem) {
+        case SyncProblem.behind || SyncProblem.diverged:
+          fixLabel = l10n.headerPull;
+          fix = () => RepoActions.pull(context, repo);
+        case SyncProblem.noUpstream when repo.remotes.isNotEmpty:
+          fixLabel = l10n.headerPush;
+          fix = () => RepoActions.push(context, repo);
+        case SyncProblem.ahead:
+          fixLabel = l10n.headerPush;
+          fix = () async {
+            // PR 방식에서 기본 브랜치에 바로 올리는 것은 흔한 실수다. 한 번 묻는다.
+            if (!flow.direct &&
+                !await confirmDanger(
+                  context,
+                  title: l10n.syncPushNoPrTitle(branch),
+                  message: l10n.syncPushNoPrMessage(s.ahead, branch),
+                  confirm: l10n.headerPush,
+                  commands: [repo.pushCommand],
+                )) {
+              return;
+            }
+            if (context.mounted) await RepoActions.push(context, repo);
+          };
+        case SyncProblem.sameContent:
+          fixLabel = l10n.syncMatchRemote;
+          fix = () async {
+            final ok = await confirmDanger(
+              context,
+              title: l10n.syncMatchRemoteTitle(branch),
+              message: l10n.syncMatchRemoteMessage(s.ahead, branch, s.upstream ?? ''),
+              confirm: l10n.syncMatchRemote,
+              commands: const [GitCommands.resetToUpstream],
+            );
+            if (ok && context.mounted) {
+              await RepoActions.report(context, repo.execute(GitCommands.resetToUpstream), done: l10n.doneMatchRemote(branch));
+            }
+          };
+        default:
+      }
+    }
+
+    return _CheckRow(
+      ok: ok,
+      label: label,
+      detail: detail,
+      action: fix == null
+          ? null
+          : TextButton(
+              onPressed: repo.busy
+                  ? null
+                  : () async {
+                      await fix!();
+                      await onRecheck();
+                    },
+              child: Text(fixLabel!),
+            ),
+    );
+  }
+}
+
 // --- ① 점검 ---------------------------------------------------------------
 
 class _CheckStep extends StatelessWidget {
@@ -351,24 +455,7 @@ class _CheckStep extends StatelessWidget {
           child: Text(l10n.branchesSwitch),
         ),
       ),
-      _CheckRow(
-        ok: c(ReleaseCheck.synced),
-        label: l10n.checkSynced,
-        detail: '↑${repo.status.ahead} ↓${repo.status.behind}',
-        action: TextButton(
-          onPressed: repo.busy
-              ? null
-              : () async {
-                  if (repo.status.behind > 0) {
-                    await RepoActions.pull(context, repo);
-                  } else {
-                    await RepoActions.push(context, repo);
-                  }
-                  await flow.runChecks();
-                },
-          child: Text(repo.status.behind > 0 ? l10n.headerPull : l10n.headerPush),
-        ),
-      ),
+      _SyncRow(flow: flow, ok: c(ReleaseCheck.synced), label: l10n.checkSynced, onRecheck: flow.runChecks),
       if (!flow.direct) _CheckRow(ok: c(ReleaseCheck.github), label: l10n.checkGitHub),
       // 바로 커밋 방식 (PLAN.md 3.8.3 P1): 혼자 쓰는 저장소, 또는 GitHub가 아닌 저장소.
       SwitchListTile(
@@ -674,9 +761,13 @@ class _TagStep extends StatelessWidget {
     final tag = flow.tag ?? '';
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (!flow.direct) _CheckRow(ok: c(TagCheck.prMerged), label: l10n.tagCheckPrMerged(flow.pr?.number ?? 0)),
-      _CheckRow(
+      _SyncRow(
+        flow: flow,
         ok: c(TagCheck.synced),
         label: flow.direct ? l10n.tagCheckSyncedDirect(flow.defaultBranch) : l10n.tagCheckSynced(flow.defaultBranch),
+        allowAhead: flow.direct,
+        showBranch: true,
+        onRecheck: flow.runTagChecks,
       ),
       _CheckRow(
         ok: c(TagCheck.versionMatches),
