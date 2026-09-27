@@ -1210,6 +1210,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prMerge => 'Merge';
 
   @override
+  String get prMerging => 'Merging…';
+
+  @override
   String get donePrCreated => 'Pull request created';
 
   @override

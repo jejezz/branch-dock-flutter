@@ -1111,6 +1111,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get prMerge => '병합하기';
 
   @override
+  String get prMerging => '병합하는 중…';
+
+  @override
   String get donePrCreated => 'PR을 만들었습니다';
 
   @override

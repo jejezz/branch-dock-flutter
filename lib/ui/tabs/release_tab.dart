@@ -736,11 +736,9 @@ class _MergeStep extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(onPressed: () => launchUrl(Uri.parse(pr.url)), child: Text(l10n.prOpenOnGitHub)),
         const SizedBox(width: AppSpacing.sm),
-        FilledButton(
-          onPressed: flow.repo.busy || !pr.open || pr.conflicting || pr.draft
-              ? null
-              : () => _report(context, flow.mergePr(), l10n.donePrMerged(pr.number)),
-          child: Text(l10n.prMerge),
+        PrMergeButton(
+          enabled: !flow.repo.busy && pr.open && !pr.conflicting && !pr.draft,
+          onMerge: () => _report(context, flow.mergePr(), l10n.donePrMerged(pr.number)),
         ),
       ]),
     ]);

@@ -736,6 +736,7 @@
   "prMethodRebase": "Rebase 후 병합",
   "prDeleteBranch": "병합 후 브랜치 삭제",
   "prMerge": "병합하기",
+  "prMerging": "병합하는 중…",
   "donePrCreated": "PR을 만들었습니다",
   "donePrMerged": "PR #{number}을(를) 병합했습니다",
   "@donePrMerged": {

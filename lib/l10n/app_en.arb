@@ -319,6 +319,7 @@
   "prMethodRebase": "Rebase and merge",
   "prDeleteBranch": "Delete the branch after merging",
   "prMerge": "Merge",
+  "prMerging": "Merging…",
   "donePrCreated": "Pull request created",
   "donePrMerged": "Merged pull request #{number}",
   "releaseTitle": "Release",
