@@ -1,6 +1,7 @@
 // 좁은 세로 창(380px)에서 화면·시트·도움말이 오류 없이 그려지는지 확인한다.
 // 실제 git으로 만든 임시 저장소를 쓴다. 넘침(overflow)도 실패로 잡힌다.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:branch_dock/core/command_log.dart';
@@ -770,5 +771,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(GhCommands.releaseUpload('v0.7.0', ['/a/b.zip'], replace: true), ['gh', 'release', 'upload', 'v0.7.0', '/a/b.zip', '--clobber']);
     expect(GhCommands.prReview(3, PrReviewKind.approve), ['gh', 'pr', 'review', '3', '--approve', '--body-file', '-']);
+  });
+
+  testWidgets('merge button shows it was pressed and cannot be pressed twice', (tester) async {
+    final done = Completer<void>();
+    var presses = 0;
+    await pump(tester, Center(child: PrMergeButton(enabled: true, onMerge: () {
+      presses++;
+      return done.future;
+    })));
+    expect(find.text('병합하기'), findsOneWidget);
+    await tester.tap(find.byType(PrMergeButton));
+    await tester.pump();
+    expect(find.text('병합하는 중…'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.tap(find.byType(PrMergeButton));
+    await tester.pump();
+    expect(presses, 1);
+    done.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('병합하기'), findsOneWidget);
   });
 }

@@ -316,25 +316,72 @@ class _PrCardState extends State<PrCard> {
                 ),
                 CommandPreview(commands: mergeCommands),
                 const SizedBox(height: AppSpacing.sm),
-                FilledButton.icon(
-                  onPressed: repo.busy || pr.draft || pr.conflicting
-                      ? null
-                      : () async {
-                          final ok = await RepoActions.report(
-                            context,
-                            repo.executeAll(mergeCommands),
-                            done: l10n.donePrMerged(pr.number),
-                          );
-                          if (ok) widget.onChanged();
-                        },
-                  icon: const Icon(Icons.merge_rounded, size: 16),
-                  label: Text(l10n.prMerge),
+                PrMergeButton(
+                  enabled: !repo.busy && !pr.draft && !pr.conflicting,
+                  onMerge: () async {
+                    final ok = await RepoActions.report(
+                      context,
+                      repo.executeAll(mergeCommands),
+                      done: l10n.donePrMerged(pr.number),
+                    );
+                    if (ok) widget.onChanged();
+                  },
                 ),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// PR 병합 버튼 (PR 시트, 릴리스 마법사 ④). 누르는 즉시 스피너와
+/// "병합하는 중…"으로 바꾸고 끝날 때까지 다시 누를 수 없게 한다 — 시트는 repo를
+/// 듣지 않아 [RepoController.busy]만으로는 버튼이 바뀌지 않는다.
+class PrMergeButton extends StatefulWidget {
+  const PrMergeButton({super.key, required this.enabled, required this.onMerge});
+
+  final bool enabled;
+  final Future<void> Function() onMerge;
+
+  @override
+  State<PrMergeButton> createState() => _PrMergeButtonState();
+}
+
+class _PrMergeButtonState extends State<PrMergeButton> {
+  bool _merging = false;
+
+  Future<void> _merge() async {
+    setState(() => _merging = true);
+    try {
+      await widget.onMerge();
+    } finally {
+      if (mounted) setState(() => _merging = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return FilledButton.icon(
+      // 병합 중에는 눌리지 않지만 흐려지지 않게 색을 유지한다.
+      style: _merging
+          ? FilledButton.styleFrom(
+              disabledBackgroundColor: scheme.primary.withValues(alpha: 0.7),
+              disabledForegroundColor: scheme.onPrimary,
+            )
+          : null,
+      onPressed: _merging || !widget.enabled ? null : _merge,
+      icon: _merging
+          ? SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: scheme.onPrimary),
+            )
+          : const Icon(Icons.merge_rounded, size: 16),
+      label: Text(_merging ? l10n.prMerging : l10n.prMerge),
     );
   }
 }

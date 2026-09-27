@@ -2012,6 +2012,12 @@ abstract class AppLocalizations {
   /// **'병합하기'**
   String get prMerge;
 
+  /// No description provided for @prMerging.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합하는 중…'**
+  String get prMerging;
+
   /// No description provided for @donePrCreated.
   ///
   /// In ko, this message translates to:
