@@ -117,6 +117,16 @@ void main() {
     expect(classifyError('whatever'), isNull);
   });
 
+  test('classifyError: branch checked out in another worktree', () {
+    const current = "fatal: 'claude/fix-9eae90' is already used by worktree at '/Users/me/repo/.claude/worktrees/fix'";
+    const older = "fatal: 'main' is already checked out at '/tmp/other wt'";
+    expect(classifyError(current), GitErrorKind.branchInOtherWorktree);
+    expect(worktreePathFromError(current), '/Users/me/repo/.claude/worktrees/fix');
+    expect(classifyError(older), GitErrorKind.branchInOtherWorktree);
+    expect(worktreePathFromError(older), '/tmp/other wt');
+    expect(worktreePathFromError('fatal: something else'), isNull);
+  });
+
   test('environment parsing', () {
     expect(EnvironmentStatus.parseVersion('git version 2.50.1 (Apple Git-155)'), '2.50.1');
     expect(

@@ -1256,6 +1256,18 @@ abstract class AppLocalizations {
   /// **'프로그램을 찾을 수 없습니다. 메뉴의 환경 점검을 확인하세요.'**
   String get errorNotInstalled;
 
+  /// No description provided for @errorBranchInOtherWorktree.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 브랜치는 다른 worktree({path})에 체크아웃되어 있습니다. git은 한 브랜치를 한 번에 한 worktree에서만 체크아웃할 수 있습니다.'**
+  String errorBranchInOtherWorktree(String path);
+
+  /// No description provided for @openWorktreeFolder.
+  ///
+  /// In ko, this message translates to:
+  /// **'그 폴더 열기'**
+  String get openWorktreeFolder;
+
   /// No description provided for @timeJustNow.
   ///
   /// In ko, this message translates to:

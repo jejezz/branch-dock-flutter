@@ -713,6 +713,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Program not found. See Check git and gh in the menu.';
 
   @override
+  String errorBranchInOtherWorktree(String path) {
+    return 'This branch is checked out in another worktree ($path). Git lets only one worktree check out a branch at a time.';
+  }
+
+  @override
+  String get openWorktreeFolder => 'Open that folder';
+
+  @override
   String get timeJustNow => 'just now';
 
   @override

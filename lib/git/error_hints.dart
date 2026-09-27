@@ -38,13 +38,25 @@ enum GitErrorKind {
 
   /// 실행 파일 없음.
   notInstalled,
+
+  /// 브랜치가 이미 다른 worktree에 체크아웃되어 있어 전환할 수 없음.
+  /// 그 worktree 경로는 [worktreePathFromError]로 꺼낸다.
+  branchInOtherWorktree,
 }
+
+/// `is already used by worktree at '<path>'` (git 2.42+),
+/// `is already checked out at '<path>'` (그 전).
+final _otherWorktree = RegExp(r"is already (?:used by worktree|checked out) at '([^']+)'");
+
+/// [GitErrorKind.branchInOtherWorktree] 오류에서 그 worktree 경로를 꺼낸다.
+String? worktreePathFromError(String output) => _otherWorktree.firstMatch(output)?.group(1);
 
 GitErrorKind? classifyError(String output, {int? exitCode}) {
   final o = output.toLowerCase();
   if (exitCode == 127 || o.contains('no such file or directory') && o.contains('failed to find')) {
     return GitErrorKind.notInstalled;
   }
+  if (_otherWorktree.hasMatch(output)) return GitErrorKind.branchInOtherWorktree;
   if (o.contains('protected branch') || o.contains('gh006')) return GitErrorKind.protectedBranch;
   if (o.contains('[rejected]') && (o.contains('fetch first') || o.contains('non-fast-forward'))) {
     return GitErrorKind.pushRejected;
