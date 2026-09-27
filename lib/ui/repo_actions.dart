@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/command_runner.dart';
+import '../core/vscode.dart';
 import '../git/commands.dart';
 import '../git/error_hints.dart';
 import '../git/status.dart';
@@ -131,5 +132,50 @@ abstract final class RepoActions {
       return;
     }
     await launchUrl(Uri.file(path));
+  }
+
+  /// 저장소 폴더(worktree면 그 폴더)를 여는 명령. 설정한 편집기 명령이 있으면
+  /// 그것을, 없으면 VS Code. VS Code도 없으면 null.
+  static Future<List<String>?> folderEditorCommand(AppServices services, String root) async {
+    final editor = services.prefs.editorCommand;
+    if (editor.isNotEmpty) return [...editor.split(RegExp(r'\s+')), root];
+    return vscodeOpenCommand(root, path: services.runner.effectivePath);
+  }
+
+  /// 저장소 폴더를 편집기로 연다. 편집기를 찾지 못하면 설치 링크를 보여 준다.
+  static Future<void> openFolderInEditor(BuildContext context, RepoController repo) async {
+    final services = ServicesScope.of(context);
+    final command = await folderEditorCommand(services, repo.root);
+    if (!context.mounted) return;
+    if (command == null) {
+      await _showVscodeMissing(context);
+      return;
+    }
+    final result = await services.runner.run(command, workingDirectory: repo.root);
+    if (!result.ok && context.mounted) showCommandError(context, result);
+  }
+
+  static Future<void> _showVscodeMissing(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        scrollable: true,
+        title: Text(l10n.vscodeMissingTitle),
+        content: SizedBox(width: 360, child: Text(l10n.vscodeMissingMessage)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonClose)),
+          FilledButton.icon(
+            autofocus: true,
+            icon: const Icon(Icons.open_in_new_rounded, size: 16),
+            label: Text(l10n.vscodeDownload),
+            onPressed: () {
+              Navigator.pop(context);
+              launchUrl(vscodeDownloadUrl);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -380,6 +380,30 @@ abstract class AppLocalizations {
   /// **'gh에 로그인해야 쓸 수 있습니다. 터미널에서 gh auth login을 실행하세요.'**
   String get envGhLoggedOut;
 
+  /// No description provided for @headerOpenFolder.
+  ///
+  /// In ko, this message translates to:
+  /// **'편집기에서 이 폴더 열기'**
+  String get headerOpenFolder;
+
+  /// No description provided for @vscodeMissingTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'VS Code를 찾지 못했습니다'**
+  String get vscodeMissingTitle;
+
+  /// No description provided for @vscodeMissingMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'VS Code를 설치하면 이 버튼으로 현재 브랜치가 체크아웃된 폴더를 바로 열 수 있습니다. 다른 편집기를 쓰려면 저장소 메뉴의 ‘파일을 열 편집기…’에 명령(cursor, zed 등)을 적으세요.'**
+  String get vscodeMissingMessage;
+
+  /// No description provided for @vscodeDownload.
+  ///
+  /// In ko, this message translates to:
+  /// **'VS Code 받기'**
+  String get vscodeDownload;
+
   /// No description provided for @headerBranchTooltip.
   ///
   /// In ko, this message translates to:
@@ -1049,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @editorMessage.
   ///
   /// In ko, this message translates to:
-  /// **'편집기 명령을 적으면 파일을 그 편집기로 엽니다. 비워 두면 OS 기본 앱으로 엽니다.'**
+  /// **'편집기 명령을 적으면 파일과 저장소 폴더를 그 편집기로 엽니다. 비워 두면 파일은 OS 기본 앱으로, 폴더는 VS Code로 엽니다.'**
   String get editorMessage;
 
   /// No description provided for @editorLabel.

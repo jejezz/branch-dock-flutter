@@ -167,6 +167,19 @@ class AppLocalizationsKo extends AppLocalizations {
       'gh에 로그인해야 쓸 수 있습니다. 터미널에서 gh auth login을 실행하세요.';
 
   @override
+  String get headerOpenFolder => '편집기에서 이 폴더 열기';
+
+  @override
+  String get vscodeMissingTitle => 'VS Code를 찾지 못했습니다';
+
+  @override
+  String get vscodeMissingMessage =>
+      'VS Code를 설치하면 이 버튼으로 현재 브랜치가 체크아웃된 폴더를 바로 열 수 있습니다. 다른 편집기를 쓰려면 저장소 메뉴의 ‘파일을 열 편집기…’에 명령(cursor, zed 등)을 적으세요.';
+
+  @override
+  String get vscodeDownload => 'VS Code 받기';
+
+  @override
   String get headerBranchTooltip => '브랜치 목록 보기';
 
   @override
@@ -538,7 +551,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get editorMessage =>
-      '편집기 명령을 적으면 파일을 그 편집기로 엽니다. 비워 두면 OS 기본 앱으로 엽니다.';
+      '편집기 명령을 적으면 파일과 저장소 폴더를 그 편집기로 엽니다. 비워 두면 파일은 OS 기본 앱으로, 폴더는 VS Code로 엽니다.';
 
   @override
   String get editorLabel => '편집기 명령';
