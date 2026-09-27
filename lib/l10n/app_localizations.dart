@@ -4489,6 +4489,114 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'worktree {name}에 커밋하지 않은 변경이 있거나 잠겨 있어 지울 수 없습니다'**
   String cleanupWorktreeBlocked(String name);
+
+  /// No description provided for @envCustomPath.
+  ///
+  /// In ko, this message translates to:
+  /// **'직접 지정'**
+  String get envCustomPath;
+
+  /// No description provided for @envSetPath.
+  ///
+  /// In ko, this message translates to:
+  /// **'경로 지정'**
+  String get envSetPath;
+
+  /// No description provided for @envGitTooOld.
+  ///
+  /// In ko, this message translates to:
+  /// **'git {min} 이상이 필요합니다. 일부 명령이 실패하거나 결과를 잘못 읽을 수 있습니다.'**
+  String envGitTooOld(String min);
+
+  /// No description provided for @envGhTooOld.
+  ///
+  /// In ko, this message translates to:
+  /// **'gh {min} 이상이 필요합니다. 더 낮으면 로그인 확인(gh auth status --json)이 안 돼 로그인했어도 \"로그인 안 됨\"으로 보입니다.'**
+  String envGhTooOld(String min);
+
+  /// No description provided for @envCopyDiagnostics.
+  ///
+  /// In ko, this message translates to:
+  /// **'진단 정보 복사'**
+  String get envCopyDiagnostics;
+
+  /// No description provided for @envDiagnosticsCopied.
+  ///
+  /// In ko, this message translates to:
+  /// **'진단 정보를 복사했습니다. 문제를 알릴 때 붙여 넣으세요.'**
+  String get envDiagnosticsCopied;
+
+  /// No description provided for @envSearchPath.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱이 쓰는 PATH'**
+  String get envSearchPath;
+
+  /// No description provided for @toolPathTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tool} 경로'**
+  String toolPathTitle(String tool);
+
+  /// No description provided for @toolPathWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'PATH에서 찾은 {tool} 대신 쓸 실행 파일을 고릅니다. 비워 두면 PATH에서 찾습니다.'**
+  String toolPathWhy(String tool);
+
+  /// No description provided for @toolPathLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'실행 파일'**
+  String get toolPathLabel;
+
+  /// No description provided for @toolPathBrowse.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 고르기'**
+  String get toolPathBrowse;
+
+  /// No description provided for @toolPathVerify.
+  ///
+  /// In ko, this message translates to:
+  /// **'확인'**
+  String get toolPathVerify;
+
+  /// No description provided for @toolPathUsePath.
+  ///
+  /// In ko, this message translates to:
+  /// **'PATH에서 찾기'**
+  String get toolPathUsePath;
+
+  /// No description provided for @toolPathOk.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tool} {version} 확인됨'**
+  String toolPathOk(String tool, String version);
+
+  /// No description provided for @toolPathBad.
+  ///
+  /// In ko, this message translates to:
+  /// **'실행할 수 없거나 {tool}이(가) 아닙니다'**
+  String toolPathBad(String tool);
+
+  /// No description provided for @toolPathNeedsCheck.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장하기 전에 확인을 누르세요'**
+  String get toolPathNeedsCheck;
+
+  /// No description provided for @doneToolPath.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tool} 경로를 저장했습니다'**
+  String doneToolPath(String tool);
+
+  /// No description provided for @doneToolPathReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tool}을(를) PATH에서 찾습니다'**
+  String doneToolPathReset(String tool);
 }
 
 class _AppLocalizationsDelegate

@@ -40,15 +40,37 @@ const _utf8 = Utf8Codec(allowMalformed: true);
 ///   같은 PATH가 필요하다.
 /// - 대화형 프롬프트를 막는다. 입력이 필요한 작업은 앱이 먼저 값을 받는다.
 class CommandRunner {
-  CommandRunner({required this.log, required this.path});
+  CommandRunner({required this.log, required this.path, this.gitPath, this.ghPath});
 
   final CommandLog log;
 
   /// [resolvePath]가 만든 PATH.
   String path;
 
+  /// 설정에서 직접 지정한 실행 파일 (PLAN.md 3.14). null이면 PATH에서 찾는다.
+  String? gitPath;
+  String? ghPath;
+
+  /// 명령 이름(`git`, `gh`)을 실제로 실행할 파일로 바꾼다.
+  String executableFor(String name) => switch (name) {
+        'git' => gitPath ?? name,
+        'gh' => ghPath ?? name,
+        _ => name,
+      };
+
+  /// 프로세스에 넘기는 PATH. 지정한 실행 파일의 폴더를 앞에 둔다 — `gh`가 git을
+  /// 부르거나 git이 인증 도우미로 `gh`를 부를 때도 같은 파일을 쓰게 한다.
+  String get effectivePath {
+    final sep = Platform.isWindows ? ';' : ':';
+    final dirs = [
+      for (final p in [gitPath, ghPath])
+        if (p != null) File(p).parent.path,
+    ];
+    return [...dirs.toSet(), path].join(sep);
+  }
+
   Map<String, String> _env(String executable) => {
-        'PATH': path,
+        'PATH': effectivePath,
         'GIT_TERMINAL_PROMPT': '0',
         'GIT_EDITOR': 'true',
         'GH_PROMPT_DISABLED': '1',
@@ -72,7 +94,7 @@ class CommandRunner {
     final watch = Stopwatch()..start();
     try {
       final process = await Process.start(
-        args.first,
+        executableFor(args.first),
         args.sublist(1),
         workingDirectory: workingDirectory,
         environment: _env(args.first),
@@ -119,6 +141,21 @@ class CommandRunner {
       return CommandResult(127, '', e.message);
     }
   }
+}
+
+/// [path]의 폴더들에서 [name] 실행 파일을 찾아 전체 경로를 돌려준다. 없으면 null.
+/// Windows에서는 `.exe`를 먼저, 그다음 `.cmd`·`.bat`를 찾는다.
+String? findExecutable(String name, String path) {
+  final windows = Platform.isWindows;
+  final names = windows ? ['$name.exe', '$name.cmd', '$name.bat'] : [name];
+  for (final ext in names) {
+    for (final dir in path.split(windows ? ';' : ':')) {
+      if (dir.trim().isEmpty) continue;
+      final file = File('${dir.trim()}${Platform.pathSeparator}$ext');
+      if (file.existsSync()) return file.path;
+    }
+  }
+  return null;
 }
 
 /// `git`, `gh`를 찾을 PATH를 만든다.

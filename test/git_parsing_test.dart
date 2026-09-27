@@ -137,6 +137,31 @@ void main() {
     expect(EnvironmentStatus.parseAuthHosts('not json'), isEmpty);
   });
 
+  test('environment: minimum versions and diagnostics', () {
+    expect(EnvironmentStatus.compareVersions('2.9.1', '2.30.0'), -1);
+    expect(EnvironmentStatus.compareVersions('2.30', '2.30.0'), 0);
+    expect(EnvironmentStatus.compareVersions('2.101.0', '2.81.0'), 1);
+    const old = EnvironmentStatus(gitVersion: '2.25.1', ghVersion: '2.45.0', checked: true);
+    expect((old.gitTooOld, old.ghTooOld), (true, true));
+    const env = EnvironmentStatus(
+      gitVersion: '2.50.1',
+      ghVersion: '2.81.0',
+      ghLogins: {'github.com': 'me'},
+      checked: true,
+      gitPath: '/opt/git/bin/git',
+      gitCustom: true,
+      searchPath: '/usr/bin:/bin',
+    );
+    expect((env.gitTooOld, env.ghTooOld), (false, false));
+    final text = env.diagnostics(appVersion: '0.9.0+15', os: 'macos 26');
+    expect(text, contains('Branch Dock 0.9.0+15'));
+    expect(text, contains('OS: macos 26'));
+    expect(text, contains('git: 2.50.1 — /opt/git/bin/git [custom]'));
+    expect(text, contains('gh: 2.81.0 — -'));
+    expect(text, contains('gh login: github.com (me)'));
+    expect(old.diagnostics(appVersion: '?'), contains('git: 2.25.1 (below 2.30.0)'));
+  });
+
   test('suggestNextAction priority', () {
     const origin = Remote(name: 'origin', fetchUrl: 'https://github.com/a/b', pushUrl: 'https://github.com/a/b');
     NextAction? s(RepoStatus st, [List<Remote> r = const [origin]]) => suggestNextAction(status: st, remotes: r);

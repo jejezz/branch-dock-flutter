@@ -2128,5 +2128,82 @@
         "type": "String"
       }
     }
+  },
+  "envCustomPath": "직접 지정",
+  "envSetPath": "경로 지정",
+  "envGitTooOld": "git {min} 이상이 필요합니다. 일부 명령이 실패하거나 결과를 잘못 읽을 수 있습니다.",
+  "@envGitTooOld": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "envGhTooOld": "gh {min} 이상이 필요합니다. 더 낮으면 로그인 확인(gh auth status --json)이 안 돼 로그인했어도 \"로그인 안 됨\"으로 보입니다.",
+  "@envGhTooOld": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "envCopyDiagnostics": "진단 정보 복사",
+  "envDiagnosticsCopied": "진단 정보를 복사했습니다. 문제를 알릴 때 붙여 넣으세요.",
+  "envSearchPath": "앱이 쓰는 PATH",
+  "toolPathTitle": "{tool} 경로",
+  "@toolPathTitle": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "toolPathWhy": "PATH에서 찾은 {tool} 대신 쓸 실행 파일을 고릅니다. 비워 두면 PATH에서 찾습니다.",
+  "@toolPathWhy": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "toolPathLabel": "실행 파일",
+  "toolPathBrowse": "파일 고르기",
+  "toolPathVerify": "확인",
+  "toolPathUsePath": "PATH에서 찾기",
+  "toolPathOk": "{tool} {version} 확인됨",
+  "@toolPathOk": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "toolPathBad": "실행할 수 없거나 {tool}이(가) 아닙니다",
+  "@toolPathBad": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "toolPathNeedsCheck": "저장하기 전에 확인을 누르세요",
+  "doneToolPath": "{tool} 경로를 저장했습니다",
+  "@doneToolPath": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
+  },
+  "doneToolPathReset": "{tool}을(를) PATH에서 찾습니다",
+  "@doneToolPathReset": {
+    "placeholders": {
+      "tool": {
+        "type": "String"
+      }
+    }
   }
 }

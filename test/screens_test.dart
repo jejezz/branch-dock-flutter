@@ -37,6 +37,7 @@ import 'package:branch_dock/ui/tabs/pr_tab.dart';
 import 'package:branch_dock/ui/tabs/release_tab.dart';
 import 'package:branch_dock/ui/tabs/tags_tab.dart';
 import 'package:branch_dock/ui/worktree_actions.dart';
+import 'package:branch_dock/ui/tool_path_sheet.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -443,6 +444,53 @@ void main() {
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('tool paths and diagnostics: environment card, path sheet checks the file', (tester) async {
+    const old = EnvironmentStatus(
+      gitVersion: '2.25.1',
+      ghVersion: '2.45.0',
+      ghLogins: {'github.com': 'me'},
+      checked: true,
+      gitPath: '/Users/someone/very/long/custom/install/location/for/git/bin/git',
+      gitCustom: true,
+      ghPath: '/opt/homebrew/bin/gh',
+      searchPath: '/usr/bin:/bin:/opt/homebrew/bin',
+    );
+    String? asked;
+    await pump(tester, SingleChildScrollView(
+      child: EnvironmentCard(environment: old, onRecheck: () {}, onSetPath: (t) => asked = t),
+    ));
+    expect(find.text('직접 지정'), findsOneWidget);
+    expect(find.textContaining('git 2.30.0 이상'), findsOneWidget);
+    expect(find.textContaining('gh 2.81.0 이상'), findsOneWidget);
+    expect(find.text('진단 정보 복사'), findsOneWidget);
+    await tester.tap(find.text('경로 지정').last);
+    expect(asked, 'gh');
+
+    final git = findExecutable('git', services.runner.path)!;
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => showToolPathSheet(context, tool: 'git', runner: services.runner),
+        child: const Text('path'),
+      );
+    }));
+    await tester.tap(find.text('path'));
+    await tester.pumpAndSettle();
+    expect(find.text('git 경로'), findsOneWidget);
+    // 비어 있으면 PATH에서 찾기로 저장할 수 있다.
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, '저장')).onPressed, isNotNull);
+    await tester.enterText(find.byType(TextField), git);
+    await tester.pump();
+    expect(find.text('저장하기 전에 확인을 누르세요'), findsOneWidget);
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, '저장')).onPressed, isNull);
+    await tester.runAsync(() async {
+      await tester.tap(find.text('확인'));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+    expect(find.textContaining('확인됨'), findsOneWidget);
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, '저장')).onPressed, isNotNull);
   });
 
   testWidgets('v0.5 screens: login guide, start screen init, fork card, version file, rollback, direct wizard', (tester) async {

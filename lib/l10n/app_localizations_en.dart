@@ -2864,4 +2864,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String cleanupWorktreeBlocked(String name) {
     return 'Can\'t remove: the $name worktree has uncommitted changes or is locked';
   }
+
+  @override
+  String get envCustomPath => 'Custom';
+
+  @override
+  String get envSetPath => 'Set path';
+
+  @override
+  String envGitTooOld(String min) {
+    return 'git $min or later is needed. Some commands may fail or be read wrongly.';
+  }
+
+  @override
+  String envGhTooOld(String min) {
+    return 'gh $min or later is needed. Older versions can\'t report login (gh auth status --json), so you show as logged out even when you aren\'t.';
+  }
+
+  @override
+  String get envCopyDiagnostics => 'Copy diagnostics';
+
+  @override
+  String get envDiagnosticsCopied =>
+      'Diagnostics copied. Paste them into your report.';
+
+  @override
+  String get envSearchPath => 'PATH used by the app';
+
+  @override
+  String toolPathTitle(String tool) {
+    return '$tool path';
+  }
+
+  @override
+  String toolPathWhy(String tool) {
+    return 'Choose an executable to use instead of the $tool found on PATH. Leave it empty to search PATH.';
+  }
+
+  @override
+  String get toolPathLabel => 'Executable';
+
+  @override
+  String get toolPathBrowse => 'Choose file';
+
+  @override
+  String get toolPathVerify => 'Check';
+
+  @override
+  String get toolPathUsePath => 'Search PATH';
+
+  @override
+  String toolPathOk(String tool, String version) {
+    return '$tool $version found';
+  }
+
+  @override
+  String toolPathBad(String tool) {
+    return 'Can\'t run it, or it isn\'t $tool';
+  }
+
+  @override
+  String get toolPathNeedsCheck => 'Press Check before saving';
+
+  @override
+  String doneToolPath(String tool) {
+    return 'Saved the $tool path';
+  }
+
+  @override
+  String doneToolPathReset(String tool) {
+    return 'Searching PATH for $tool';
+  }
 }
