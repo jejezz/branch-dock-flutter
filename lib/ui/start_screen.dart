@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../git/commands.dart';
 import '../l10n/app_localizations.dart';
@@ -24,6 +26,7 @@ class StartScreen extends StatelessWidget {
     this.onInitRepository,
     this.onClone,
     this.onLogin,
+    this.onSetToolPath,
     this.failure,
     this.failedPath,
     this.dragging = false,
@@ -44,6 +47,9 @@ class StartScreen extends StatelessWidget {
 
   /// 로그인 안내 열기.
   final VoidCallback? onLogin;
+
+  /// git / gh 경로 지정 (`git`이 PATH에 없을 때 특히).
+  final ValueChanged<String>? onSetToolPath;
   final OpenFailure? failure;
   final String? failedPath;
   final bool dragging;
@@ -62,7 +68,7 @@ class StartScreen extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           if (env.checked && !env.hasGit)
-            EnvironmentCard(environment: env, onRecheck: onCheckEnvironment)
+            EnvironmentCard(environment: env, onRecheck: onCheckEnvironment, onSetPath: onSetToolPath)
           else ...[
             if (failure != null)
               Container(
@@ -137,7 +143,7 @@ class StartScreen extends StatelessWidget {
             ],
             if (env.checked && !env.ghReady) ...[
               const SizedBox(height: AppSpacing.lg),
-              EnvironmentCard(environment: env, onRecheck: onCheckEnvironment, onLogin: onLogin),
+              EnvironmentCard(environment: env, onRecheck: onCheckEnvironment, onLogin: onLogin, onSetPath: onSetToolPath),
             ],
           ],
         ],
@@ -148,13 +154,29 @@ class StartScreen extends StatelessWidget {
 
 /// 환경 점검 체크리스트 (UI_UX.md §8): 항목별 ✓/✕, 설치·로그인 명령 복사.
 class EnvironmentCard extends StatelessWidget {
-  const EnvironmentCard({super.key, required this.environment, required this.onRecheck, this.onLogin});
+  const EnvironmentCard({super.key, required this.environment, required this.onRecheck, this.onLogin, this.onSetPath});
 
   final EnvironmentStatus environment;
   final VoidCallback onRecheck;
 
   /// 로그인 안내(SSH/HTTPS)를 연다. 없으면 명령 복사만.
   final VoidCallback? onLogin;
+
+  /// git / gh 경로를 직접 지정한다 (PLAN.md 3.14). 인자는 `git` 또는 `gh`.
+  final ValueChanged<String>? onSetPath;
+
+  Future<void> _copyDiagnostics(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    var version = '?';
+    try {
+      final info = await PackageInfo.fromPlatform();
+      version = '${info.version}+${info.buildNumber}';
+    } on Object {
+      // 테스트처럼 플랫폼 정보가 없으면 버전 없이 복사한다.
+    }
+    await Clipboard.setData(ClipboardData(text: environment.diagnostics(appVersion: version)));
+    if (context.mounted) showDone(context, l10n.envDiagnosticsCopied);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,73 +190,172 @@ class EnvironmentCard extends StatelessWidget {
       return tool == 'git' ? 'sudo apt install git' : 'sudo apt install gh';
     }
 
-    Widget item(bool ok, String title, String detail, {String? command}) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(ok ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                size: 18, color: toneColor(context, ok ? Tone.success : Tone.danger)),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: theme.textTheme.titleSmall),
+    Widget item(
+      bool ok,
+      String title,
+      String detail, {
+      String? command,
+      String? path,
+      bool custom = false,
+      String? warning,
+      String? tool,
+    }) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            !ok ? Icons.cancel_rounded : (warning != null ? Icons.warning_rounded : Icons.check_circle_rounded),
+            size: 18,
+            color: toneColor(context, !ok ? Tone.danger : (warning != null ? Tone.warning : Tone.success)),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(title, style: theme.textTheme.titleSmall),
+                    if (custom) ...[
+                      const SizedBox(width: 6),
+                      StatusPill(label: l10n.envCustomPath, tone: Tone.primary),
+                    ],
+                    const Spacer(),
+                    if (tool != null && onSetPath != null)
+                      SizedBox(
+                        height: 24,
+                        child: TextButton(onPressed: () => onSetPath!(tool), child: Text(l10n.envSetPath)),
+                      ),
+                  ],
+                ),
                 Text(detail, style: theme.textTheme.bodySmall),
+                if (path != null)
+                  SelectableText(
+                    path,
+                    style: AppFonts.mono.copyWith(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                if (warning != null)
+                  Text(warning, style: theme.textTheme.bodySmall?.copyWith(color: toneColor(context, Tone.warning))),
                 if (!ok && command != null) ...[
                   const SizedBox(height: 4),
-                  Row(children: [
-                    Expanded(child: SelectableText(command, style: AppFonts.mono.copyWith(fontSize: 12))),
-                    CopyButton(text: command, size: 14),
-                  ]),
+                  Row(
+                    children: [
+                      Expanded(child: SelectableText(command, style: AppFonts.mono.copyWith(fontSize: 12))),
+                      CopyButton(text: command, size: 14),
+                    ],
+                  ),
                 ],
-              ]),
+              ],
             ),
-          ]),
-        );
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadius.tile),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+        ],
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l10n.envTitle, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 4),
-        Text(env.hasGit ? l10n.envGitOnlyNote : l10n.envGitRequired, style: theme.textTheme.bodySmall),
-        const SizedBox(height: AppSpacing.sm),
-        item(env.hasGit, 'git', env.hasGit ? l10n.envVersion(env.gitVersion!) : l10n.envNotInstalled,
-            command: install('git')),
-        item(env.hasGh, 'gh (GitHub CLI)', env.hasGh ? l10n.envVersion(env.ghVersion!) : l10n.envNotInstalled,
-            command: install('gh')),
-        if (env.hasGh)
-          item(env.ghLoggedIn, l10n.envLogin,
-              env.ghLoggedIn ? l10n.envLoggedInAs(env.ghLogins['github.com'] ?? '') : l10n.envNotLoggedIn,
-              command: 'gh auth login'),
-        if (env.hasGh && !env.ghLoggedIn && onLogin != null)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FilledButton.icon(
-              onPressed: onLogin,
-              icon: const Icon(Icons.login_rounded, size: 16),
-              label: Text(l10n.loginTitle),
+    );
+
+    // Material이어야 안의 PATH 펼치기(ExpansionTile)가 배경 위에 그려진다.
+    return Material(
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.tile),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.envTitle, style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(env.hasGit ? l10n.envGitOnlyNote : l10n.envGitRequired, style: theme.textTheme.bodySmall),
+            const SizedBox(height: AppSpacing.sm),
+            item(
+              env.hasGit,
+              'git',
+              env.hasGit ? l10n.envVersion(env.gitVersion!) : l10n.envNotInstalled,
+              command: install('git'),
+              path: env.gitPath,
+              custom: env.gitCustom,
+              warning: env.gitTooOld ? l10n.envGitTooOld(EnvironmentStatus.minGit) : null,
+              tool: 'git',
             ),
-          ),
-        const SizedBox(height: AppSpacing.sm),
-        Align(
-          alignment: Alignment.centerRight,
-          child: OutlinedButton.icon(
-            onPressed: onRecheck,
-            icon: const Icon(Icons.refresh_rounded, size: 16),
-            label: Text(l10n.envRecheck),
-          ),
+            item(
+              env.hasGh,
+              'gh (GitHub CLI)',
+              env.hasGh ? l10n.envVersion(env.ghVersion!) : l10n.envNotInstalled,
+              command: install('gh'),
+              path: env.ghPath,
+              custom: env.ghCustom,
+              warning: env.ghTooOld ? l10n.envGhTooOld(EnvironmentStatus.minGh) : null,
+              tool: 'gh',
+            ),
+            if (env.hasGh)
+              item(
+                env.ghLoggedIn,
+                l10n.envLogin,
+                env.ghLoggedIn ? l10n.envLoggedInAs(env.ghLogins['github.com'] ?? '') : l10n.envNotLoggedIn,
+                command: 'gh auth login',
+              ),
+            if (env.hasGh && !env.ghLoggedIn && onLogin != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.icon(
+                  onPressed: onLogin,
+                  icon: const Icon(Icons.login_rounded, size: 16),
+                  label: Text(l10n.loginTitle),
+                ),
+              ),
+            if (env.checked && env.searchPath.isNotEmpty)
+              Theme(
+                data: theme.copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  dense: true,
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  title: Text(l10n.envSearchPath, style: theme.textTheme.bodySmall),
+                  children: [
+                    SelectableText(
+                      env.searchPath.split(Platform.isWindows ? ';' : ':').where((p) => p.trim().isNotEmpty).join('\n'),
+                      style: AppFonts.mono.copyWith(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                if (env.checked)
+                  TextButton.icon(
+                    onPressed: () => _copyDiagnostics(context),
+                    icon: const Icon(Icons.content_copy_rounded, size: 16),
+                    label: Text(l10n.envCopyDiagnostics),
+                  ),
+                OutlinedButton.icon(
+                  onPressed: onRecheck,
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: Text(l10n.envRecheck),
+                ),
+              ],
+            ),
+          ],
         ),
-      ]),
+      ),
     );
   }
 }
 
 /// 앱 바 메뉴의 "환경 점검".
-Future<void> showEnvironmentSheet(BuildContext context, EnvironmentStatus env, VoidCallback onRecheck, {VoidCallback? onLogin}) {
+Future<void> showEnvironmentSheet(
+  BuildContext context,
+  EnvironmentStatus env,
+  VoidCallback onRecheck, {
+  VoidCallback? onLogin,
+  ValueChanged<String>? onSetPath,
+}) {
   return showActionSheet<void>(
     context,
     (context) => SafeArea(
@@ -251,6 +372,12 @@ Future<void> showEnvironmentSheet(BuildContext context, EnvironmentStatus env, V
               : () {
                   Navigator.pop(context);
                   onLogin();
+                },
+          onSetPath: onSetPath == null
+              ? null
+              : (tool) {
+                  Navigator.pop(context);
+                  onSetPath(tool);
                 },
         ),
       ),

@@ -27,6 +27,7 @@ import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
 import 'start_screen.dart';
+import 'tool_path_sheet.dart';
 import 'status_header.dart';
 import 'tabs/actions_tab.dart';
 import 'tabs/branches_tab.dart';
@@ -117,6 +118,28 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     if (mounted) setState(() => _env = env);
   }
 
+  /// git / gh 경로 지정 (PLAN.md 3.14). 저장하면 환경을 다시 점검하고, 저장소가
+  /// 열려 있으면 결과를 볼 수 있게 환경 점검을 다시 연다.
+  Future<void> _setToolPath(String tool) async {
+    final l10n = AppLocalizations.of(context);
+    final runner = _services.runner;
+    final path = await showToolPathSheet(context, tool: tool, runner: runner, current: _services.prefs.toolPath(tool));
+    if (path == null || !mounted) return;
+    await _services.prefs.setToolPath(tool, path);
+    final value = path.isEmpty ? null : path;
+    if (tool == 'git') {
+      runner.gitPath = value;
+    } else {
+      runner.ghPath = value;
+    }
+    await _checkEnvironment();
+    if (!mounted) return;
+    showDone(context, value == null ? l10n.doneToolPathReset(tool) : l10n.doneToolPath(tool));
+    if (_repo != null) {
+      await showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin, onSetPath: _setToolPath);
+    }
+  }
+
   Future<void> _open(String path, {bool quietFailure = false}) async {
     final (repo, failure) = await RepoController.open(_services.runner, path);
     if (!mounted) {
@@ -194,7 +217,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
         PaletteItem(title: l10n.menuSnapRight, icon: Icons.align_horizontal_right_rounded, group: actions, onRun: () => _snap(right: true), keywords: 'snap window'),
         PaletteItem(title: l10n.menuSnapLeft, icon: Icons.align_horizontal_left_rounded, group: actions, onRun: () => _snap(right: false), keywords: 'snap window'),
       ],
-      PaletteItem(title: l10n.menuEnvironment, icon: Icons.health_and_safety_outlined, group: actions, onRun: () => showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin), keywords: 'environment gh git'),
+      PaletteItem(title: l10n.menuEnvironment, icon: Icons.health_and_safety_outlined, group: actions, onRun: () => showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin, onSetPath: _setToolPath), keywords: 'environment gh git'),
       if (repo != null) ...[
         for (final (i, name) in [
           l10n.tabChanges, l10n.tabBranches, l10n.tabTags, l10n.tabRemotes, l10n.tabRelease, l10n.tabPr, l10n.tabCi, l10n.tabHistory,
@@ -383,6 +406,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
                     onInitRepository: _initRepository,
                     onClone: _clone,
                     onLogin: _showLogin,
+                    onSetToolPath: _setToolPath,
                   )
                 : RepoScope(repo: repo, environment: _env, openRepo: _open, child: _RepoView(state: this)),
           ),
@@ -461,7 +485,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
                 await _services.prefs.setAutoFetch(!_services.prefs.autoFetch);
                 setState(() {});
               case ':env':
-                if (context.mounted) await showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin);
+                if (context.mounted) await showEnvironmentSheet(context, _env, _checkEnvironment, onLogin: _showLogin, onSetPath: _setToolPath);
               case ':browse':
                 await _services.runner.run(GhCommands.browse, workingDirectory: repo.root);
               case ':snapRight':

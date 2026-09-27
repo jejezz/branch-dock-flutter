@@ -8,6 +8,7 @@ import 'package:branch_dock/core/command_log.dart';
 import 'package:branch_dock/core/command_runner.dart';
 import 'package:branch_dock/git/commands.dart';
 import 'package:branch_dock/git/error_hints.dart';
+import 'package:branch_dock/repo/environment.dart';
 import 'package:branch_dock/repo/repo_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -295,5 +296,27 @@ void main() {
     expect((await repo.execute(GitCommands.worktreePrune)).ok, isTrue);
     expect(repo.worktrees.length, 1);
     repo.dispose();
+  });
+
+  test('tool paths: custom git is used and its folder leads PATH; probe checks the tool', () async {
+    final git = findExecutable('git', runner.path);
+    expect(git, isNotNull);
+    expect(runner.executableFor('git'), 'git');
+    runner.gitPath = git;
+    expect(runner.executableFor('git'), git);
+    expect(runner.executableFor('gh'), 'gh');
+    expect(runner.effectivePath.startsWith(File(git!).parent.path), isTrue);
+    expect((await runner.run(GitCommands.version, workingDirectory: tmp.path)).ok, isTrue);
+
+    expect(await EnvironmentStatus.probe(runner, 'git', git, tmp.path), isNotNull);
+    expect(await EnvironmentStatus.probe(runner, 'gh', git, tmp.path), isNull, reason: 'git is not gh');
+    expect(await EnvironmentStatus.probe(runner, 'git', '${tmp.path}/nope', tmp.path), isNull);
+
+    final env = await EnvironmentStatus.check(runner, tmp.path);
+    expect((env.gitPath, env.gitCustom), (git, true));
+
+    runner.gitPath = '${tmp.path}/missing-git';
+    expect((await runner.run(GitCommands.version, workingDirectory: tmp.path)).exitCode, 127);
+    runner.gitPath = null;
   });
 }

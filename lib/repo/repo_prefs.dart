@@ -58,6 +58,12 @@ class RepoPrefs {
   String get editorCommand => _prefs.getString(_editorKey) ?? '';
   Future<void> setEditorCommand(String command) => _prefs.setString(_editorKey, command.trim());
 
+  /// 직접 지정한 git / gh 실행 파일 (PLAN.md 3.14). null이면 PATH에서 찾는다.
+  String? toolPath(String tool) => _prefs.getString('tool_path:$tool');
+  Future<void> setToolPath(String tool, String? path) => path == null || path.trim().isEmpty
+      ? _prefs.remove('tool_path:$tool')
+      : _prefs.setString('tool_path:$tool', path.trim());
+
   /// 창 크기·위치 (UI_UX.md §2: 필수).
   Rect? get windowBounds {
     final v = _prefs.getStringList(_boundsKey);

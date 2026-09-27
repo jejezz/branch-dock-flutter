@@ -2654,4 +2654,74 @@ class AppLocalizationsKo extends AppLocalizations {
   String cleanupWorktreeBlocked(String name) {
     return 'worktree $name에 커밋하지 않은 변경이 있거나 잠겨 있어 지울 수 없습니다';
   }
+
+  @override
+  String get envCustomPath => '직접 지정';
+
+  @override
+  String get envSetPath => '경로 지정';
+
+  @override
+  String envGitTooOld(String min) {
+    return 'git $min 이상이 필요합니다. 일부 명령이 실패하거나 결과를 잘못 읽을 수 있습니다.';
+  }
+
+  @override
+  String envGhTooOld(String min) {
+    return 'gh $min 이상이 필요합니다. 더 낮으면 로그인 확인(gh auth status --json)이 안 돼 로그인했어도 \"로그인 안 됨\"으로 보입니다.';
+  }
+
+  @override
+  String get envCopyDiagnostics => '진단 정보 복사';
+
+  @override
+  String get envDiagnosticsCopied => '진단 정보를 복사했습니다. 문제를 알릴 때 붙여 넣으세요.';
+
+  @override
+  String get envSearchPath => '앱이 쓰는 PATH';
+
+  @override
+  String toolPathTitle(String tool) {
+    return '$tool 경로';
+  }
+
+  @override
+  String toolPathWhy(String tool) {
+    return 'PATH에서 찾은 $tool 대신 쓸 실행 파일을 고릅니다. 비워 두면 PATH에서 찾습니다.';
+  }
+
+  @override
+  String get toolPathLabel => '실행 파일';
+
+  @override
+  String get toolPathBrowse => '파일 고르기';
+
+  @override
+  String get toolPathVerify => '확인';
+
+  @override
+  String get toolPathUsePath => 'PATH에서 찾기';
+
+  @override
+  String toolPathOk(String tool, String version) {
+    return '$tool $version 확인됨';
+  }
+
+  @override
+  String toolPathBad(String tool) {
+    return '실행할 수 없거나 $tool이(가) 아닙니다';
+  }
+
+  @override
+  String get toolPathNeedsCheck => '저장하기 전에 확인을 누르세요';
+
+  @override
+  String doneToolPath(String tool) {
+    return '$tool 경로를 저장했습니다';
+  }
+
+  @override
+  String doneToolPathReset(String tool) {
+    return '$tool을(를) PATH에서 찾습니다';
+  }
 }

@@ -57,7 +57,12 @@ Future<void> main() async {
   }
 
   final services = AppServices(
-    runner: CommandRunner(log: CommandLog(), path: await resolvePath()),
+    runner: CommandRunner(
+      log: CommandLog(),
+      path: await resolvePath(),
+      gitPath: prefs.toolPath('git'),
+      ghPath: prefs.toolPath('gh'),
+    ),
     prefs: prefs,
   );
   final settings = await AppSettings.load();
