@@ -169,6 +169,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Log in to gh first: run gh auth login in a terminal.';
 
   @override
+  String get headerOpenFolder => 'Open this folder in the editor';
+
+  @override
+  String get vscodeMissingTitle => 'VS Code not found';
+
+  @override
+  String get vscodeMissingMessage =>
+      'Install VS Code to open the folder where the current branch is checked out with this button. To use another editor, enter its command (cursor, zed, …) under ‘Editor for opening files…’ in the repository menu.';
+
+  @override
+  String get vscodeDownload => 'Get VS Code';
+
+  @override
   String get headerBranchTooltip => 'Show branches';
 
   @override
@@ -580,7 +593,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editorMessage =>
-      'Enter an editor command to open files with it. Leave it empty to use the system default app.';
+      'Enter an editor command to open files and the repository folder with it. Leave it empty to open files with the system default app and the folder with VS Code.';
 
   @override
   String get editorLabel => 'Editor command';

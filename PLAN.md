@@ -132,6 +132,9 @@ push할 커밋을 만들 수 있어야 나머지 흐름이 이어지므로 최�
 - `P0` 커밋 메시지 입력과 커밋(⌘Enter). Conventional Commit 접두어
   (`feat:`, `fix:`, `chore:` …) 빠른 선택.
 - `P0` 파일을 편집기로 열기 (OS 기본 앱, 또는 설정한 편집기 명령 `code` 등).
+- `P1` 저장소 폴더를 편집기로 열기 (상태 헤더 버튼). 설정한 편집기 명령,
+  없으면 VS Code — macOS `open -b com.microsoft.VSCode`, Windows 설치 폴더의
+  `bin\code.cmd`, Linux PATH의 `code`·snap·flatpak. 찾지 못하면 설치 링크만.
 - `P1` 직전 커밋 고치기(`--amend`) — 이미 push한 커밋이면 경고.
 - `P1` 변경 취소(`git restore`) — 확인 필요.
 - `P1` Stash: 임시 저장 / 목록 / 다시 적용 / 삭제. 브랜치 전환이나 pull이

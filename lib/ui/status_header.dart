@@ -61,29 +61,34 @@ class StatusHeader extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Flexible(
-            child: ActionChip(
-              avatar: Icon(s.detached ? Icons.sell_outlined : Icons.call_split_rounded, size: 16),
-              label: Text(branchLabel, overflow: TextOverflow.ellipsis, style: AppFonts.userContent),
-              tooltip: l10n.headerBranchTooltip,
-              onPressed: onBranchTap,
-              shape: const StadiumBorder(),
-            ),
+          Expanded(
+            child: Row(children: [
+              Flexible(
+                child: ActionChip(
+                  avatar: Icon(s.detached ? Icons.sell_outlined : Icons.call_split_rounded, size: 16),
+                  label: Text(branchLabel, overflow: TextOverflow.ellipsis, style: AppFonts.userContent),
+                  tooltip: l10n.headerBranchTooltip,
+                  onPressed: onBranchTap,
+                  shape: const StadiumBorder(),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.arrow_forward_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 6),
+              if (s.hasUpstream)
+                Flexible(
+                  child: Text(s.upstream!,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.merge(AppFonts.userContent)),
+                )
+              else if (repo.headMergedAndGone)
+                StatusPill(label: l10n.headerMergedAndGone, tone: Tone.primary, tooltip: l10n.headerMergedAndGoneTooltip)
+              else
+                StatusPill(label: l10n.headerNoUpstream, tooltip: l10n.headerNoUpstreamTooltip),
+              const HelpButton(concept: Concept.upstream),
+            ]),
           ),
-          const SizedBox(width: 6),
-          Icon(Icons.arrow_forward_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(width: 6),
-          if (s.hasUpstream)
-            Flexible(
-              child: Text(s.upstream!,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.merge(AppFonts.userContent)),
-            )
-          else if (repo.headMergedAndGone)
-            StatusPill(label: l10n.headerMergedAndGone, tone: Tone.primary, tooltip: l10n.headerMergedAndGoneTooltip)
-          else
-            StatusPill(label: l10n.headerNoUpstream, tooltip: l10n.headerNoUpstreamTooltip),
-          const HelpButton(concept: Concept.upstream),
+          const _OpenFolderButton(),
         ]),
         if (pills.isNotEmpty) ...[
           const SizedBox(height: 6),
@@ -92,6 +97,53 @@ class StatusHeader extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         if (repo.operation != RepoOperation.none) const _OperationButtons() else const _SyncButtons(),
       ]),
+    );
+  }
+}
+
+/// 저장소 폴더를 편집기(기본 VS Code)로 여는 버튼. 툴팁에 실제 명령을 보여 준다.
+class _OpenFolderButton extends StatefulWidget {
+  const _OpenFolderButton();
+
+  @override
+  State<_OpenFolderButton> createState() => _OpenFolderButtonState();
+}
+
+class _OpenFolderButtonState extends State<_OpenFolderButton> {
+  String? _key;
+  Future<List<String>?>? _command;
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = RepoScope.of(context);
+    final services = ServicesScope.of(context);
+    final l10n = AppLocalizations.of(context);
+    // 저장소나 편집기 설정이 바뀔 때만 다시 찾는다.
+    final key = '${repo.root}\n${services.prefs.editorCommand}';
+    if (key != _key) {
+      _key = key;
+      _command = RepoActions.folderEditorCommand(services, repo.root);
+    }
+    return FutureBuilder<List<String>?>(
+      future: _command,
+      builder: (context, snap) {
+        final command = snap.data;
+        final done = snap.connectionState == ConnectionState.done;
+        return IconButton(
+          tooltip: [
+            l10n.headerOpenFolder,
+            if (command != null) formatCommandLine(command) else if (done) l10n.vscodeMissingTitle,
+          ].join('\n'),
+          iconSize: 18,
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.code_rounded),
+          onPressed: () async {
+            await RepoActions.openFolderInEditor(context, repo);
+            // 방금 설치했을 수도 있으니 툴팁을 다시 찾게 한다.
+            if (mounted) setState(() => _key = null);
+          },
+        );
+      },
     );
   }
 }
