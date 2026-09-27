@@ -193,6 +193,8 @@
   "errorRepositoryNotFound": "Remote repository not found. Check the URL and your access.",
   "errorNetwork": "Can't reach the server. Check your network.",
   "errorNotInstalled": "Program not found. See Check git and gh in the menu.",
+  "errorBranchInOtherWorktree": "This branch is checked out in another worktree ({path}). Git lets only one worktree check out a branch at a time.",
+  "openWorktreeFolder": "Open that folder",
   "timeJustNow": "just now",
   "timeMinutesAgo": "{n, plural, =1{1 minute ago} other{{n} minutes ago}}",
   "timeHoursAgo": "{n, plural, =1{1 hour ago} other{{n} hours ago}}",

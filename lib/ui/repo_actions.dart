@@ -9,6 +9,7 @@ import '../git/error_hints.dart';
 import '../git/status.dart';
 import '../l10n/app_localizations.dart';
 import '../repo/repo_controller.dart';
+import 'repo_scope.dart';
 import 'services.dart';
 import 'widgets.dart';
 
@@ -45,11 +46,14 @@ abstract final class RepoActions {
 
   /// 커밋하지 않은 변경 때문에 막히면 "임시 저장하고 다시"를 제안한다
   /// (PLAN.md 3.2 P1: 브랜치 전환이나 pull이 변경 때문에 막힐 때).
+  /// 브랜치가 다른 worktree에 체크아웃되어 막히면 그 폴더를 열어 준다.
+  /// [openRepo]를 주지 않으면 [RepoScope]에서 찾는다.
   static Future<bool> withStashRetry(
     BuildContext context,
     RepoController repo,
     Future<CommandResult> Function() run, {
     required String done,
+    ValueChanged<String>? openRepo,
   }) async {
     final l10n = AppLocalizations.of(context);
     final result = await run();
@@ -58,7 +62,19 @@ abstract final class RepoActions {
       showDone(context, done);
       return true;
     }
-    final blocked = classifyError(result.combined, exitCode: result.exitCode) == GitErrorKind.localChangesWouldBeOverwritten;
+    final hint = classifyError(result.combined, exitCode: result.exitCode);
+    if (hint == GitErrorKind.branchInOtherWorktree) {
+      final path = worktreePathFromError(result.combined);
+      final open = openRepo ?? RepoScope.openRepoOf(context);
+      showCommandError(
+        context,
+        result,
+        action: path != null && open != null ? l10n.openWorktreeFolder : null,
+        onAction: path != null && open != null ? () => open(path) : null,
+      );
+      return false;
+    }
+    final blocked = hint == GitErrorKind.localChangesWouldBeOverwritten;
     showCommandError(
       context,
       result,

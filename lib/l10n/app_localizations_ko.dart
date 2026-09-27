@@ -667,6 +667,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorNotInstalled => '프로그램을 찾을 수 없습니다. 메뉴의 환경 점검을 확인하세요.';
 
   @override
+  String errorBranchInOtherWorktree(String path) {
+    return '이 브랜치는 다른 worktree($path)에 체크아웃되어 있습니다. git은 한 브랜치를 한 번에 한 worktree에서만 체크아웃할 수 있습니다.';
+  }
+
+  @override
+  String get openWorktreeFolder => '그 폴더 열기';
+
+  @override
   String get timeJustNow => '방금';
 
   @override

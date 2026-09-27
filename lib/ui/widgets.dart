@@ -209,7 +209,7 @@ void showCommandError(
   final l10n = AppLocalizations.of(context);
   final hint = classifyError(result.combined, exitCode: result.exitCode);
   final raw = result.combined.trim();
-  final explanation = hint == null ? null : errorHintText(l10n, hint);
+  final explanation = hint == null ? null : errorHintText(l10n, hint, output: result.combined);
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(
@@ -232,7 +232,7 @@ void showCommandError(
     ));
 }
 
-String errorHintText(AppLocalizations l10n, GitErrorKind hint) => switch (hint) {
+String errorHintText(AppLocalizations l10n, GitErrorKind hint, {String output = ''}) => switch (hint) {
       GitErrorKind.pushRejected => l10n.errorPushRejected,
       GitErrorKind.authFailed => l10n.errorAuthFailed,
       GitErrorKind.conflict => l10n.errorConflict,
@@ -245,6 +245,7 @@ String errorHintText(AppLocalizations l10n, GitErrorKind hint) => switch (hint) 
       GitErrorKind.repositoryNotFound => l10n.errorRepositoryNotFound,
       GitErrorKind.network => l10n.errorNetwork,
       GitErrorKind.notInstalled => l10n.errorNotInstalled,
+      GitErrorKind.branchInOtherWorktree => l10n.errorBranchInOtherWorktree(worktreePathFromError(output) ?? ''),
     };
 
 /// 되돌릴 수 없는 작업 확인 (ui-ux.md §6): 위험 버튼은 error 색, 기본 포커스는 취소.

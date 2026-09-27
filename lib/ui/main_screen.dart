@@ -212,7 +212,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
             icon: Icons.call_split_rounded,
             group: l10n.paletteGroupBranches,
             keywords: 'switch checkout',
-            onRun: () => RepoActions.withStashRetry(context, repo, () => repo.switchTo(b), done: l10n.doneSwitch(b.name)),
+            onRun: () => RepoActions.withStashRetry(context, repo, () => repo.switchTo(b), done: l10n.doneSwitch(b.name), openRepo: _open),
           ),
       ],
       for (final path in _services.prefs.recent.where((p) => p != repo?.root))
@@ -384,7 +384,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
                     onClone: _clone,
                     onLogin: _showLogin,
                   )
-                : RepoScope(repo: repo, environment: _env, child: _RepoView(state: this)),
+                : RepoScope(repo: repo, environment: _env, openRepo: _open, child: _RepoView(state: this)),
           ),
           CommandBar(
             log: _services.log,
