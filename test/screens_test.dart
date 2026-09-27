@@ -36,6 +36,7 @@ import 'package:branch_dock/ui/merge_sheet.dart';
 import 'package:branch_dock/ui/tabs/pr_tab.dart';
 import 'package:branch_dock/ui/tabs/release_tab.dart';
 import 'package:branch_dock/ui/tabs/tags_tab.dart';
+import 'package:branch_dock/ui/worktree_actions.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -336,6 +337,74 @@ void main() {
     await tester.tap(find.text('릴리스 마법사 열기'));
     await tester.pumpAndSettle();
     expect(wizardOpened, isTrue);
+  });
+
+  testWidgets('v0.8 worktrees: group, held branch pill, switch dialog, delete asks, cleanup removes worktree', (tester) async {
+    const held = 'feature/a-rather-long-branch-name-for-narrow-windows';
+    await tester.runAsync(() async {
+      await git(repo.root, ['update-ref', 'refs/remotes/origin/main', 'HEAD']);
+      await git(repo.root, ['worktree', 'add', '-q', '${tmp.path}/.claude/worktrees/side', held]);
+      await repo.refresh();
+    });
+    expect(repo.worktreeHolding(held), isNotNull);
+
+    await pump(tester, const BranchesTab());
+    expect(find.text('Worktree'), findsOneWidget);
+    expect(find.text('worktree'), findsOneWidget, reason: 'pill on the held branch');
+    expect(find.text('기본 폴더'), findsOneWidget);
+    expect(find.text('.claude/worktrees/side'), findsNothing, reason: 'outside the main folder: full path');
+    expect(find.textContaining('worktrees/side'), findsOneWidget);
+
+    // 전환: git 오류 대신 이유와 "풀고 여기로 전환".
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.text(held).first));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('전환'));
+    // 행의 더블클릭 인식이 끝나야 버튼 탭이 이긴다.
+    await tester.pump(kDoubleTapTimeout);
+    await tester.pumpAndSettle();
+    expect(find.text('풀고 여기로 전환'), findsOneWidget);
+    expect(find.textContaining('git -C'), findsOneWidget);
+    expect(find.textContaining('Claude Code 세션'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+
+    // 삭제: worktree도 지우고 브랜치를 지울지 묻는다 (두 명령을 미리 보여 준다).
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => WorktreeActions.removeHolder(context, repo, held, repo.worktreeHolding(held)!),
+        child: const Text('delete'),
+      );
+    }));
+    // 지우기 전에 그 폴더의 변경 수를 실제 git으로 읽는다.
+    await tester.runAsync(() async {
+      await tester.tap(find.text('delete'));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+    expect(find.text('worktree도 지우고 브랜치를 삭제할까요?'), findsOneWidget);
+    expect(find.textContaining('git branch -d'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+
+    // 정리: 병합된 브랜치를 지우면 worktree도 함께 — Claude 폴더라 기본으로 고르지 않는다.
+    final branch = repo.localBranches.firstWhere((b) => b.name == held);
+    await pump(tester, Builder(builder: (context) {
+      return TextButton(
+        onPressed: () => showCleanupSheetWith(context, repo, [(branch: branch, merged: true)]),
+        child: const Text('cleanup'),
+      );
+    }));
+    await tester.tap(find.text('cleanup'));
+    await tester.pumpAndSettle();
+    expect(find.text('worktree side도 함께 지웁니다'), findsOneWidget);
+    expect(find.text('0개 삭제'), findsOneWidget);
+    await tester.tap(find.byType(Checkbox));
+    await tester.pumpAndSettle();
+    expect(find.text('1개 삭제'), findsOneWidget);
+    expect(find.textContaining('git worktree remove'), findsOneWidget);
   });
 
   testWidgets('v0.4 sheets: push options, stash, cleanup, set upstream; stash section', (tester) async {

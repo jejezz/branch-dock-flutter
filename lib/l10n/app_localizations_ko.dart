@@ -2525,4 +2525,133 @@ class AppLocalizationsKo extends AppLocalizations {
   String syncPushNoPrMessage(int count, String branch) {
     return 'push하지 않은 커밋 $count개가 PR을 거치지 않고 $branch에 바로 올라갑니다. 보호된 브랜치면 거부됩니다. 작업 브랜치로 옮겨 PR을 올리는 편이 안전합니다.';
   }
+
+  @override
+  String get worktreesTitle => 'Worktree';
+
+  @override
+  String get worktreePill => 'worktree';
+
+  @override
+  String worktreeHeldTooltip(String path) {
+    return '$path에 체크아웃되어 있습니다';
+  }
+
+  @override
+  String get worktreeDetachedHead => '분리된 HEAD';
+
+  @override
+  String get worktreeMainPill => '기본 폴더';
+
+  @override
+  String get worktreeOpenPill => '지금 연 폴더';
+
+  @override
+  String worktreeChangesPill(int count) {
+    return '변경 $count';
+  }
+
+  @override
+  String get worktreeMissingPill => '폴더 없음';
+
+  @override
+  String get worktreeLockedPill => '잠김';
+
+  @override
+  String get worktreeOpen => '열기';
+
+  @override
+  String get worktreeDetach => '브랜치 풀기';
+
+  @override
+  String get worktreeRemove => '지우기';
+
+  @override
+  String get worktreeClaudeWarning =>
+      'Claude Code 세션이 쓰는 폴더일 수 있습니다. 세션이 끝났는지 먼저 확인하세요.';
+
+  @override
+  String worktreeHeldTitle(String branch) {
+    return '$branch는 다른 worktree에 있습니다';
+  }
+
+  @override
+  String worktreeHeldMessage(String path) {
+    return 'git은 한 브랜치를 한 worktree에서만 체크아웃하게 합니다. $path에서 이 브랜치를 쓰고 있어 여기서는 전환할 수 없습니다. 그 폴더를 열어 작업하거나, 그 폴더의 브랜치를 풀고(분리된 HEAD) 여기로 전환하세요.';
+  }
+
+  @override
+  String get worktreeDetachAndSwitch => '풀고 여기로 전환';
+
+  @override
+  String worktreeDetachTitle(String name) {
+    return '$name의 브랜치를 풀까요?';
+  }
+
+  @override
+  String worktreeDetachMessage(String path, String branch) {
+    return '$path를 $branch에서 분리된 HEAD로 바꿉니다. 파일과 커밋은 그대로이고, $branch를 다른 곳에서 체크아웃하거나 지울 수 있게 됩니다.';
+  }
+
+  @override
+  String worktreeRemoveTitle(String name) {
+    return '$name worktree를 지울까요?';
+  }
+
+  @override
+  String worktreeRemoveMessage(String path) {
+    return '폴더 $path를 지웁니다. 브랜치와 커밋은 저장소에 남습니다.';
+  }
+
+  @override
+  String get worktreeRemoveForceTitle => '커밋하지 않은 변경까지 지울까요?';
+
+  @override
+  String worktreeRemoveForceMessage(String path, int count) {
+    return '$path에 커밋하지 않은 변경이 $count개 있습니다. 지우면 되찾을 수 없습니다.';
+  }
+
+  @override
+  String worktreeLockedMessage(String path) {
+    return '$path는 잠겨 있어 지울 수 없습니다. 먼저 git worktree unlock으로 잠금을 푸세요.';
+  }
+
+  @override
+  String get worktreeDeleteBranchTitle => 'worktree도 지우고 브랜치를 삭제할까요?';
+
+  @override
+  String worktreeDeleteBranchMessage(String branch, String path) {
+    return '$branch는 $path에 체크아웃되어 있어 그대로는 지울 수 없습니다. 그 worktree 폴더를 먼저 지우고 브랜치를 삭제합니다.';
+  }
+
+  @override
+  String worktreeDeleteBranchDirty(String branch, String path, int count) {
+    return '$branch는 $path에 체크아웃되어 있고, 그 폴더에 커밋하지 않은 변경이 $count개 있습니다. 그 폴더를 열어 정리한 뒤 다시 지우세요.';
+  }
+
+  @override
+  String get worktreePrune => '사라진 폴더 기록 정리';
+
+  @override
+  String doneWorktreeRemoved(String name) {
+    return '$name worktree를 지웠습니다';
+  }
+
+  @override
+  String doneWorktreeDetached(String name) {
+    return '$name의 브랜치를 풀었습니다';
+  }
+
+  @override
+  String get doneWorktreePruned => 'worktree 기록을 정리했습니다';
+
+  @override
+  String cleanupWorktree(String name) {
+    return 'worktree $name도 함께 지웁니다';
+  }
+
+  @override
+  String cleanupWorktreeBlocked(String name) {
+    return 'worktree $name에 커밋하지 않은 변경이 있거나 잠겨 있어 지울 수 없습니다';
+  }
 }

@@ -1969,5 +1969,164 @@
         "type": "String"
       }
     }
+  },
+  "worktreesTitle": "Worktree",
+  "worktreePill": "worktree",
+  "worktreeHeldTooltip": "{path}에 체크아웃되어 있습니다",
+  "@worktreeHeldTooltip": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeDetachedHead": "분리된 HEAD",
+  "worktreeMainPill": "기본 폴더",
+  "worktreeOpenPill": "지금 연 폴더",
+  "worktreeChangesPill": "변경 {count}",
+  "@worktreeChangesPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worktreeMissingPill": "폴더 없음",
+  "worktreeLockedPill": "잠김",
+  "worktreeOpen": "열기",
+  "worktreeDetach": "브랜치 풀기",
+  "worktreeRemove": "지우기",
+  "worktreeClaudeWarning": "Claude Code 세션이 쓰는 폴더일 수 있습니다. 세션이 끝났는지 먼저 확인하세요.",
+  "worktreeHeldTitle": "{branch}는 다른 worktree에 있습니다",
+  "@worktreeHeldTitle": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeHeldMessage": "git은 한 브랜치를 한 worktree에서만 체크아웃하게 합니다. {path}에서 이 브랜치를 쓰고 있어 여기서는 전환할 수 없습니다. 그 폴더를 열어 작업하거나, 그 폴더의 브랜치를 풀고(분리된 HEAD) 여기로 전환하세요.",
+  "@worktreeHeldMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeDetachAndSwitch": "풀고 여기로 전환",
+  "worktreeDetachTitle": "{name}의 브랜치를 풀까요?",
+  "@worktreeDetachTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeDetachMessage": "{path}를 {branch}에서 분리된 HEAD로 바꿉니다. 파일과 커밋은 그대로이고, {branch}를 다른 곳에서 체크아웃하거나 지울 수 있게 됩니다.",
+  "@worktreeDetachMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeRemoveTitle": "{name} worktree를 지울까요?",
+  "@worktreeRemoveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeRemoveMessage": "폴더 {path}를 지웁니다. 브랜치와 커밋은 저장소에 남습니다.",
+  "@worktreeRemoveMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeRemoveForceTitle": "커밋하지 않은 변경까지 지울까요?",
+  "worktreeRemoveForceMessage": "{path}에 커밋하지 않은 변경이 {count}개 있습니다. 지우면 되찾을 수 없습니다.",
+  "@worktreeRemoveForceMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worktreeLockedMessage": "{path}는 잠겨 있어 지울 수 없습니다. 먼저 git worktree unlock으로 잠금을 푸세요.",
+  "@worktreeLockedMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeDeleteBranchTitle": "worktree도 지우고 브랜치를 삭제할까요?",
+  "worktreeDeleteBranchMessage": "{branch}는 {path}에 체크아웃되어 있어 그대로는 지울 수 없습니다. 그 worktree 폴더를 먼저 지우고 브랜치를 삭제합니다.",
+  "@worktreeDeleteBranchMessage": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "worktreeDeleteBranchDirty": "{branch}는 {path}에 체크아웃되어 있고, 그 폴더에 커밋하지 않은 변경이 {count}개 있습니다. 그 폴더를 열어 정리한 뒤 다시 지우세요.",
+  "@worktreeDeleteBranchDirty": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      },
+      "path": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worktreePrune": "사라진 폴더 기록 정리",
+  "doneWorktreeRemoved": "{name} worktree를 지웠습니다",
+  "@doneWorktreeRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doneWorktreeDetached": "{name}의 브랜치를 풀었습니다",
+  "@doneWorktreeDetached": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doneWorktreePruned": "worktree 기록을 정리했습니다",
+  "cleanupWorktree": "worktree {name}도 함께 지웁니다",
+  "@cleanupWorktree": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cleanupWorktreeBlocked": "worktree {name}에 커밋하지 않은 변경이 있거나 잠겨 있어 지울 수 없습니다",
+  "@cleanupWorktreeBlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

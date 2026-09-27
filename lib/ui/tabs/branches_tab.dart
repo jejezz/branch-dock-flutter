@@ -4,6 +4,7 @@ import '../../core/command_log.dart';
 import '../../git/commands.dart';
 import '../../git/error_hints.dart';
 import '../../git/refs.dart';
+import '../../git/worktrees.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
@@ -15,6 +16,7 @@ import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
 import '../shortcut_label.dart';
+import '../worktree_actions.dart';
 
 /// 브랜치 탭 (UI_UX.md §4.2): 로컬 / 원격, 검색, 전환, 새 브랜치.
 class BranchesTab extends StatefulWidget {
@@ -28,11 +30,24 @@ class _BranchesTabState extends State<BranchesTab> {
   final _filter = TextEditingController();
   bool _localOpen = true;
   bool _remoteOpen = true;
+  bool _worktreesOpen = true;
+  bool _loadedWorktreeChanges = false;
 
   @override
   void initState() {
     super.initState();
     _filter.addListener(() => setState(() {}));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 커밋하지 않은 변경 수는 폴더마다 git status가 필요해 탭을 열 때 한 번 읽는다.
+    if (!_loadedWorktreeChanges) {
+      _loadedWorktreeChanges = true;
+      final repo = RepoScope.of(context);
+      if (repo.worktrees.length > 1) repo.loadWorktreeChanges();
+    }
   }
 
   @override
@@ -118,6 +133,23 @@ class _BranchesTabState extends State<BranchesTab> {
         ),
         if (_remoteOpen)
           for (final b in remote) _BranchRow(branch: b, repo: repo),
+        // worktree (PLAN.md 3.4a): 다른 worktree가 있을 때만.
+        if (repo.worktrees.length > 1) ...[
+          GroupHeader(
+            title: l10n.worktreesTitle,
+            count: repo.worktrees.length,
+            expanded: _worktreesOpen,
+            onToggle: () => setState(() => _worktreesOpen = !_worktreesOpen),
+            action: repo.worktrees.any((w) => w.prunable)
+                ? TextButton(
+                    onPressed: repo.busy ? null : () => WorktreeActions.prune(context, repo),
+                    child: Text(l10n.worktreePrune),
+                  )
+                : null,
+          ),
+          if (_worktreesOpen)
+            for (final w in repo.worktrees) _WorktreeRow(worktree: w, repo: repo),
+        ],
       ],
     );
   }
@@ -132,6 +164,7 @@ enum _BranchMenu {
   rename,
   delete,
   deleteRemote,
+  openWorktree,
 }
 
 class _BranchRow extends StatefulWidget {
@@ -152,9 +185,17 @@ class _BranchRowState extends State<_BranchRow> {
   Branch get branch => widget.branch;
   RepoController get repo => widget.repo;
 
+  /// 이 브랜치를 체크아웃하고 있는 다른 worktree (로컬 브랜치만).
+  Worktree? get holder => branch.remote ? null : repo.worktreeHolding(branch.name);
+
   Future<void> _switch(BuildContext context) async {
     if (branch.current || repo.busy) return;
     final l10n = AppLocalizations.of(context);
+    final held = holder;
+    if (held != null) {
+      await WorktreeActions.switchToHeld(context, repo, branch.name, held);
+      return;
+    }
     await RepoActions.withStashRetry(
       context,
       repo,
@@ -201,6 +242,8 @@ class _BranchRowState extends State<_BranchRow> {
           value: _BranchMenu.delete,
           child: Text(l10n.branchesDelete),
         ),
+      if (holder != null && WorktreeActions.canOpen(context))
+        PopupMenuItem(value: _BranchMenu.openWorktree, child: Text(l10n.openWorktreeFolder)),
       if (branch.remote)
         PopupMenuItem(
           value: _BranchMenu.deleteRemote,
@@ -248,11 +291,17 @@ class _BranchRowState extends State<_BranchRow> {
         await _deleteLocal(context);
       case _BranchMenu.deleteRemote:
         await _deleteRemote(context);
+      case _BranchMenu.openWorktree:
+        if (holder != null) WorktreeActions.open(context, holder!);
     }
   }
 
   Future<void> _deleteLocal(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
+    // 다른 worktree가 쥔 브랜치는 그 worktree부터 지운다 (PLAN.md 3.4a).
+    final held = holder;
+    if (held != null && !await WorktreeActions.removeHolder(context, repo, branch.name, held)) return;
+    if (!context.mounted) return;
     final result = await repo.execute(GitCommands.deleteBranch(branch.name));
     if (!context.mounted) return;
     if (result.ok) {
@@ -372,6 +421,14 @@ class _BranchRowState extends State<_BranchRow> {
                     ),
                   ),
                   const SizedBox(width: 6),
+                  if (holder != null) ...[
+                    StatusPill(
+                      label: l10n.worktreePill,
+                      icon: Icons.folder_copy_outlined,
+                      tooltip: l10n.worktreeHeldTooltip(holder!.path),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   if (b.upstreamGone)
                     StatusPill(
                       label: l10n.branchesUpstreamGone,
@@ -414,6 +471,148 @@ class _BranchRowState extends State<_BranchRow> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+enum _WorktreeMenu { open, detach, remove }
+
+/// worktree 한 줄 (PLAN.md 3.4a): 폴더 이름 · 브랜치(또는 분리된 HEAD) · 상태 pill.
+/// 더블클릭은 그 폴더를 연다.
+class _WorktreeRow extends StatelessWidget {
+  const _WorktreeRow({required this.worktree, required this.repo});
+
+  final Worktree worktree;
+  final RepoController repo;
+
+  /// main worktree 아래에 있으면 그 기준 상대 경로 (`.claude/worktrees/x`).
+  String get _shortPath {
+    final main = repo.worktrees.firstOrNull?.path;
+    final p = worktree.path;
+    if (main != null && p != main && p.startsWith(main)) return p.substring(main.length + 1);
+    return p;
+  }
+
+  Future<void> _menu(BuildContext context, Offset? position) async {
+    final l10n = AppLocalizations.of(context);
+    final w = worktree;
+    final here = repo.isOpenWorktree(w);
+    final items = <PopupMenuEntry<_WorktreeMenu>>[
+      if (!here && !w.prunable && WorktreeActions.canOpen(context))
+        PopupMenuItem(value: _WorktreeMenu.open, child: Text(l10n.worktreeOpen)),
+      if (!here && !w.prunable && w.branch != null)
+        PopupMenuItem(value: _WorktreeMenu.detach, child: Text(l10n.worktreeDetach)),
+      if (!here && !w.main && !w.prunable)
+        PopupMenuItem(
+          value: _WorktreeMenu.remove,
+          child: Text(l10n.worktreeRemove, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        ),
+    ];
+    if (items.isEmpty) return;
+    final box = context.findRenderObject() as RenderBox;
+    final origin = position ?? box.localToGlobal(Offset(box.size.width - 40, box.size.height));
+    final choice = await showMenu<_WorktreeMenu>(
+      context: context,
+      position: RelativeRect.fromLTRB(origin.dx, origin.dy, origin.dx, origin.dy),
+      items: items,
+    );
+    if (choice == null || !context.mounted) return;
+    switch (choice) {
+      case _WorktreeMenu.open:
+        WorktreeActions.open(context, w);
+      case _WorktreeMenu.detach:
+        await WorktreeActions.detach(context, repo, w);
+      case _WorktreeMenu.remove:
+        await WorktreeActions.remove(context, repo, w);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final w = worktree;
+    final here = repo.isOpenWorktree(w);
+    final changes = repo.worktreeChanges[w.path] ?? 0;
+    return GestureDetector(
+      onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
+      child: InkWell(
+        splashFactory: NoSplash.splashFactory,
+        onDoubleTap: here || w.prunable ? null : () => WorktreeActions.open(context, w),
+        onTap: () {},
+        child: SizedBox(
+          height: 40,
+          child: Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.lg, right: 4),
+            child: Row(children: [
+              SizedBox(
+                width: 14,
+                child: here ? Icon(Icons.circle, size: 8, color: theme.colorScheme.primary) : null,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Tooltip(
+                  message: w.path,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        w.branch ?? l10n.worktreeDetachedHead,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppFonts.userContent.copyWith(
+                          fontSize: 13,
+                          fontWeight: here ? FontWeight.w700 : FontWeight.w500,
+                          color: w.branch == null ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.onSurface,
+                          decoration: w.prunable ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                      Text(
+                        _shortPath,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.merge(AppFonts.mono).copyWith(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              if (w.main) StatusPill(label: l10n.worktreeMainPill),
+              if (here && !w.main) StatusPill(label: l10n.worktreeOpenPill, tone: Tone.primary),
+              if (changes > 0) ...[
+                const SizedBox(width: 4),
+                StatusPill(label: l10n.worktreeChangesPill(changes), tone: Tone.warning),
+              ],
+              if (w.prunable) ...[
+                const SizedBox(width: 4),
+                StatusPill(label: l10n.worktreeMissingPill, tone: Tone.warning),
+              ],
+              if (w.locked) ...[
+                const SizedBox(width: 4),
+                StatusPill(label: l10n.worktreeLockedPill, icon: Icons.lock_outline_rounded),
+              ],
+              if (w.byClaude && !here) ...[
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: l10n.worktreeClaudeWarning,
+                  child: Icon(Icons.smart_toy_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ],
+              Builder(
+                builder: (context) => IconButton(
+                  tooltip: l10n.commonMore,
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 18,
+                  icon: const Icon(Icons.more_horiz_rounded),
+                  onPressed: repo.busy || here ? null : () => _menu(context, null),
+                ),
+              ),
+            ]),
           ),
         ),
       ),
@@ -707,6 +906,7 @@ Future<void> showSetUpstreamSheet(BuildContext context, RepoController repo, Bra
 /// 사라진 로컬 브랜치를 골라 지운다. 병합되지 않은 것은 강제 삭제라 따로 표시한다.
 Future<void> showCleanupSheet(BuildContext context, RepoController repo) async {
   final candidates = await repo.cleanupCandidates();
+  if (candidates.any((c) => repo.worktreeHolding(c.branch.name) != null)) await repo.loadWorktreeChanges();
   if (!context.mounted) return;
   await showCleanupSheetWith(context, repo, candidates);
 }
@@ -721,26 +921,45 @@ Future<void> showCleanupSheetWith(
     showDone(context, l10n.cleanupNothing(repo.defaultBranch ?? 'main'));
     return Future.value();
   }
-  // 병합된 것만 기본으로 고른다. 병합 안 된(원격에서만 사라진) 것은 사용자가 고른다.
-  final selected = {for (final c in candidates) if (c.merged) c.branch.name};
+  // 다른 worktree가 쥔 브랜치는 그 worktree를 먼저 지운다 (PLAN.md 3.4a).
+  // 그 폴더에 커밋하지 않은 변경이 있거나 잠겼으면 고를 수 없다.
+  final holders = {
+    for (final c in candidates)
+      c.branch.name: ?repo.worktreeHolding(c.branch.name),
+  };
+  bool blocked(String name) {
+    final w = holders[name];
+    return w != null && (w.locked || (repo.worktreeChanges[w.path] ?? 0) > 0);
+  }
+
+  // 병합된 것만 기본으로 고른다. 병합 안 된(원격에서만 사라진) 것과 Claude Code
+  // 세션이 쓰고 있을 수 있는 worktree의 브랜치는 사용자가 고른다.
+  final selected = {
+    for (final c in candidates)
+      if (c.merged && !blocked(c.branch.name) && !(holders[c.branch.name]?.byClaude ?? false)) c.branch.name,
+  };
   return showActionSheet<void>(context, (context) {
     return StatefulBuilder(builder: (context, setState) {
       final l10n = AppLocalizations.of(context);
       final theme = Theme.of(context);
       final commands = [
         for (final c in candidates)
-          if (selected.contains(c.branch.name)) GitCommands.deleteBranch(c.branch.name, force: !c.merged),
+          if (selected.contains(c.branch.name)) ...[
+            if (holders[c.branch.name] case final w?) GitCommands.worktreeRemove(w.path),
+            GitCommands.deleteBranch(c.branch.name, force: !c.merged),
+          ],
       ];
+      final branchCount = selected.length;
       return ActionSheetBody(
         title: l10n.branchesCleanup,
         commands: commands,
-        confirmLabel: l10n.cleanupConfirm(commands.length),
+        confirmLabel: l10n.cleanupConfirm(branchCount),
         danger: true,
         onConfirm: commands.isEmpty
             ? null
             : () async {
                 Navigator.pop(context);
-                await RepoActions.report(context, repo.executeAll(commands), done: l10n.doneCleanup(commands.length));
+                await RepoActions.report(context, repo.executeAll(commands), done: l10n.doneCleanup(branchCount));
               },
         children: [
           Text(l10n.cleanupWhy(repo.defaultBranch ?? 'main'), style: theme.textTheme.bodySmall),
@@ -751,12 +970,24 @@ Future<void> showCleanupSheetWith(
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
               value: selected.contains(c.branch.name),
-              onChanged: (v) => setState(() => v == true ? selected.add(c.branch.name) : selected.remove(c.branch.name)),
+              onChanged: blocked(c.branch.name)
+                  ? null
+                  : (v) => setState(() => v == true ? selected.add(c.branch.name) : selected.remove(c.branch.name)),
               title: Text(c.branch.name, style: AppFonts.mono.copyWith(fontSize: 12.5)),
-              subtitle: Text(
-                c.merged ? l10n.cleanupMerged : l10n.cleanupGoneNotMerged,
-                style: TextStyle(color: c.merged ? null : toneColor(context, Tone.warning)),
-              ),
+              subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  c.merged ? l10n.cleanupMerged : l10n.cleanupGoneNotMerged,
+                  style: TextStyle(color: c.merged ? null : toneColor(context, Tone.warning)),
+                ),
+                if (holders[c.branch.name] case final w?) ...[
+                  Text(
+                    blocked(c.branch.name) ? l10n.cleanupWorktreeBlocked(w.name) : l10n.cleanupWorktree(w.name),
+                    style: TextStyle(color: blocked(c.branch.name) ? toneColor(context, Tone.warning) : null),
+                  ),
+                  if (w.byClaude)
+                    Text(l10n.worktreeClaudeWarning, style: TextStyle(color: toneColor(context, Tone.warning))),
+                ],
+              ]),
             ),
         ],
       );
