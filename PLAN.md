@@ -166,6 +166,37 @@ push할 커밋을 만들 수 있어야 나머지 흐름이 이어지므로 최�
 - `P1` 병합이 끝난 브랜치 정리: 병합된 로컬 브랜치와 원격에서 사라진
   브랜치(`[gone]`)를 모아 한 번에 삭제.
 
+#### 3.4a Worktree (v0.8.0)
+
+git은 한 브랜치를 한 worktree에서만 체크아웃하게 한다. 다른 worktree가 쥔
+브랜치는 전환(`is already used by worktree at …`)도 삭제(`cannot delete
+branch … used by worktree at …`)도 거부된다. Claude Code 같은 도구가 작업마다
+`.claude/worktrees/…`를 만들면서 이런 브랜치가 쌓이므로, 앱에서 원인을 보여
+주고 풀 수 있게 한다.
+
+- `P1` **worktree 목록**: `git worktree list --porcelain`으로 폴더 · 브랜치
+  (또는 분리된 HEAD) · 커밋하지 않은 변경 수를 보여 준다. 행마다 `열기`
+  (그 폴더를 저장소로 열기) · `브랜치 풀기`(`git -C <폴더> switch --detach`) ·
+  `지우기`(`git worktree remove <폴더>`). 폴더가 이미 사라진 항목은
+  `git worktree prune`으로 정리한다.
+- `P1` **브랜치 목록에 표시**: 다른 worktree가 쥔 브랜치에 아이콘과 폴더 경로를
+  붙인다. 전환·삭제를 누르면 git 오류 대신 이유와 해결 버튼(`그 폴더 열기`,
+  `브랜치 풀기`)을 보여 준다.
+- `P1` **worktree와 함께 삭제**: worktree가 쥔 브랜치를 삭제하면 "worktree도
+  지우고 브랜치를 삭제할까요?"를 묻고 두 명령을 미리 보여 준다
+  (`git worktree remove <폴더>` → `git branch -d <브랜치>`).
+- `P1` **병합된 브랜치 정리에 포함** (§3.4): 정리 후보 중 worktree가 쥔 브랜치도
+  worktree 삭제와 함께 지울 수 있게 한다.
+- 안전장치:
+  - 커밋하지 않은 변경이 있는 worktree는 기본으로 지우지 않는다 (git도
+    거부한다). `--force`는 이름을 입력하는 확인(`confirmTyped`)을 거친 뒤에만.
+  - main worktree와 지금 앱에서 연 폴더는 지울 수 없다.
+  - `.claude/worktrees/` 아래 worktree에는 "Claude Code 세션이 쓰는 폴더일 수
+    있습니다 — 세션이 끝났는지 확인하세요"를 한 줄 붙인다. 지우면 그 세션이
+    깨진다.
+- 새 worktree 만들기(`git worktree add`)는 넣지 않는다. 쌓인 것을 정리하는
+  데 집중한다.
+
 ### 3.5 병합 (중점)
 
 - `P0` 다른 브랜치를 현재 브랜치로 병합: fast-forward / 병합 커밋(`--no-ff`) /
@@ -519,7 +550,7 @@ v1.0 전에 macOS가 아닌 환경과 설치 방식이 다른 환경에서도 �
 | v0.5.0 | 시작·원격·릴리스 P1 — 3.1 git init·clone·gh 로그인(SSH 안내), 3.6 fork upstream·set-default·browse, 3.8.2 bump-version.sh·**3.8.2a 버전 파일 보완**(lock 파일, 감지 넓히기, pyproject 표, 버전 파일 지정, 빌드 영향 파일), 3.8.3 바로 커밋 방식, 3.8.7 되돌리기, 화면 가장자리에 붙이기 |
 | v0.6.0 | P2 일부 — 3.2 diff 보기(변경 파일, 기록의 커밋), 3.11 revert·cherry-pick(다른 브랜치 기록 보기, 진행 중 상태 계속/건너뛰기/중단), 3.12 명령 팔레트(⌘K), 개념 카드(revert·cherry-pick) |
 | v0.7.0 | P2 일부 — 3.9 PR 리뷰(승인·변경 요청·코멘트, 최근 활동), 3.8 릴리스 산출물(올리기·받기·삭제), 넓은 창(840px 이상) 왼쪽 섹션 레일 |
-| v0.8.0 | 1.0 준비 — 3.14 실행 환경: Windows 셸 없이 실행·설치 위치 보완, git/gh 경로 지정, 환경 진단, GitHub Enterprise 표시, 편집기 고르기, Linux 알림 대체 |
+| v0.8.0 | 1.0 준비 — 3.14 실행 환경: Windows 셸 없이 실행·설치 위치 보완, git/gh 경로 지정, 환경 진단, GitHub Enterprise 표시, 편집기 고르기, Linux 알림 대체 · 3.4a worktree: 목록·열기·브랜치 풀기·지우기, worktree가 쥔 브랜치 표시와 함께 삭제 |
 | 이후 | v1.0.0 — 새 기능 없이 v0.8.0을 Windows·Linux에서 확인한 뒤 정식 릴리스. 모노레포는 §4 |
 
 첫 정식 릴리스 전에 README의 기능·동작 방식·스크린샷·데모 GIF를 채운다.
