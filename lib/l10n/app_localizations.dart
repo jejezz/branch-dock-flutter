@@ -2171,7 +2171,7 @@ abstract class AppLocalizations {
   /// No description provided for @checkSynced.
   ///
   /// In ko, this message translates to:
-  /// **'원격과 같다'**
+  /// **'받을 커밋도 보낼 커밋도 없다'**
   String get checkSynced;
 
   /// No description provided for @checkGitHub.
@@ -2321,7 +2321,7 @@ abstract class AppLocalizations {
   /// No description provided for @tagCheckSynced.
   ///
   /// In ko, this message translates to:
-  /// **'{branch}에 있고 원격과 같다'**
+  /// **'{branch}에 있고 받을 커밋도 보낼 커밋도 없다'**
   String tagCheckSynced(String branch);
 
   /// No description provided for @tagCheckVersion.
@@ -4201,6 +4201,90 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{name}을(를) 삭제했습니다'**
   String doneAssetDeleted(String name);
+
+  /// No description provided for @syncUpstreamCounts.
+  ///
+  /// In ko, this message translates to:
+  /// **'{upstream}  ↑{ahead} ↓{behind}'**
+  String syncUpstreamCounts(String upstream, int ahead, int behind);
+
+  /// No description provided for @syncNoUpstream.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}에 연결된 원격 브랜치가 없습니다'**
+  String syncNoUpstream(String branch);
+
+  /// No description provided for @syncOnOtherBranch.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금은 {branch}에 있습니다'**
+  String syncOnOtherBranch(String branch);
+
+  /// No description provided for @syncBehind.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에 아직 받지 않은 커밋이 {count}개 있습니다. Pull 하세요.'**
+  String syncBehind(int count);
+
+  /// No description provided for @syncAhead.
+  ///
+  /// In ko, this message translates to:
+  /// **'push하지 않은 커밋이 {count}개 있습니다.'**
+  String syncAhead(int count);
+
+  /// No description provided for @syncAheadPr.
+  ///
+  /// In ko, this message translates to:
+  /// **'push하지 않은 커밋이 {count}개 있습니다. 여기서 Push하면 PR 없이 {branch}에 바로 올라갑니다.'**
+  String syncAheadPr(int count, String branch);
+
+  /// No description provided for @syncDiverged.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격과 갈라졌습니다. 받을 커밋 {behind}개, 보낼 커밋 {ahead}개.'**
+  String syncDiverged(int behind, int ahead);
+
+  /// No description provided for @syncSameContent.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 내용은 원격과 같고 커밋만 다릅니다 (로컬 커밋 {count}개). PR을 squash나 rebase로 병합하면 로컬에 옛 커밋이 남아 이렇게 됩니다.'**
+  String syncSameContent(int count);
+
+  /// No description provided for @syncMatchRemote.
+  ///
+  /// In ko, this message translates to:
+  /// **'원격에 맞추기'**
+  String get syncMatchRemote;
+
+  /// No description provided for @syncMatchRemoteTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}를 원격에 맞출까요?'**
+  String syncMatchRemoteTitle(String branch);
+
+  /// No description provided for @syncMatchRemoteMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'로컬 커밋 {count}개를 버리고 {branch}를 {upstream}으로 옮깁니다. 파일 내용은 그대로이고 커밋하지 않은 변경도 지킵니다. 버린 커밋은 git reflog로 되찾을 수 있습니다.'**
+  String syncMatchRemoteMessage(int count, String branch, String upstream);
+
+  /// No description provided for @doneMatchRemote.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}를 원격에 맞췄습니다'**
+  String doneMatchRemote(String branch);
+
+  /// No description provided for @syncPushNoPrTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'PR 없이 {branch}에 push할까요?'**
+  String syncPushNoPrTitle(String branch);
+
+  /// No description provided for @syncPushNoPrMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'push하지 않은 커밋 {count}개가 PR을 거치지 않고 {branch}에 바로 올라갑니다. 보호된 브랜치면 거부됩니다. 작업 브랜치로 옮겨 PR을 올리는 편이 안전합니다.'**
+  String syncPushNoPrMessage(int count, String branch);
 }
 
 class _AppLocalizationsDelegate

@@ -165,6 +165,13 @@ abstract final class GitCommands {
   /// 추적 브랜치에 없는 내 커밋 (올릴 커밋).
   static const unpushed = ['git', 'rev-list', '@{u}..HEAD'];
 
+  /// 종료 코드 0이면 HEAD와 추적 브랜치의 파일 내용(트리)이 같다.
+  static const sameTreeAsUpstream = ['git', 'diff', '--quiet', '@{u}', 'HEAD'];
+
+  /// 현재 브랜치를 추적 브랜치로 옮긴다. `--keep`은 커밋하지 않은 변경을 지키고,
+  /// 그 변경을 덮어써야 하면 아무것도 하지 않고 멈춘다.
+  static const resetToUpstream = ['git', 'reset', '--keep', '@{u}'];
+
   // --- 병합 (3.5) ---------------------------------------------------------
 
   /// [base]에 없는 [branch]의 커밋 (들어올 커밋).

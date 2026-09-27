@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:branch_dock/git/commands.dart';
 import 'package:branch_dock/git/commits.dart';
+import 'package:branch_dock/git/status.dart';
 import 'package:branch_dock/git/tags.dart';
 import 'package:branch_dock/github/models.dart';
+import 'package:branch_dock/release/release_flow.dart';
 import 'package:branch_dock/release/repo_release_info.dart';
 import 'package:branch_dock/release/version_files.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -190,5 +192,22 @@ void main() {
       File('${dir.path}/.github/workflows/nightly.yaml').writeAsStringSync('on:\n  schedule:\n    - cron: "0 0 * * *"\n  workflow_dispatch:\n');
       expect(detectDispatchWorkflows(dir.path), ['nightly.yaml', 'release.yml']);
     });
+  });
+
+  test('syncProblem explains why the branch is not in sync', () {
+    RepoStatus st({String? upstream = 'origin/main', int ahead = 0, int behind = 0}) =>
+        RepoStatus(head: 'main', oid: 'x', upstream: upstream, ahead: ahead, behind: behind);
+
+    expect(syncProblem(st()), isNull);
+    expect(syncProblem(st(upstream: null)), SyncProblem.noUpstream);
+    expect(syncProblem(st(behind: 2)), SyncProblem.behind);
+    expect(syncProblem(st(ahead: 1)), SyncProblem.ahead);
+    expect(syncProblem(st(ahead: 1, behind: 1)), SyncProblem.diverged);
+    // squash 병합 뒤 로컬에 남은 옛 커밋: Pull로는 풀리지 않으니 원격에 맞춘다.
+    expect(syncProblem(st(ahead: 3, behind: 1), sameContent: true), SyncProblem.sameContent);
+    // 바로 커밋 방식의 ⑤: 올릴 커밋과 추적 브랜치 없음은 괜찮고, 받을 커밋만 막는다.
+    expect(syncProblem(st(ahead: 1), allowAhead: true), isNull);
+    expect(syncProblem(st(upstream: null), allowAhead: true), isNull);
+    expect(syncProblem(st(behind: 1), allowAhead: true), SyncProblem.behind);
   });
 }

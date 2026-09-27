@@ -1302,7 +1302,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get checkSynced => 'In sync with the remote';
+  String get checkSynced => 'Nothing to pull or push';
 
   @override
   String get checkGitHub => 'GitHub remote and gh login';
@@ -1404,7 +1404,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String tagCheckSynced(String branch) {
-    return 'On $branch and in sync with the remote';
+    return 'On $branch with nothing to pull or push';
   }
 
   @override
@@ -2615,5 +2615,103 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String doneAssetDeleted(String name) {
     return 'Deleted $name';
+  }
+
+  @override
+  String syncUpstreamCounts(String upstream, int ahead, int behind) {
+    return '$upstream  ↑$ahead ↓$behind';
+  }
+
+  @override
+  String syncNoUpstream(String branch) {
+    return '$branch has no remote branch to track';
+  }
+
+  @override
+  String syncOnOtherBranch(String branch) {
+    return 'You\'re on $branch';
+  }
+
+  @override
+  String syncBehind(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count commits on the remote aren\'t pulled yet',
+      one: '1 commit on the remote isn\'t pulled yet',
+    );
+    return '$_temp0. Pull first.';
+  }
+
+  @override
+  String syncAhead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count commits aren\'t pushed yet',
+      one: '1 commit isn\'t pushed yet',
+    );
+    return '$_temp0.';
+  }
+
+  @override
+  String syncAheadPr(int count, String branch) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count commits aren\'t pushed yet',
+      one: '1 commit isn\'t pushed yet',
+    );
+    return '$_temp0. Pushing here puts them on $branch without a PR.';
+  }
+
+  @override
+  String syncDiverged(int behind, int ahead) {
+    return 'Diverged from the remote: $behind to pull, $ahead to push.';
+  }
+
+  @override
+  String syncSameContent(int count) {
+    return 'Files match the remote, but the commits don\'t ($count local). This happens when a PR is merged with squash or rebase and the old commits stay on your branch.';
+  }
+
+  @override
+  String get syncMatchRemote => 'Match remote';
+
+  @override
+  String syncMatchRemoteTitle(String branch) {
+    return 'Match $branch to the remote?';
+  }
+
+  @override
+  String syncMatchRemoteMessage(int count, String branch, String upstream) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count local commits',
+      one: '1 local commit',
+    );
+    return 'Drops $_temp0 and moves $branch to $upstream. Files stay the same and uncommitted changes are kept. The dropped commits can be recovered with git reflog.';
+  }
+
+  @override
+  String doneMatchRemote(String branch) {
+    return 'Matched $branch to the remote';
+  }
+
+  @override
+  String syncPushNoPrTitle(String branch) {
+    return 'Push to $branch without a PR?';
+  }
+
+  @override
+  String syncPushNoPrMessage(int count, String branch) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unpushed commits go',
+      one: '1 unpushed commit goes',
+    );
+    return '$_temp0 straight to $branch without a PR. A protected branch will reject it. Moving the work to a branch and opening a PR is safer.';
   }
 }
