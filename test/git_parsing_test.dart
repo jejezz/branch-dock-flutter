@@ -4,6 +4,7 @@ import 'package:branch_dock/git/error_hints.dart';
 import 'package:branch_dock/git/refs.dart';
 import 'package:branch_dock/git/remotes.dart';
 import 'package:branch_dock/git/status.dart';
+import 'package:branch_dock/git/worktrees.dart';
 import 'package:branch_dock/repo/environment.dart';
 import 'package:branch_dock/repo/next_action.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -167,5 +168,18 @@ void main() {
       NextActionKind.push,
     );
     expect(suggestNextAction(status: pushed, remotes: const [origin]), isNull);
+  });
+
+  test('Worktree.parse: main, branch, detached, locked, prunable, Claude folder', () {
+    const out = 'worktree /r\nHEAD aaa\nbranch refs/heads/main\n\n'
+        'worktree /r/.claude/worktrees/x\nHEAD bbb\nbranch refs/heads/claude/x\nlocked\n\n'
+        'worktree /r/.claude/worktrees/y\nHEAD ccc\ndetached\n\n'
+        'worktree /gone\nHEAD ddd\nbranch refs/heads/old\nprunable gitdir file points to non-existent location\n';
+    final w = Worktree.parse(out);
+    expect(w.map((e) => e.path), ['/r', '/r/.claude/worktrees/x', '/r/.claude/worktrees/y', '/gone']);
+    expect(w.map((e) => e.main), [true, false, false, false]);
+    expect(w.map((e) => e.branch), ['main', 'claude/x', null, 'old']);
+    expect((w[1].locked, w[1].byClaude, w[1].name), (true, true, 'x'));
+    expect((w[2].detached, w[3].prunable, w[0].byClaude), (true, true, false));
   });
 }

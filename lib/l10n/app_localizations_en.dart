@@ -2722,4 +2722,146 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0 straight to $branch without a PR. A protected branch will reject it. Moving the work to a branch and opening a PR is safer.';
   }
+
+  @override
+  String get worktreesTitle => 'Worktrees';
+
+  @override
+  String get worktreePill => 'worktree';
+
+  @override
+  String worktreeHeldTooltip(String path) {
+    return 'Checked out in $path';
+  }
+
+  @override
+  String get worktreeDetachedHead => 'Detached HEAD';
+
+  @override
+  String get worktreeMainPill => 'Main';
+
+  @override
+  String get worktreeOpenPill => 'Open here';
+
+  @override
+  String worktreeChangesPill(int count) {
+    return '$count changed';
+  }
+
+  @override
+  String get worktreeMissingPill => 'Missing';
+
+  @override
+  String get worktreeLockedPill => 'Locked';
+
+  @override
+  String get worktreeOpen => 'Open';
+
+  @override
+  String get worktreeDetach => 'Release branch';
+
+  @override
+  String get worktreeRemove => 'Remove';
+
+  @override
+  String get worktreeClaudeWarning =>
+      'A Claude Code session may be using this folder. Make sure the session has finished first.';
+
+  @override
+  String worktreeHeldTitle(String branch) {
+    return '$branch is checked out in another worktree';
+  }
+
+  @override
+  String worktreeHeldMessage(String path) {
+    return 'Git lets only one worktree check out a branch at a time. $path is using this branch, so you can\'t switch to it here. Open that folder, or release the branch there (detached HEAD) and switch here.';
+  }
+
+  @override
+  String get worktreeDetachAndSwitch => 'Release and switch here';
+
+  @override
+  String worktreeDetachTitle(String name) {
+    return 'Release the branch in $name?';
+  }
+
+  @override
+  String worktreeDetachMessage(String path, String branch) {
+    return '$path moves from $branch to a detached HEAD. Files and commits stay as they are, and $branch can then be checked out or deleted elsewhere.';
+  }
+
+  @override
+  String worktreeRemoveTitle(String name) {
+    return 'Remove the $name worktree?';
+  }
+
+  @override
+  String worktreeRemoveMessage(String path) {
+    return 'Deletes the folder $path. Branches and commits stay in the repository.';
+  }
+
+  @override
+  String get worktreeRemoveForceTitle => 'Delete uncommitted changes too?';
+
+  @override
+  String worktreeRemoveForceMessage(String path, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uncommitted changes',
+      one: '1 uncommitted change',
+    );
+    return '$path has $_temp0. They can\'t be recovered once removed.';
+  }
+
+  @override
+  String worktreeLockedMessage(String path) {
+    return '$path is locked and can\'t be removed. Unlock it first with git worktree unlock.';
+  }
+
+  @override
+  String get worktreeDeleteBranchTitle =>
+      'Remove the worktree and delete the branch?';
+
+  @override
+  String worktreeDeleteBranchMessage(String branch, String path) {
+    return '$branch is checked out in $path, so it can\'t be deleted as is. The worktree folder is removed first, then the branch.';
+  }
+
+  @override
+  String worktreeDeleteBranchDirty(String branch, String path, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uncommitted changes',
+      one: '1 uncommitted change',
+    );
+    return '$branch is checked out in $path, which has $_temp0. Open that folder, tidy it up, then delete again.';
+  }
+
+  @override
+  String get worktreePrune => 'Clean up missing folders';
+
+  @override
+  String doneWorktreeRemoved(String name) {
+    return 'Removed the $name worktree';
+  }
+
+  @override
+  String doneWorktreeDetached(String name) {
+    return 'Released the branch in $name';
+  }
+
+  @override
+  String get doneWorktreePruned => 'Cleaned up worktree records';
+
+  @override
+  String cleanupWorktree(String name) {
+    return 'Also removes the $name worktree';
+  }
+
+  @override
+  String cleanupWorktreeBlocked(String name) {
+    return 'Can\'t remove: the $name worktree has uncommitted changes or is locked';
+  }
 }

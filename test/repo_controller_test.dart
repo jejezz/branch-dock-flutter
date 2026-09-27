@@ -244,4 +244,56 @@ void main() {
     expect(repo.needsPublish, isTrue);
     repo.dispose();
   });
+
+  test('worktrees: branch held elsewhere, change counts, remove then delete', () async {
+    final a = await clone('a');
+    File('${a.path}/x').writeAsStringSync('x\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'init']);
+    await git(a.path, ['branch', 'feat/w']);
+    final wt = '${a.path}/.claude/worktrees/w';
+    await git(a.path, ['worktree', 'add', '-q', wt, 'feat/w']);
+    final repo = await open(a);
+    expect(repo.worktrees.length, 2);
+    expect(repo.isOpenWorktree(repo.worktrees.first), isTrue);
+    final held = repo.worktreeHolding('feat/w')!;
+    expect((held.byClaude, held.main), (true, false));
+    expect(repo.worktreeHolding('main'), isNull, reason: 'the open folder does not count');
+
+    // 전환·삭제가 막히는 것은 git이 정한다.
+    final sw = await repo.execute(GitCommands.switchTo('feat/w'));
+    expect(classifyError(sw.combined), GitErrorKind.branchInOtherWorktree);
+    expect((await repo.execute(GitCommands.deleteBranch('feat/w'))).ok, isFalse);
+
+    File('$wt/dirty').writeAsStringSync('d\n');
+    await repo.loadWorktreeChanges();
+    expect(repo.worktreeChanges[held.path], 1);
+    expect((await repo.execute(GitCommands.worktreeRemove(held.path))).ok, isFalse, reason: 'git keeps uncommitted work');
+
+    File('$wt/dirty').deleteSync();
+    expect((await repo.execute(GitCommands.worktreeRemove(held.path))).ok, isTrue);
+    expect((await repo.execute(GitCommands.deleteBranch('feat/w'))).ok, isTrue);
+    expect(repo.worktrees.length, 1);
+    repo.dispose();
+  });
+
+  test('worktrees: detach releases the branch; prune clears a missing folder', () async {
+    final a = await clone('a');
+    File('${a.path}/x').writeAsStringSync('x\n');
+    await git(a.path, ['add', '-A']);
+    await git(a.path, ['commit', '-q', '-m', 'init']);
+    final wt = '${tmp.path}/side';
+    await git(a.path, ['worktree', 'add', '-q', '-b', 'feat/d', wt]);
+    final repo = await open(a);
+    expect((await repo.execute(GitCommands.worktreeDetach(repo.worktreeHolding('feat/d')!.path))).ok, isTrue);
+    expect(repo.worktreeHolding('feat/d'), isNull);
+    expect((await repo.execute(GitCommands.switchTo('feat/d'))).ok, isTrue);
+
+    Directory(wt).deleteSync(recursive: true);
+    await repo.refresh();
+    expect(repo.worktrees.last.prunable, isTrue);
+    expect((await repo.execute(GitCommands.worktreePrune)).ok, isTrue);
+    expect(repo.worktrees.length, 1);
+    repo.dispose();
+  });
 }

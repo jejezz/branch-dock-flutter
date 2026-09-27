@@ -260,6 +260,8 @@ Future<bool> confirmDanger(
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
+      // 좁은 창에서 긴 설명과 명령이 넘치지 않게.
+      scrollable: true,
       title: Text(title),
       content: SizedBox(
         width: 360,
@@ -415,6 +417,7 @@ class _TypedConfirmDialogState extends State<_TypedConfirmDialog> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return AlertDialog(
+      scrollable: true,
       title: Text(widget.title),
       content: SizedBox(
         width: 360,

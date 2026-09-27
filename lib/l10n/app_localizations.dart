@@ -4297,6 +4297,198 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'push하지 않은 커밋 {count}개가 PR을 거치지 않고 {branch}에 바로 올라갑니다. 보호된 브랜치면 거부됩니다. 작업 브랜치로 옮겨 PR을 올리는 편이 안전합니다.'**
   String syncPushNoPrMessage(int count, String branch);
+
+  /// No description provided for @worktreesTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Worktree'**
+  String get worktreesTitle;
+
+  /// No description provided for @worktreePill.
+  ///
+  /// In ko, this message translates to:
+  /// **'worktree'**
+  String get worktreePill;
+
+  /// No description provided for @worktreeHeldTooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}에 체크아웃되어 있습니다'**
+  String worktreeHeldTooltip(String path);
+
+  /// No description provided for @worktreeDetachedHead.
+  ///
+  /// In ko, this message translates to:
+  /// **'분리된 HEAD'**
+  String get worktreeDetachedHead;
+
+  /// No description provided for @worktreeMainPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 폴더'**
+  String get worktreeMainPill;
+
+  /// No description provided for @worktreeOpenPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금 연 폴더'**
+  String get worktreeOpenPill;
+
+  /// No description provided for @worktreeChangesPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 {count}'**
+  String worktreeChangesPill(int count);
+
+  /// No description provided for @worktreeMissingPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'폴더 없음'**
+  String get worktreeMissingPill;
+
+  /// No description provided for @worktreeLockedPill.
+  ///
+  /// In ko, this message translates to:
+  /// **'잠김'**
+  String get worktreeLockedPill;
+
+  /// No description provided for @worktreeOpen.
+  ///
+  /// In ko, this message translates to:
+  /// **'열기'**
+  String get worktreeOpen;
+
+  /// No description provided for @worktreeDetach.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치 풀기'**
+  String get worktreeDetach;
+
+  /// No description provided for @worktreeRemove.
+  ///
+  /// In ko, this message translates to:
+  /// **'지우기'**
+  String get worktreeRemove;
+
+  /// No description provided for @worktreeClaudeWarning.
+  ///
+  /// In ko, this message translates to:
+  /// **'Claude Code 세션이 쓰는 폴더일 수 있습니다. 세션이 끝났는지 먼저 확인하세요.'**
+  String get worktreeClaudeWarning;
+
+  /// No description provided for @worktreeHeldTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}는 다른 worktree에 있습니다'**
+  String worktreeHeldTitle(String branch);
+
+  /// No description provided for @worktreeHeldMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'git은 한 브랜치를 한 worktree에서만 체크아웃하게 합니다. {path}에서 이 브랜치를 쓰고 있어 여기서는 전환할 수 없습니다. 그 폴더를 열어 작업하거나, 그 폴더의 브랜치를 풀고(분리된 HEAD) 여기로 전환하세요.'**
+  String worktreeHeldMessage(String path);
+
+  /// No description provided for @worktreeDetachAndSwitch.
+  ///
+  /// In ko, this message translates to:
+  /// **'풀고 여기로 전환'**
+  String get worktreeDetachAndSwitch;
+
+  /// No description provided for @worktreeDetachTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}의 브랜치를 풀까요?'**
+  String worktreeDetachTitle(String name);
+
+  /// No description provided for @worktreeDetachMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}를 {branch}에서 분리된 HEAD로 바꿉니다. 파일과 커밋은 그대로이고, {branch}를 다른 곳에서 체크아웃하거나 지울 수 있게 됩니다.'**
+  String worktreeDetachMessage(String path, String branch);
+
+  /// No description provided for @worktreeRemoveTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} worktree를 지울까요?'**
+  String worktreeRemoveTitle(String name);
+
+  /// No description provided for @worktreeRemoveMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'폴더 {path}를 지웁니다. 브랜치와 커밋은 저장소에 남습니다.'**
+  String worktreeRemoveMessage(String path);
+
+  /// No description provided for @worktreeRemoveForceTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋하지 않은 변경까지 지울까요?'**
+  String get worktreeRemoveForceTitle;
+
+  /// No description provided for @worktreeRemoveForceMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}에 커밋하지 않은 변경이 {count}개 있습니다. 지우면 되찾을 수 없습니다.'**
+  String worktreeRemoveForceMessage(String path, int count);
+
+  /// No description provided for @worktreeLockedMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}는 잠겨 있어 지울 수 없습니다. 먼저 git worktree unlock으로 잠금을 푸세요.'**
+  String worktreeLockedMessage(String path);
+
+  /// No description provided for @worktreeDeleteBranchTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'worktree도 지우고 브랜치를 삭제할까요?'**
+  String get worktreeDeleteBranchTitle;
+
+  /// No description provided for @worktreeDeleteBranchMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}는 {path}에 체크아웃되어 있어 그대로는 지울 수 없습니다. 그 worktree 폴더를 먼저 지우고 브랜치를 삭제합니다.'**
+  String worktreeDeleteBranchMessage(String branch, String path);
+
+  /// No description provided for @worktreeDeleteBranchDirty.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}는 {path}에 체크아웃되어 있고, 그 폴더에 커밋하지 않은 변경이 {count}개 있습니다. 그 폴더를 열어 정리한 뒤 다시 지우세요.'**
+  String worktreeDeleteBranchDirty(String branch, String path, int count);
+
+  /// No description provided for @worktreePrune.
+  ///
+  /// In ko, this message translates to:
+  /// **'사라진 폴더 기록 정리'**
+  String get worktreePrune;
+
+  /// No description provided for @doneWorktreeRemoved.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} worktree를 지웠습니다'**
+  String doneWorktreeRemoved(String name);
+
+  /// No description provided for @doneWorktreeDetached.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}의 브랜치를 풀었습니다'**
+  String doneWorktreeDetached(String name);
+
+  /// No description provided for @doneWorktreePruned.
+  ///
+  /// In ko, this message translates to:
+  /// **'worktree 기록을 정리했습니다'**
+  String get doneWorktreePruned;
+
+  /// No description provided for @cleanupWorktree.
+  ///
+  /// In ko, this message translates to:
+  /// **'worktree {name}도 함께 지웁니다'**
+  String cleanupWorktree(String name);
+
+  /// No description provided for @cleanupWorktreeBlocked.
+  ///
+  /// In ko, this message translates to:
+  /// **'worktree {name}에 커밋하지 않은 변경이 있거나 잠겨 있어 지울 수 없습니다'**
+  String cleanupWorktreeBlocked(String name);
 }
 
 class _AppLocalizationsDelegate

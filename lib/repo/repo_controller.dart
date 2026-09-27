@@ -10,6 +10,7 @@ import '../git/refs.dart';
 import '../git/remotes.dart';
 import '../git/status.dart';
 import '../git/tags.dart';
+import '../git/worktrees.dart';
 import '../github/models.dart';
 
 /// 병합·rebase가 끝나지 않은 상태.
@@ -34,6 +35,12 @@ class RepoController extends ChangeNotifier {
   List<Remote> remotes = const [];
   List<Tag> tags = const [];
   List<Stash> stashes = const [];
+
+  /// 이 저장소의 worktree 전부 (지금 연 폴더 포함). 첫 항목이 main worktree.
+  List<Worktree> worktrees = const [];
+
+  /// worktree 폴더별 커밋하지 않은 변경 수. [loadWorktreeChanges]로만 읽는다.
+  Map<String, int> worktreeChanges = const {};
 
   /// 마지막으로 원격을 확인한 때 (Fetch 버튼이든 자동 fetch든).
   DateTime? lastFetch;
@@ -138,6 +145,7 @@ class RepoController extends ChangeNotifier {
         runner.run(GitCommands.remotes, workingDirectory: root, quiet: true),
         runner.run(GitCommands.tags, workingDirectory: root, quiet: true),
         runner.run(GitCommands.stashList, workingDirectory: root, quiet: true),
+        runner.run(GitCommands.worktreeList, workingDirectory: root, quiet: true),
       ]);
       if (_disposed) return;
       if (results[3].ok) tags = _withPushed(Tag.parse(results[3].stdout));
@@ -145,6 +153,7 @@ class RepoController extends ChangeNotifier {
       if (results[0].ok) status = RepoStatus.parse(results[0].stdout);
       if (results[1].ok) branches = Branch.parse(results[1].stdout);
       if (results[2].ok) remotes = Remote.parse(results[2].stdout);
+      if (results[5].ok) worktrees = Worktree.parse(results[5].stdout);
       operation = _readOperation();
       defaultBranch = await _readDefaultBranch();
       headMergedAndGone = await _readHeadMergedAndGone();
@@ -314,6 +323,50 @@ class RepoController extends ChangeNotifier {
       await refresh();
       if (remoteTagNames != null) await loadRemoteTags();
     }
+  }
+
+  /// [w]가 지금 연 폴더인가.
+  bool isOpenWorktree(Worktree w) => _samePath(w.path, root);
+
+  /// [branch]를 체크아웃하고 있는 다른 worktree. git은 한 브랜치를 한
+  /// worktree에서만 체크아웃하게 하므로, 있으면 여기서 전환도 삭제도 안 된다.
+  Worktree? worktreeHolding(String branch) =>
+      worktrees.where((w) => w.branch == branch && !isOpenWorktree(w)).firstOrNull;
+
+  /// 다른 worktree들의 커밋하지 않은 변경 수를 읽는다. 폴더마다 `git status`를
+  /// 돌리므로 자동 새로 고침에는 넣지 않고, 목록을 보여 줄 때와 지우기 전에 부른다.
+  /// 읽지 못한 폴더(사라짐)는 빠진다.
+  Future<void> loadWorktreeChanges() async {
+    final result = <String, int>{};
+    for (final w in worktrees) {
+      if (w.bare || w.prunable || isOpenWorktree(w)) continue;
+      final r = await read(GitCommands.worktreeChanges(w.path));
+      if (r.ok) result[w.path] = r.stdout.split('\n').where((l) => l.trim().isNotEmpty).length;
+    }
+    if (_disposed) return;
+    worktreeChanges = result;
+    notifyListeners();
+  }
+
+  /// 경로 비교용 정규형. 브랜치 행마다 부르므로 폴더별로 한 번만 계산한다.
+  static final _normalized = <String, String>{};
+
+  static bool _samePath(String a, String b) {
+    String norm(String path) => _normalized[path] ??= _normalize(path);
+    return norm(a) == norm(b);
+  }
+
+  static String _normalize(String p) {
+    try {
+      p = Directory(p).resolveSymbolicLinksSync();
+    } on FileSystemException {
+      // 사라진 폴더는 그대로 비교한다.
+    }
+    p = p.replaceAll(r'\', '/');
+    while (p.length > 1 && p.endsWith('/')) {
+      p = p.substring(0, p.length - 1);
+    }
+    return Platform.isWindows || Platform.isMacOS ? p.toLowerCase() : p;
   }
 
   /// 지워도 되는 로컬 브랜치 (PLAN.md 3.4 P1): 원격 기본 브랜치에 병합됐거나

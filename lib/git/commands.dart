@@ -109,6 +109,24 @@ abstract final class GitCommands {
       ['git', 'push', '--force-with-lease', remote, branch];
 
   static List<String> setUpstream(String branch, String upstream) => ['git', 'branch', '-u', upstream, branch];
+
+  // --- worktree (3.4a) ----------------------------------------------------
+
+  static const worktreeList = ['git', 'worktree', 'list', '--porcelain'];
+
+  /// 폴더를 지운다. 커밋하지 않은 변경(추적 안 된 파일 포함)이 있으면 git이
+  /// 거부하고, [force]면 그 변경까지 지운다. 잠긴 worktree는 [force]로도 안 된다.
+  static List<String> worktreeRemove(String path, {bool force = false}) =>
+      ['git', 'worktree', 'remove', if (force) '--force', path];
+
+  /// 폴더가 사라진 worktree 기록을 지운다.
+  static const worktreePrune = ['git', 'worktree', 'prune'];
+
+  /// 그 worktree의 브랜치를 풀어(분리된 HEAD) 다른 곳에서 쓸 수 있게 한다.
+  static List<String> worktreeDetach(String path) => ['git', '-C', path, 'switch', '--detach'];
+
+  /// 그 worktree의 커밋하지 않은 변경 (한 줄에 파일 하나).
+  static List<String> worktreeChanges(String path) => ['git', '-C', path, 'status', '--porcelain'];
   static List<String> mergedInto(String base) =>
       ['git', 'branch', '--merged', base, '--format=%(refname:short)'];
 
