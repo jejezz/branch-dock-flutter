@@ -382,6 +382,7 @@
   "tagCheckVersion": "Version files match {tag}",
   "tagCheckVersionWrong": "The version is {version}. The version bump PR may not be merged yet.",
   "tagCheckFree": "{tag} doesn't exist yet",
+  "tagCheckFreeLocal": "{tag} exists only on this computer (an earlier push probably failed). It won't be recreated — only pushed.",
   "tagConfirmTitle": "Push tag {tag}?",
   "tagConfirmMessage": "Tags the merge commit on {branch} as {tag}. Pushing publishes the release, and tags aren't moved or deleted afterwards.",
   "tagConfirmPush": "Tag and push",

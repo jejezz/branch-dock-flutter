@@ -2387,6 +2387,12 @@ abstract class AppLocalizations {
   /// **'{tag} 태그가 아직 없다'**
   String tagCheckFree(String tag);
 
+  /// No description provided for @tagCheckFreeLocal.
+  ///
+  /// In ko, this message translates to:
+  /// **'{tag} 태그가 이 컴퓨터에만 있다 (이전 시도에서 push가 실패한 듯). 새로 만들지 않고 push만 한다.'**
+  String tagCheckFreeLocal(String tag);
+
   /// No description provided for @tagConfirmTitle.
   ///
   /// In ko, this message translates to:

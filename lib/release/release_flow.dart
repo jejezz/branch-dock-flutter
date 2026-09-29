@@ -447,14 +447,19 @@ class ReleaseFlow extends ChangeNotifier {
     final s = repo.status;
     final onDisk = detectVersionFiles(repo.root, custom: customVersionFile);
     final t = tag ?? '';
+    // 앞선 시도에서 태그만 만들어지고 push가 실패했으면 로컬 태그가 남는다.
+    // 그 태그가 지금 커밋을 가리키고 원격에 없으면 새로 만들지 않고 push만 잇는다.
+    final head = await repo.read(GitCommands.headCommit);
+    final local = repo.tags.where((x) => x.name == t).firstOrNull;
+    final onRemote = repo.remoteTagNames?.contains(t) ?? false;
+    reusesLocalTag = local != null && !onRemote && head.ok && local.commit == head.stdout.trim();
     tagChecks
       // 바로 커밋 방식에는 PR이 없다. 버전 올림 커밋은 태그와 함께 push하므로
       // ahead는 괜찮고, 원격에 내가 없는 커밋(behind)만 없으면 된다.
       ..[TagCheck.prMerged] = direct || (pr?.merged ?? false)
       ..[TagCheck.synced] = s.head == defaultBranch && syncIssue(allowAhead: direct) == null
       ..[TagCheck.versionMatches] = onDisk.isEmpty || onDisk.every((f) => f.version.name == next?.name)
-      ..[TagCheck.tagFree] =
-          !repo.tags.any((x) => x.name == t) && !(repo.remoteTagNames?.contains(t) ?? false);
+      ..[TagCheck.tagFree] = !onRemote && (local == null || reusesLocalTag);
     notifyListeners();
   }
 
@@ -466,10 +471,13 @@ class ReleaseFlow extends ChangeNotifier {
 
   String get tagMessage => '$displayName ${next?.name ?? ''}';
 
+  /// 같은 이름의 로컬 태그가 이미 지금 커밋에 있다 — 태그 생성은 건너뛰고 push만 한다.
+  bool reusesLocalTag = false;
+
   List<List<String>> get tagCommands => [
         // 바로 커밋 방식은 버전 올림 커밋을 태그와 함께 올린다.
         if (direct) GitCommands.publish(remote, defaultBranch),
-        GitCommands.createTag(tag ?? '', message: tagMessage),
+        if (!reusesLocalTag) GitCommands.createTag(tag ?? '', message: tagMessage),
         GitCommands.pushTags(remote, [tag ?? '']),
       ];
 

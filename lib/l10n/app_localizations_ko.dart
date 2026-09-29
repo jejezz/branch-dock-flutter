@@ -1309,6 +1309,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String tagCheckFreeLocal(String tag) {
+    return '$tag 태그가 이 컴퓨터에만 있다 (이전 시도에서 push가 실패한 듯). 새로 만들지 않고 push만 한다.';
+  }
+
+  @override
   String tagConfirmTitle(String tag) {
     return '$tag 태그를 push할까요?';
   }

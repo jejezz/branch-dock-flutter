@@ -235,6 +235,7 @@ abstract final class GitCommands {
   // --- 릴리스 (3.8) -------------------------------------------------------
 
   /// 마지막 태그 (없으면 실패).
+  static const headCommit = ['git', 'rev-parse', 'HEAD'];
   static const lastTag = ['git', 'describe', '--tags', '--abbrev=0'];
   static List<String> log({String? since, String until = 'HEAD'}) =>
       ['git', 'log', '--format=$commitFormat', since == null ? until : '$since..$until'];

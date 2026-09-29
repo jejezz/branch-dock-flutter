@@ -773,7 +773,11 @@ class _TagStep extends StatelessWidget {
         label: l10n.tagCheckVersion(tag),
         detail: c(TagCheck.versionMatches) == false ? l10n.tagCheckVersionWrong(flow.defaultBranchVersion) : null,
       ),
-      _CheckRow(ok: c(TagCheck.tagFree), label: l10n.tagCheckFree(tag)),
+      _CheckRow(
+        ok: c(TagCheck.tagFree),
+        label: l10n.tagCheckFree(tag),
+        detail: flow.reusesLocalTag ? l10n.tagCheckFreeLocal(tag) : null,
+      ),
       const SizedBox(height: AppSpacing.md),
       CommandPreview(commands: flow.tagCommands),
       const SizedBox(height: AppSpacing.sm),

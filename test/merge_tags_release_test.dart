@@ -188,4 +188,25 @@ void main() {
     flow.dispose();
     repo.dispose();
   });
+
+  test('tag checks: a local-only tag on HEAD is reused, not recreated', () async {
+    final repo = await setUpRepo();
+    final flow = ReleaseFlow(repo, ghReady: false);
+    await flow.runChecks();
+    flow.chooseVersion(SemVer.tryParse('0.2.0+4')!);
+    await repo.execute(GitCommands.createTag('v0.2.0', message: 'a 0.2.0'));
+    await flow.runTagChecks();
+    expect(flow.tagChecks[TagCheck.tagFree], isTrue);
+    expect(flow.reusesLocalTag, isTrue);
+    expect(flow.tagCommands, [GitCommands.pushTags('origin', ['v0.2.0'])]);
+
+    // 다른 커밋을 가리키는 같은 이름의 태그는 그대로 실패한다.
+    await commitFile(repo.root, 'c.txt', 'c\n', 'feat: c');
+    await repo.refresh();
+    await flow.runTagChecks();
+    expect(flow.tagChecks[TagCheck.tagFree], isFalse);
+    expect(flow.reusesLocalTag, isFalse);
+    flow.dispose();
+    repo.dispose();
+  });
 }

@@ -1387,6 +1387,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tagCheckFreeLocal(String tag) {
+    return '$tag exists only on this computer (an earlier push probably failed). It won\'t be recreated — only pushed.';
+  }
+
+  @override
   String tagConfirmTitle(String tag) {
     return 'Push tag $tag?';
   }
