@@ -16,6 +16,7 @@ class RepoPrefs {
   static const _recentKey = 'recent_repos';
   static const _editorKey = 'editor_command';
   static const _boundsKey = 'window_bounds';
+  static const _pixelBoundsKey = 'window_bounds_px';
   static const maxRecent = 10;
 
   List<String> get recent => _prefs.getStringList(_recentKey) ?? const [];
@@ -75,4 +76,20 @@ class RepoPrefs {
 
   Future<void> setWindowBounds(Rect r) =>
       _prefs.setStringList(_boundsKey, [r.left, r.top, r.width, r.height].map((d) => d.toStringAsFixed(0)).toList());
+
+  /// Windows용: 배율이 다른 모니터 사이에서도 어긋나지 않도록 물리 픽셀로 저장한다.
+  Rect? get windowPixelBounds => _readRect(_pixelBoundsKey);
+
+  Future<void> setWindowPixelBounds(Rect r) => _writeRect(_pixelBoundsKey, r);
+
+  Rect? _readRect(String key) {
+    final v = _prefs.getStringList(key);
+    if (v == null || v.length != 4) return null;
+    final n = v.map(double.tryParse).toList();
+    if (n.contains(null)) return null;
+    return Rect.fromLTWH(n[0]!, n[1]!, n[2]!, n[3]!);
+  }
+
+  Future<void> _writeRect(String key, Rect r) =>
+      _prefs.setStringList(key, [r.left, r.top, r.width, r.height].map((d) => d.toStringAsFixed(0)).toList());
 }
