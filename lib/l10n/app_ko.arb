@@ -820,6 +820,7 @@
   },
   "checkSynced": "받을 커밋도 보낼 커밋도 없다",
   "checkGitHub": "GitHub 원격과 gh 로그인",
+  "checkGitBash": "Git for Windows의 bash (버전 올림 스크립트용)",
   "checkChangesSince": "{tag} 이후 커밋 {count}개",
   "@checkChangesSince": {
     "placeholders": {

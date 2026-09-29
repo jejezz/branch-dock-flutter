@@ -19,7 +19,7 @@ import 'version_files.dart';
 enum ReleaseStep { check, version, pr, merge, tag, notes, ci, done }
 
 /// ① 점검 항목.
-enum ReleaseCheck { cleanTree, onDefaultBranch, synced, github, hasChanges }
+enum ReleaseCheck { cleanTree, onDefaultBranch, synced, github, hasChanges, bash }
 
 /// ⑤ 태그 전 점검 항목.
 enum TagCheck { prMerged, synced, versionMatches, tagFree }
@@ -81,6 +81,9 @@ class ReleaseFlow extends ChangeNotifier {
       File('${repo.root}/scripts/bump-version.sh').existsSync() &&
       files.any((f) => f.kind == VersionFileKind.pubspec);
 
+  /// Windows에서 bump-version.sh를 돌리려면 Git for Windows의 bash가 있어야 한다.
+  bool get needsGitBash => Platform.isWindows && usesBumpScript;
+
   void setDirect(bool value) {
     direct = value;
     notifyListeners();
@@ -140,7 +143,8 @@ class ReleaseFlow extends ChangeNotifier {
   List<String> get buildRisks => _risks;
   bool get ciMode => workflow?.onTags ?? false;
   bool get checksPassed =>
-      ReleaseCheck.values.every((c) => (direct && c == ReleaseCheck.github) || (checks[c] ?? false));
+      ReleaseCheck.values.every((c) =>
+          (direct && c == ReleaseCheck.github) || (c == ReleaseCheck.bash && !needsGitBash) || (checks[c] ?? false));
   bool get tagChecksPassed => TagCheck.values.every((c) => tagChecks[c] ?? false);
   String get defaultBranch => repo.defaultBranch ?? 'main';
   String get remote => repo.githubRemote?.name ?? repo.defaultRemote ?? 'origin';
@@ -246,7 +250,8 @@ class ReleaseFlow extends ChangeNotifier {
       ..[ReleaseCheck.onDefaultBranch] = s.head == defaultBranch
       ..[ReleaseCheck.synced] = syncIssue() == null
       ..[ReleaseCheck.github] = ghReady && repo.githubRemote != null
-      ..[ReleaseCheck.hasChanges] = releaseCommits.isNotEmpty;
+      ..[ReleaseCheck.hasChanges] = releaseCommits.isNotEmpty
+      ..[ReleaseCheck.bash] = !needsGitBash || repo.runner.gitBashPath() != null;
     loading = false;
     notifyListeners();
   }
