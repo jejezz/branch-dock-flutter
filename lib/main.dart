@@ -38,8 +38,10 @@ Future<void> main() async {
   if (_isDesktop) {
     await windowManager.ensureInitialized();
     final saved = prefs.windowBounds;
-    const options = WindowOptions(
-      size: _defaultSize,
+    // Windows는 runner(main.cpp)가 첫 크기와 위치를 정한다. Dart 쪽 setSize/center는
+    // devicePixelRatio 오차로 창을 화면 오른쪽 밖에 놓을 수 있다.
+    final options = WindowOptions(
+      size: Platform.isWindows ? null : _defaultSize,
       minimumSize: _minimumSize,
       title: AppIdentity.displayName,
     );
@@ -47,7 +49,7 @@ Future<void> main() async {
       // 사용자가 편집기 옆에 맞춰 둔 크기와 위치를 되살린다.
       if (saved != null && saved.width >= _minimumSize.width && saved.height >= _minimumSize.height) {
         await windowManager.setBounds(saved);
-      } else {
+      } else if (!Platform.isWindows) {
         await windowManager.center();
       }
       await windowManager.show();

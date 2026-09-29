@@ -25,8 +25,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);
-  Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1280, 720);
+  // 첫 실행 창(440x960, UI_UX.md §2)을 주 모니터 작업 영역 가운데에 둔다.
+  // Dart 쪽 center()는 devicePixelRatio를 잘못 읽으면 화면 밖으로 밀려난다.
+  const POINT zero = {0, 0};
+  HMONITOR primary = MonitorFromPoint(zero, MONITOR_DEFAULTTOPRIMARY);
+  MONITORINFO info = {sizeof(info)};
+  GetMonitorInfo(primary, &info);
+  const double scale = FlutterDesktopGetDpiForMonitor(primary) / 96.0;
+  const double area_w = (info.rcWork.right - info.rcWork.left) / scale;
+  const double area_h = (info.rcWork.bottom - info.rcWork.top) / scale;
+  const double win_w = area_w < 440 ? area_w : 440;
+  const double win_h = area_h < 960 ? area_h : 960;
+  Win32Window::Point origin(
+      static_cast<unsigned int>(info.rcWork.left / scale + (area_w - win_w) / 2),
+      static_cast<unsigned int>(info.rcWork.top / scale + (area_h - win_h) / 2));
+  Win32Window::Size size(static_cast<unsigned int>(win_w),
+                         static_cast<unsigned int>(win_h));
   if (!window.Create(L"Branch Dock", origin, size)) {
     return EXIT_FAILURE;
   }
