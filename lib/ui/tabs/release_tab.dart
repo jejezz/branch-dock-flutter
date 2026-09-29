@@ -457,6 +457,7 @@ class _CheckStep extends StatelessWidget {
       ),
       _SyncRow(flow: flow, ok: c(ReleaseCheck.synced), label: l10n.checkSynced, onRecheck: flow.runChecks),
       if (!flow.direct) _CheckRow(ok: c(ReleaseCheck.github), label: l10n.checkGitHub),
+      if (flow.needsGitBash) _CheckRow(ok: c(ReleaseCheck.bash), label: l10n.checkGitBash),
       // 바로 커밋 방식 (PLAN.md 3.8.3 P1): 혼자 쓰는 저장소, 또는 GitHub가 아닌 저장소.
       SwitchListTile(
         dense: true,

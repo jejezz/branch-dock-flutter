@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -56,8 +55,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTagline => 'A desktop companion for Git and the GitHub CLI';
 
   @override
-  String get aboutDescription =>
-      'Dock it beside your editor and handle branches, tags, merges, pull/push, remotes and releases with buttons that show the exact git and gh commands they run.';
+  String get aboutDescription => 'Dock it beside your editor and handle branches, tags, merges, pull/push, remotes and releases with buttons that show the exact git and gh commands they run.';
 
   @override
   String get homeEmptyTitle => 'Choose a repository to get started';
@@ -108,8 +106,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commandPreviewLabel => 'Command to run';
 
   @override
-  String get startDropHint =>
-      'You can also drop a git repository folder on this window.';
+  String get startDropHint => 'You can also drop a git repository folder on this window.';
 
   @override
   String get startRecent => 'Recent repositories';
@@ -131,12 +128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get envTitle => 'git and GitHub CLI';
 
   @override
-  String get envGitRequired =>
-      'Branch Dock runs the git installed on your computer. Install git first.';
+  String get envGitRequired => 'Branch Dock runs the git installed on your computer. Install git first.';
 
   @override
-  String get envGitOnlyNote =>
-      'Branches, pull and push work without gh. Publishing to GitHub, pull requests and releases need gh and a login.';
+  String get envGitOnlyNote => 'Branches, pull and push work without gh. Publishing to GitHub, pull requests and releases need gh and a login.';
 
   @override
   String envVersion(String version) {
@@ -161,12 +156,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get envRecheck => 'Check again';
 
   @override
-  String get envGhMissing =>
-      'Needs the GitHub CLI (gh), which isn\'t installed. See Check git and gh in the menu.';
+  String get envGhMissing => 'Needs the GitHub CLI (gh), which isn\'t installed. See Check git and gh in the menu.';
 
   @override
-  String get envGhLoggedOut =>
-      'Log in to gh first: run gh auth login in a terminal.';
+  String get envGhLoggedOut => 'Log in to gh first: run gh auth login in a terminal.';
 
   @override
   String get headerOpenFolder => 'Open this folder in the editor';
@@ -175,8 +168,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vscodeMissingTitle => 'VS Code not found';
 
   @override
-  String get vscodeMissingMessage =>
-      'Install VS Code to open the folder where the current branch is checked out with this button. To use another editor, enter its command (cursor, zed, …) under ‘Editor for opening files…’ in the repository menu.';
+  String get vscodeMissingMessage => 'Install VS Code to open the folder where the current branch is checked out with this button. To use another editor, enter its command (cursor, zed, …) under ‘Editor for opening files…’ in the repository menu.';
 
   @override
   String get vscodeDownload => 'Get VS Code';
@@ -191,8 +183,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headerNoUpstream => 'Not on remote';
 
   @override
-  String get headerNoUpstreamTooltip =>
-      'This branch isn\'t on the remote yet. Publish it to push it there.';
+  String get headerNoUpstreamTooltip => 'This branch isn\'t on the remote yet. Publish it to push it there.';
 
   @override
   String headerAheadTooltip(int count) {
@@ -259,22 +250,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pullModeMerge => 'Merge (default)';
 
   @override
-  String get pullModeMergeWhen =>
-      'If both sides have new commits, joins them with a merge commit. The safest choice.';
+  String get pullModeMergeWhen => 'If both sides have new commits, joins them with a merge commit. The safest choice.';
 
   @override
   String get pullModeRebase => 'Rebase';
 
   @override
-  String get pullModeRebaseWhen =>
-      'Moves your commits on top of the new ones to keep history in one line.';
+  String get pullModeRebaseWhen => 'Moves your commits on top of the new ones to keep history in one line.';
 
   @override
   String get pullModeFastForward => 'Fast-forward only';
 
   @override
-  String get pullModeFastForwardWhen =>
-      'Only pulls when you have no commits of your own; stops and tells you if history has split.';
+  String get pullModeFastForwardWhen => 'Only pulls when you have no commits of your own; stops and tells you if history has split.';
 
   @override
   String get operationAbort => 'Abort';
@@ -289,12 +277,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get operationAbortTitle => 'Abort the operation in progress?';
 
   @override
-  String get operationAbortMergeMessage =>
-      'Goes back to before the merge started. Any conflict resolutions you\'ve made are lost.';
+  String get operationAbortMergeMessage => 'Goes back to before the merge started. Any conflict resolutions you\'ve made are lost.';
 
   @override
-  String get operationAbortRebaseMessage =>
-      'Goes back to before the rebase started. Any conflict resolutions you\'ve made are lost.';
+  String get operationAbortRebaseMessage => 'Goes back to before the rebase started. Any conflict resolutions you\'ve made are lost.';
 
   @override
   String bannerConflicts(int count) {
@@ -405,8 +391,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changesCleanTitle => 'Nothing to commit';
 
   @override
-  String get changesCleanMessage =>
-      'Save a file in your editor and it shows up here.';
+  String get changesCleanMessage => 'Save a file in your editor and it shows up here.';
 
   @override
   String get branchesTitle => 'Branches';
@@ -445,8 +430,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get branchesUnbornTitle => 'No commits yet';
 
   @override
-  String get branchesUnbornMessage =>
-      'Make the first commit, then you can create branches.';
+  String get branchesUnbornMessage => 'Make the first commit, then you can create branches.';
 
   @override
   String get branchesForceDeleteTitle => 'This branch isn\'t merged';
@@ -474,15 +458,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get branchNameEmpty => 'Enter a name';
 
   @override
-  String get branchNameInvalidCharacter =>
-      'Spaces and ~ ^ : ? * [ \\ aren\'t allowed';
+  String get branchNameInvalidCharacter => 'Spaces and ~ ^ : ? * [ \\ aren\'t allowed';
 
   @override
   String get branchNameStartsWithDash => 'Can\'t start with -';
 
   @override
-  String get branchNameInvalidSequence =>
-      'Can\'t contain .. or //, a part starting with ., or a part ending in .lock';
+  String get branchNameInvalidSequence => 'Can\'t contain .. or //, a part starting with ., or a part ending in .lock';
 
   @override
   String get branchNameInvalidEdge => 'Can\'t start with / or end with / or .';
@@ -530,22 +512,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remotesEmptyTitle => 'This repository isn\'t on GitHub yet';
 
   @override
-  String get remotesEmptyMessage =>
-      'Creates a new repository on GitHub and pushes your current branch.';
+  String get remotesEmptyMessage => 'Creates a new repository on GitHub and pushes your current branch.';
 
   @override
   String get remotesPublishToGitHub => 'Publish to GitHub';
 
   @override
-  String get remotesPublishAlsoToGitHub =>
-      'Also publish to GitHub (adds a remote)';
+  String get remotesPublishAlsoToGitHub => 'Also publish to GitHub (adds a remote)';
 
   @override
   String get remotesPublishConfirm => 'Create and publish';
 
   @override
-  String get remotesNotGitHubNote =>
-      'Not a GitHub repository, so pull requests, releases and Actions aren\'t available (gh is GitHub-only).';
+  String get remotesNotGitHubNote => 'Not a GitHub repository, so pull requests, releases and Actions aren\'t available (gh is GitHub-only).';
 
   @override
   String get remotesNameLabel => 'Remote name';
@@ -569,8 +548,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishNameLabel => 'Repository name';
 
   @override
-  String get publishNameHelper =>
-      'Use org/name to create it in an organization';
+  String get publishNameHelper => 'Use org/name to create it in an organization';
 
   @override
   String get publishNameInvalid => 'Letters, numbers, - _ . only';
@@ -585,15 +563,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishPublic => 'Public';
 
   @override
-  String get publishNoCommitsNote =>
-      'There are no commits yet, so this only creates the repository. Push after your first commit.';
+  String get publishNoCommitsNote => 'There are no commits yet, so this only creates the repository. Push after your first commit.';
 
   @override
   String get editorTitle => 'Editor for opening files';
 
   @override
-  String get editorMessage =>
-      'Enter an editor command to open files and the repository folder with it. Leave it empty to open files with the system default app and the folder with VS Code.';
+  String get editorMessage => 'Enter an editor command to open files and the repository folder with it. Leave it empty to open files with the system default app and the folder with VS Code.';
 
   @override
   String get editorLabel => 'Editor command';
@@ -682,28 +658,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorGeneric => 'The command failed. See the output below.';
 
   @override
-  String get errorPushRejected =>
-      'Push was rejected because the remote has commits you don\'t have. Pull first.';
+  String get errorPushRejected => 'Push was rejected because the remote has commits you don\'t have. Pull first.';
 
   @override
-  String get errorAuthFailed =>
-      'Authentication failed. Check that you\'re logged in with gh auth login, or that your SSH key is registered.';
+  String get errorAuthFailed => 'Authentication failed. Check that you\'re logged in with gh auth login, or that your SSH key is registered.';
 
   @override
-  String get errorConflict =>
-      'There are conflicts. Open the conflicted files from Changes, fix them, then mark them resolved.';
+  String get errorConflict => 'There are conflicts. Open the conflicted files from Changes, fix them, then mark them resolved.';
 
   @override
-  String get errorLocalChanges =>
-      'Stopped because uncommitted changes would be overwritten. Commit them first.';
+  String get errorLocalChanges => 'Stopped because uncommitted changes would be overwritten. Commit them first.';
 
   @override
-  String get errorNotFastForward =>
-      'History has split, so it can\'t fast-forward. Change the pull method to merge or rebase.';
+  String get errorNotFastForward => 'History has split, so it can\'t fast-forward. Change the pull method to merge or rebase.';
 
   @override
-  String get errorProtectedBranch =>
-      'This branch is protected, so you can\'t push to it directly. Push a new branch and open a pull request.';
+  String get errorProtectedBranch => 'This branch is protected, so you can\'t push to it directly. Push a new branch and open a pull request.';
 
   @override
   String get errorBranchNotMerged => 'This branch has unmerged commits.';
@@ -715,15 +685,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorAlreadyExists => 'That name already exists.';
 
   @override
-  String get errorRepositoryNotFound =>
-      'Remote repository not found. Check the URL and your access.';
+  String get errorRepositoryNotFound => 'Remote repository not found. Check the URL and your access.';
 
   @override
   String get errorNetwork => 'Can\'t reach the server. Check your network.';
 
   @override
-  String get errorNotInstalled =>
-      'Program not found. See Check git and gh in the menu.';
+  String get errorNotInstalled => 'Program not found. See Check git and gh in the menu.';
 
   @override
   String errorBranchInOtherWorktree(String path) {
@@ -797,8 +765,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpCaptionAfterPull => 'After pull — your main catches up';
 
   @override
-  String get helpCaptionAheadOne =>
-      'feature is one commit ahead of origin/feature (↑1)';
+  String get helpCaptionAheadOne => 'feature is one commit ahead of origin/feature (↑1)';
 
   @override
   String get helpLinkBranchingBasics => 'Pro Git — Basic Branching and Merging';
@@ -813,31 +780,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpFetchVsPullTitle => 'Fetch vs. pull';
 
   @override
-  String get helpFetchVsPullWord =>
-      'To fetch is to go and get something; to pull is to draw it toward you.';
+  String get helpFetchVsPullWord => 'To fetch is to go and get something; to pull is to draw it toward you.';
 
   @override
-  String get helpFetchVsPullInGit =>
-      'Fetch downloads new commits from the remote (GitHub) and only moves the remote labels such as origin/main. Your branch and files stay as they are. Pull does a fetch and then joins those commits into your branch.';
+  String get helpFetchVsPullInGit => 'Fetch downloads new commits from the remote (GitHub) and only moves the remote labels such as origin/main. Your branch and files stay as they are. Pull does a fetch and then joins those commits into your branch.';
 
   @override
-  String get helpFetchVsPullWhy =>
-      'Fetch when you want to see what changed first; it\'s always safe. Pull when you want to catch up right away. Pull can stop if you have uncommitted changes, so commit first.';
+  String get helpFetchVsPullWhy => 'Fetch when you want to see what changed first; it\'s always safe. Pull when you want to catch up right away. Pull can stop if you have uncommitted changes, so commit first.';
 
   @override
   String get helpUpstreamTitle => 'Upstream and origin';
 
   @override
-  String get helpUpstreamWord =>
-      'Upstream is the part of a river the water comes from. Origin is where something comes from.';
+  String get helpUpstreamWord => 'Upstream is the part of a river the water comes from. Origin is where something comes from.';
 
   @override
-  String get helpUpstreamInGit =>
-      'origin is the default name for the remote you cloned from, usually GitHub. The remote branch your branch is paired with (such as origin/feature) is its upstream. The ↑↓ numbers compare your branch with it.';
+  String get helpUpstreamInGit => 'origin is the default name for the remote you cloned from, usually GitHub. The remote branch your branch is paired with (such as origin/feature) is its upstream. The ↑↓ numbers compare your branch with it.';
 
   @override
-  String get helpUpstreamWhy =>
-      'With an upstream, plain Push and Pull know where to go. A new branch has none, so the first push is a Publish (git push -u), which sets it.';
+  String get helpUpstreamWhy => 'With an upstream, plain Push and Pull know where to go. A new branch has none, so the first push is a Publish (git push -u), which sets it.';
 
   @override
   String get helpFastForwardTitle => 'Fast-forward';
@@ -846,42 +807,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpFastForwardWord => 'Winding a tape or video quickly forward.';
 
   @override
-  String get helpFastForwardInGit =>
-      'When your branch is simply behind and hasn\'t split off, git makes no new commit; it just moves the branch label forward to the latest commit. It only winds forward along commits that already exist.';
+  String get helpFastForwardInGit => 'When your branch is simply behind and hasn\'t split off, git makes no new commit; it just moves the branch label forward to the latest commit. It only winds forward along commits that already exist.';
 
   @override
-  String get helpFastForwardWhy =>
-      'History stays in one clean line and there\'s nothing to conflict. If both sides have different new commits (history has split) it can\'t wind forward, so fast-forward only stops and you need a merge or rebase. A push rejected as non-fast-forward fails for the same reason.';
+  String get helpFastForwardWhy => 'History stays in one clean line and there\'s nothing to conflict. If both sides have different new commits (history has split) it can\'t wind forward, so fast-forward only stops and you need a merge or rebase. A push rejected as non-fast-forward fails for the same reason.';
 
   @override
   String get helpMergeCommitTitle => 'Merge commit';
 
   @override
-  String get helpMergeCommitWord =>
-      'To merge is to join; two roads becoming one.';
+  String get helpMergeCommitWord => 'To merge is to join; two roads becoming one.';
 
   @override
-  String get helpMergeCommitInGit =>
-      'Keeps both lines of history as they are and adds one new commit whose parents are both of them. The history shows exactly what was joined and when.';
+  String get helpMergeCommitInGit => 'Keeps both lines of history as they are and adds one new commit whose parents are both of them. The history shows exactly what was joined and when.';
 
   @override
-  String get helpMergeCommitWhy =>
-      'It never rewrites commits you\'ve already shared, so it\'s the safest. Good for branches you share with others. The trade-off is extra merge commits in the history.';
+  String get helpMergeCommitWhy => 'It never rewrites commits you\'ve already shared, so it\'s the safest. Good for branches you share with others. The trade-off is extra merge commits in the history.';
 
   @override
   String get helpRebaseTitle => 'Rebase';
 
   @override
-  String get helpRebaseWord =>
-      'Base is what something stands on; to rebase is to set it on a new base.';
+  String get helpRebaseWord => 'Base is what something stands on; to rebase is to set it on a new base.';
 
   @override
-  String get helpRebaseInGit =>
-      'Takes your commits off and replays them one by one on top of the commits you just got. The changes are the same, but they become new commits (C\', D\') and the history is a single line.';
+  String get helpRebaseInGit => 'Takes your commits off and replays them one by one on top of the commits you just got. The changes are the same, but they become new commits (C\', D\') and the history is a single line.';
 
   @override
-  String get helpRebaseWhy =>
-      'Keeps history clean with no merge commits. Use it only on commits you haven\'t pushed yet: rebasing pushed commits makes your history differ from everyone else\'s and needs a force push.';
+  String get helpRebaseWhy => 'Keeps history clean with no merge commits. Use it only on commits you haven\'t pushed yet: rebasing pushed commits makes your history differ from everyone else\'s and needs a force push.';
 
   @override
   String get tabTags => 'Tags';
@@ -922,26 +875,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mergeFastForward => 'Fast-forward';
 
   @override
-  String get mergeFastForwardWhen =>
-      'Just moves the label forward, no new commit. History stays in one line.';
+  String get mergeFastForwardWhen => 'Just moves the label forward, no new commit. History stays in one line.';
 
   @override
-  String get mergeFastForwardDisabled =>
-      'Not possible: the current branch has its own new commits (history has split).';
+  String get mergeFastForwardDisabled => 'Not possible: the current branch has its own new commits (history has split).';
 
   @override
   String get mergeMergeCommit => 'Merge commit';
 
   @override
-  String get mergeMergeCommitWhen =>
-      'Keeps both histories and joins them with a merge commit. The safest choice.';
+  String get mergeMergeCommitWhen => 'Keeps both histories and joins them with a merge commit. The safest choice.';
 
   @override
   String get mergeSquash => 'Squash';
 
   @override
-  String get mergeSquashWhen =>
-      'Squashes the branch\'s commits into one. One feature, one commit.';
+  String get mergeSquashWhen => 'Squashes the branch\'s commits into one. One feature, one commit.';
 
   @override
   String mergeSquashNote(String source) {
@@ -1015,8 +964,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagsEmptyTitle => 'No tags yet';
 
   @override
-  String get tagsEmptyMessage =>
-      'A tag is a name for a specific commit, usually a release version like v1.0.0.';
+  String get tagsEmptyMessage => 'A tag is a name for a specific commit, usually a release version like v1.0.0.';
 
   @override
   String tagsPushAfter(String remote) {
@@ -1033,8 +981,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagNameInvalid => 'No spaces, .., or ~ ^ : ? * [ \\';
 
   @override
-  String get tagNameNotSemVer =>
-      'Not a version (v1.2.3). Allowed, but releases should use versions.';
+  String get tagNameNotSemVer => 'Not a version (v1.2.3). Allowed, but releases should use versions.';
 
   @override
   String get tagNameMissingV => 'Release tags usually start with v (v1.2.3).';
@@ -1101,8 +1048,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prNotGitHubTitle => 'Not a GitHub repository';
 
   @override
-  String get prNotGitHubMessage =>
-      'Pull requests need a GitHub repository — gh only works with GitHub.';
+  String get prNotGitHubMessage => 'Pull requests need a GitHub repository — gh only works with GitHub.';
 
   @override
   String get prGhRequiredTitle => 'Needs gh';
@@ -1114,8 +1060,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prOnDefaultTitle => 'You\'re on the default branch';
 
   @override
-  String get prOnDefaultMessage =>
-      'Pull requests come from a work branch. Create one in Branches.';
+  String get prOnDefaultMessage => 'Pull requests come from a work branch. Create one in Branches.';
 
   @override
   String prNoneTitle(String head) {
@@ -1167,12 +1112,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prReviewRequired => 'Review required';
 
   @override
-  String get prBlockedDraft =>
-      'Draft pull requests can\'t be merged. Mark it ready for review on GitHub.';
+  String get prBlockedDraft => 'Draft pull requests can\'t be merged. Mark it ready for review on GitHub.';
 
   @override
-  String get prBlockedConflict =>
-      'It conflicts with the base branch. Merge the base branch in and resolve the conflicts.';
+  String get prBlockedConflict => 'It conflicts with the base branch. Merge the base branch in and resolve the conflicts.';
 
   @override
   String prBlockedChecks(String names) {
@@ -1191,8 +1134,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get prBlockedReview =>
-      'A review may be required. If merging is refused, check on GitHub.';
+  String get prBlockedReview => 'A review may be required. If merging is refused, check on GitHub.';
 
   @override
   String get prMethodMerge => 'Merge commit';
@@ -1232,12 +1174,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get releaseNoTags => 'No releases yet';
 
   @override
-  String get releaseIntro =>
-      'Walks you through version bump → PR → merge → tag → CI.';
+  String get releaseIntro => 'Walks you through version bump → PR → merge → tag → CI.';
 
   @override
-  String get releaseNeedsGitHub =>
-      'The release wizard needs a GitHub repository. You can still create tags in Tags.';
+  String get releaseNeedsGitHub => 'The release wizard needs a GitHub repository. You can still create tags in Tags.';
 
   @override
   String get releaseStart => 'New release';
@@ -1262,8 +1202,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get releaseCancelAfterTag =>
-      'The tag is already pushed. This only closes the wizard; check CI and the release on GitHub.';
+  String get releaseCancelAfterTag => 'The tag is already pushed. This only closes the wizard; check CI and the release on GitHub.';
 
   @override
   String releaseDone(String tag) {
@@ -1332,6 +1271,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkGitHub => 'GitHub remote and gh login';
 
   @override
+  String get checkGitBash => 'Git for Windows bash (for the version bump script)';
+
+  @override
   String checkChangesSince(int count, String tag) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1346,8 +1288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkFirstRelease => 'This is the first release';
 
   @override
-  String get checkNoWorkflow =>
-      'No workflow runs on tags, so the app creates the GitHub release.';
+  String get checkNoWorkflow => 'No workflow runs on tags, so the app creates the GitHub release.';
 
   @override
   String checkWorkflowCi(String file) {
@@ -1363,8 +1304,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manualBuildTitle => 'Build check before tagging (recommended)';
 
   @override
-  String get manualBuildWhy =>
-      'Files that affect the build changed since the last release. Check that every platform builds before tagging. A manual run never publishes.';
+  String get manualBuildWhy => 'Files that affect the build changed since the last release. Check that every platform builds before tagging. A manual run never publishes.';
 
   @override
   String get manualBuildStart => 'Run build check';
@@ -1521,12 +1461,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get runSkipped => 'skipped';
 
   @override
-  String get helpCaptionAfterSquash =>
-      'After a squash merge — one new commit S on main';
+  String get helpCaptionAfterSquash => 'After a squash merge — one new commit S on main';
 
   @override
-  String get helpCaptionTag =>
-      'v1.0.0 and v1.1.0 stay put; main keeps moving forward';
+  String get helpCaptionTag => 'v1.0.0 and v1.1.0 stay put; main keeps moving forward';
 
   @override
   String get helpLinkGitHubMergeMethods => 'GitHub — About merge methods';
@@ -1541,12 +1479,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpSquashWord => 'To press something flat.';
 
   @override
-  String get helpSquashInGit =>
-      'Presses the branch\'s commits into a single commit on the target branch. The changes are the same; only the number of commits becomes one.';
+  String get helpSquashInGit => 'Presses the branch\'s commits into a single commit on the target branch. The changes are the same; only the number of commits becomes one.';
 
   @override
-  String get helpSquashWhy =>
-      'Keeps work-in-progress commits like \'fix typo\' out of the main history: one feature, one commit. Common when merging pull requests. The original commits don\'t reach the default branch, so delete the merged branch instead of reusing it.';
+  String get helpSquashWhy => 'Keeps work-in-progress commits like \'fix typo\' out of the main history: one feature, one commit. Common when merging pull requests. The original commits don\'t reach the default branch, so delete the merged branch instead of reusing it.';
 
   @override
   String get helpTagTitle => 'Tags (annotated and lightweight)';
@@ -1555,19 +1491,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpTagWord => 'A tag is a label you attach to something.';
 
   @override
-  String get helpTagInGit =>
-      'A name attached to one commit. A branch label moves forward with new commits; a tag stays on its commit. An annotated tag also stores who made it, when, and a message; a lightweight tag stores only the name.';
+  String get helpTagInGit => 'A name attached to one commit. A branch label moves forward with new commits; a tag stays on its commit. An annotated tag also stores who made it, when, and a message; a lightweight tag stores only the name.';
 
   @override
-  String get helpTagWhy =>
-      'Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don\'t move or delete a pushed tag; if it\'s wrong, tag the next number.';
+  String get helpTagWhy => 'Use annotated tags for release versions (v1.2.0): the release is recorded, and GitHub releases and CI run from the tag. Don\'t move or delete a pushed tag; if it\'s wrong, tag the next number.';
 
   @override
   String get headerMergedAndGone => 'Merged · deleted on remote';
 
   @override
-  String get headerMergedAndGoneTooltip =>
-      'This branch is already merged into the default branch and was deleted on the remote. Publishing it again would bring the deleted branch back.';
+  String get headerMergedAndGoneTooltip => 'This branch is already merged into the default branch and was deleted on the remote. Publishing it again would bring the deleted branch back.';
 
   @override
   String bannerMergedAndGone(String branch) {
@@ -1599,8 +1532,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ciTitle => 'Workflow runs';
 
   @override
-  String get ciNotGitHubMessage =>
-      'Actions need a GitHub repository — gh only works with GitHub.';
+  String get ciNotGitHubMessage => 'Actions need a GitHub repository — gh only works with GitHub.';
 
   @override
   String ciEmptyTitle(String branch) {
@@ -1608,8 +1540,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get ciEmptyMessage =>
-      'Runs triggered by pushes, pull requests or tags show up here.';
+  String get ciEmptyMessage => 'Runs triggered by pushes, pull requests or tags show up here.';
 
   @override
   String get ciRerun => 'Re-run';
@@ -1621,8 +1552,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ciDispatch => 'Run workflow';
 
   @override
-  String get ciDispatchNeedsPush =>
-      'Manual runs need a branch that\'s on the remote. Publish it first.';
+  String get ciDispatchNeedsPush => 'Manual runs need a branch that\'s on the remote. Publish it first.';
 
   @override
   String ciDispatchTitle(String file) {
@@ -1679,8 +1609,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prCheckout => 'Check out this PR';
 
   @override
-  String get prCheckoutWhy =>
-      'Fetches the PR\'s branch and switches to it — to try it out or fix something.';
+  String get prCheckoutWhy => 'Fetches the PR\'s branch and switches to it — to try it out or fix something.';
 
   @override
   String donePrCheckout(int number, String branch) {
@@ -1720,8 +1649,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get releaseDeleteMessage =>
-      'The GitHub release and its files are removed. People may have downloaded them already.';
+  String get releaseDeleteMessage => 'The GitHub release and its files are removed. People may have downloaded them already.';
 
   @override
   String releaseDeleteTagToo(String tag) {
@@ -1763,16 +1691,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tagVersionMismatchWhy =>
-      'A release tag goes on the commit that bumps the version — the release wizard does the bump PR through the tag in order.';
+  String get tagVersionMismatchWhy => 'A release tag goes on the commit that bumps the version — the release wizard does the bump PR through the tag in order.';
 
   @override
-  String get tagVersionMismatchCi =>
-      'In this repository pushing a tag makes CI build the release, and CI stops when the versions differ.';
+  String get tagVersionMismatchCi => 'In this repository pushing a tag makes CI build the release, and CI stops when the versions differ.';
 
   @override
-  String get tagVersionMismatchBlocked =>
-      'So pushing is blocked. Turn off push to create it only locally.';
+  String get tagVersionMismatchBlocked => 'So pushing is blocked. Turn off push to create it only locally.';
 
   @override
   String get tagOpenReleaseWizard => 'Open the release wizard';
@@ -1790,8 +1715,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changesAmend => 'Amend';
 
   @override
-  String get changesAmendPushedWarning =>
-      'This commit is already on the remote. Amending splits the history and needs a force push (force-with-lease).';
+  String get changesAmendPushedWarning => 'This commit is already on the remote. Amending splits the history and needs a force push (force-with-lease).';
 
   @override
   String get doneAmend => 'Amended the last commit';
@@ -1870,8 +1794,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get doneStashDropped => 'Stash deleted';
 
   @override
-  String get doneStashAndRetry =>
-      'Stashed your changes and ran it again. Restore them from Stashes in Changes.';
+  String get doneStashAndRetry => 'Stashed your changes and ran it again. Restore them from Stashes in Changes.';
 
   @override
   String get pushOptionsTooltip => 'Push options';
@@ -1883,15 +1806,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pushFollowTags => 'Push tags too (--follow-tags)';
 
   @override
-  String get pushFollowTagsWhy =>
-      'Also pushes annotated tags on the commits you push. Applies to this repository only.';
+  String get pushFollowTagsWhy => 'Also pushes annotated tags on the commits you push. Applies to this repository only.';
 
   @override
   String get pushForceTitle => 'Force push (force-with-lease)';
 
   @override
-  String get pushForceWhy =>
-      'Only after amending or rebasing commits you already pushed. git refuses if the remote has commits you haven\'t seen, so nobody else\'s work is overwritten.';
+  String get pushForceWhy => 'Only after amending or rebasing commits you already pushed. git refuses if the remote has commits you haven\'t seen, so nobody else\'s work is overwritten.';
 
   @override
   String pushForceBlockedDefault(String branch) {
@@ -1915,8 +1836,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get operationSkip => 'Skip';
 
   @override
-  String get operationSkipTooltip =>
-      'Drops the conflicting commit and continues the rebase';
+  String get operationSkipTooltip => 'Drops the conflicting commit and continues the rebase';
 
   @override
   String get doneSkip => 'Skipped the commit';
@@ -1949,8 +1869,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cleanupMerged => 'Merged';
 
   @override
-  String get cleanupGoneNotMerged =>
-      'Gone on remote · not merged — its commits get hard to find';
+  String get cleanupGoneNotMerged => 'Gone on remote · not merged — its commits get hard to find';
 
   @override
   String cleanupConfirm(int count) {
@@ -2006,8 +1925,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tagsCheckoutMessage =>
-      'You\'ll see the files exactly as they were at the tag. You won\'t be on any branch (\'detached HEAD\'), so create a branch before committing here.';
+  String get tagsCheckoutMessage => 'You\'ll see the files exactly as they were at the tag. You won\'t be on any branch (\'detached HEAD\'), so create a branch before committing here.';
 
   @override
   String doneCheckoutTag(String tag) {
@@ -2015,8 +1933,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get bannerDetached =>
-      'You\'re not on a branch. Create one before committing here';
+  String get bannerDetached => 'You\'re not on a branch. Create one before committing here';
 
   @override
   String get historyTitle => 'History';
@@ -2042,57 +1959,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpLinkStashing => 'Pro Git — Stashing and Cleaning';
 
   @override
-  String get helpCaptionStash =>
-      'Uncommitted changes W put aside at the top of the stash list — main is unchanged';
+  String get helpCaptionStash => 'Uncommitted changes W put aside at the top of the stash list — main is unchanged';
 
   @override
   String get helpStashTitle => 'Stash';
 
   @override
-  String get helpStashWord =>
-      'To stash is to put something away for later, like into a drawer.';
+  String get helpStashWord => 'To stash is to put something away for later, like into a drawer.';
 
   @override
-  String get helpStashInGit =>
-      'Saves your uncommitted changes outside the branch history and resets the working tree to clean. Stashes pile up in a list (newest on top) and can be applied later on any branch.';
+  String get helpStashInGit => 'Saves your uncommitted changes outside the branch history and resets the working tree to clean. Stashes pile up in a list (newest on top) and can be applied later on any branch.';
 
   @override
-  String get helpStashWhy =>
-      'Use it when it\'s too early to commit but you need to switch branches or pull. \'pop\' applies and removes it; \'apply\' keeps it in the list. Add a note — old stashes are easy to forget.';
+  String get helpStashWhy => 'Use it when it\'s too early to commit but you need to switch branches or pull. \'pop\' applies and removes it; \'apply\' keeps it in the list. Add a note — old stashes are easy to forget.';
 
   @override
-  String get helpCaptionDetached =>
-      'HEAD points straight at the v1.0.0 commit, not at a branch';
+  String get helpCaptionDetached => 'HEAD points straight at the v1.0.0 commit, not at a branch';
 
   @override
   String get helpDetachedTitle => 'Detached HEAD';
 
   @override
-  String get helpDetachedWord =>
-      'Detached means separated. HEAD means \'where you are now\'.';
+  String get helpDetachedWord => 'Detached means separated. HEAD means \'where you are now\'.';
 
   @override
-  String get helpDetachedInGit =>
-      'Normally HEAD points at a branch label, and committing moves that label forward. Checking out a tag or commit makes HEAD point straight at the commit, detached from any branch.';
+  String get helpDetachedInGit => 'Normally HEAD points at a branch label, and committing moves that label forward. Checking out a tag or commit makes HEAD point straight at the commit, detached from any branch.';
 
   @override
-  String get helpDetachedWhy =>
-      'Safe for trying out or comparing an old version. Commits made here belong to no branch and are hard to find once you move away — create a branch first if you want to commit.';
+  String get helpDetachedWhy => 'Safe for trying out or comparing an old version. Commits made here belong to no branch and are hard to find once you move away — create a branch first if you want to commit.';
 
   @override
   String get helpForceTitle => 'Force push (force-with-lease)';
 
   @override
-  String get helpForceWord =>
-      'Force means by force; a lease is an agreement — here, \'only if it\'s still how I last saw it\'.';
+  String get helpForceWord => 'Force means by force; a lease is an agreement — here, \'only if it\'s still how I last saw it\'.';
 
   @override
-  String get helpForceInGit =>
-      'After amending or rebasing commits you already pushed, your history has split from the remote and a normal push is rejected. A force push replaces the remote branch with yours. --force-with-lease only does so if the remote is exactly as you last fetched it, and refuses if someone pushed in between.';
+  String get helpForceInGit => 'After amending or rebasing commits you already pushed, your history has split from the remote and a normal push is rejected. A force push replaces the remote branch with yours. --force-with-lease only does so if the remote is exactly as you last fetched it, and refuses if someone pushed in between.';
 
   @override
-  String get helpForceWhy =>
-      'Only on a work branch you use alone, after tidying its history. Never on shared branches, especially main. This app doesn\'t offer plain --force, and blocks force push on the default branch.';
+  String get helpForceWhy => 'Only on a work branch you use alone, after tidying its history. Never on shared branches, especially main. This app doesn\'t offer plain --force, and blocks force push on the default branch.';
 
   @override
   String get menuBrowse => 'Open repository in browser';
@@ -2145,8 +2051,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginSshRecommended => 'SSH recommended';
 
   @override
-  String get loginSshWhy =>
-      'With an SSH remote or an SSH session, logging in over HTTPS can leave git push authenticating separately.';
+  String get loginSshWhy => 'With an SSH remote or an SSH session, logging in over HTTPS can leave git push authenticating separately.';
 
   @override
   String get loginStepKey => 'Check for an SSH key';
@@ -2155,15 +2060,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginStepKeyFound => 'This key will be added to GitHub';
 
   @override
-  String get loginStepKeyMissing =>
-      'No key found. Create one in a terminal with the command below (a passphrase is recommended). The app never handles keys or passphrases.';
+  String get loginStepKeyMissing => 'No key found. Create one in a terminal with the command below (a passphrase is recommended). The app never handles keys or passphrases.';
 
   @override
   String get loginStepLogin => 'Log in';
 
   @override
-  String get loginStepLoginWhy =>
-      'Log in to GitHub in the browser and enter a one-time code.';
+  String get loginStepLoginWhy => 'Log in to GitHub in the browser and enter a one-time code.';
 
   @override
   String get loginLoggedIn => 'You\'re logged in';
@@ -2172,33 +2075,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginStart => 'Log in with browser';
 
   @override
-  String get loginDeviceHowTo =>
-      'If no browser opens, or you\'re on a remote server, open this address on any device and enter the code.';
+  String get loginDeviceHowTo => 'If no browser opens, or you\'re on a remote server, open this address on any device and enter the code.';
 
   @override
   String get loginStepUpload => 'Add the public key';
 
   @override
-  String get loginStepUploadWhy =>
-      'Registers the chosen public key with your GitHub account. Skipped if it\'s already there.';
+  String get loginStepUploadWhy => 'Registers the chosen public key with your GitHub account. Skipped if it\'s already there.';
 
   @override
   String get loginUploadKey => 'Add key';
 
   @override
-  String get loginNeedsKeyScope =>
-      'Missing permission to add keys. Add it with the command below in a terminal, then try again.';
+  String get loginNeedsKeyScope => 'Missing permission to add keys. Add it with the command below in a terminal, then try again.';
 
   @override
   String get loginStepTest => 'Test the connection';
 
   @override
-  String get loginStepTestWhy =>
-      'Connects to GitHub over SSH. The first time, github.com\'s host key is added to known_hosts.';
+  String get loginStepTestWhy => 'Connects to GitHub over SSH. The first time, github.com\'s host key is added to known_hosts.';
 
   @override
-  String get loginSshFailed =>
-      'Couldn\'t connect. Check that the key is added to GitHub and loaded in ssh-agent.';
+  String get loginSshFailed => 'Couldn\'t connect. Check that the key is added to GitHub and loaded in ssh-agent.';
 
   @override
   String get loginTest => 'Test';
@@ -2210,15 +2108,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginStepProtocol => 'Use SSH for git';
 
   @override
-  String get loginStepProtocolWhy =>
-      'gh will use SSH addresses from now on. Switch existing HTTPS remotes in Remotes → Change URL.';
+  String get loginStepProtocolWhy => 'gh will use SSH addresses from now on. Switch existing HTTPS remotes in Remotes → Change URL.';
 
   @override
   String get loginUseSshProtocol => 'Use SSH';
 
   @override
-  String get loginAgentTip =>
-      'To avoid typing the passphrase every time, use ssh-add --apple-use-keychain on macOS, or ssh-agent elsewhere.';
+  String get loginAgentTip => 'To avoid typing the passphrase every time, use ssh-add --apple-use-keychain on macOS, or ssh-agent elsewhere.';
 
   @override
   String get doneProtocolSsh => 'gh now uses SSH for git';
@@ -2229,12 +2125,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get forkAddWhy =>
-      'Add the original repository as the upstream remote to bring in its new commits.';
+  String get forkAddWhy => 'Add the original repository as the upstream remote to bring in its new commits.';
 
   @override
-  String get forkSyncWhy =>
-      'Fetches new commits from the original (upstream) and merges them into your current branch.';
+  String get forkSyncWhy => 'Fetches new commits from the original (upstream) and merges them into your current branch.';
 
   @override
   String get forkAddUpstream => 'Add upstream';
@@ -2254,16 +2148,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get releaseNeedsRemote =>
-      'No remote to release to. Publish it from Remotes first.';
+  String get releaseNeedsRemote => 'No remote to release to. Publish it from Remotes first.';
 
   @override
-  String get releaseDirectOnlyNotGitHub =>
-      'Not a GitHub repository, so this uses direct commit (check → version → tag). Do PRs, release notes and CI on your host\'s website.';
+  String get releaseDirectOnlyNotGitHub => 'Not a GitHub repository, so this uses direct commit (check → version → tag). Do PRs, release notes and CI on your host\'s website.';
 
   @override
-  String get releaseDirectOnly =>
-      'Without gh, only direct commit is available.';
+  String get releaseDirectOnly => 'Without gh, only direct commit is available.';
 
   @override
   String get releaseDirectMode => 'Direct commit';
@@ -2279,8 +2170,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get versionUsesScript =>
-      'Uses the repository\'s scripts/bump-version.sh (lock files included, same result as the conventions).';
+  String get versionUsesScript => 'Uses the repository\'s scripts/bump-version.sh (lock files included, same result as the conventions).';
 
   @override
   String versionLockFiles(String files) {
@@ -2299,8 +2189,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get versionFileTitle => 'Version file';
 
   @override
-  String get versionFileWhy =>
-      'For when the version file isn\'t found or is the wrong one. The first group in the pattern is the version. Applies to this repository only.';
+  String get versionFileWhy => 'For when the version file isn\'t found or is the wrong one. The first group in the pattern is the version. Applies to this repository only.';
 
   @override
   String get versionFilePath => 'File (path in the repository)';
@@ -2314,8 +2203,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get versionFileNotFound =>
-      'File missing, or no version matches the pattern';
+  String get versionFileNotFound => 'File missing, or no version matches the pattern';
 
   @override
   String get versionFileAuto => 'Back to auto-detect';
@@ -2360,8 +2248,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get operationAbortPickMessage =>
-      'Goes back to before it started. Any conflict resolutions you\'ve made are lost.';
+  String get operationAbortPickMessage => 'Goes back to before it started. Any conflict resolutions you\'ve made are lost.';
 
   @override
   String get historyBranchLabel => 'Branch';
@@ -2397,12 +2284,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get historyRevertMessage =>
-      'Makes a new commit that undoes this one. History isn\'t rewritten, so it\'s safe even for commits you\'ve pushed.';
+  String get historyRevertMessage => 'Makes a new commit that undoes this one. History isn\'t rewritten, so it\'s safe even for commits you\'ve pushed.';
 
   @override
-  String get historyRevertUnpushed =>
-      'Makes a new commit that undoes this one. Since it isn\'t pushed yet, you could also amend or fix it in a new commit.';
+  String get historyRevertUnpushed => 'Makes a new commit that undoes this one. Since it isn\'t pushed yet, you could also amend or fix it in a new commit.';
 
   @override
   String get historyCherryPick => 'Bring in';
@@ -2418,8 +2303,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get historyCherryPickMessage =>
-      'Copies the same change onto your current branch as a new commit — for taking just one commit without merging the whole branch.';
+  String get historyCherryPickMessage => 'Copies the same change onto your current branch as a new commit — for taking just one commit without merging the whole branch.';
 
   @override
   String doneRevert(String hash) {
@@ -2466,8 +2350,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpCaptionAfterRevert => 'C stays; a new commit C⁻ undoes it';
 
   @override
-  String get helpCaptionAfterCherryPick =>
-      'The change from feature\'s D is copied onto main as a new commit D\'';
+  String get helpCaptionAfterCherryPick => 'The change from feature\'s D is copied onto main as a new commit D\'';
 
   @override
   String get helpRevertTitle => 'Revert';
@@ -2476,27 +2359,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpRevertWord => 'To revert is to go back to how something was.';
 
   @override
-  String get helpRevertInGit =>
-      'Doesn\'t delete the commit — it adds a new commit that applies the opposite change. Both the original and the revert stay in history.';
+  String get helpRevertInGit => 'Doesn\'t delete the commit — it adds a new commit that applies the opposite change. Both the original and the revert stay in history.';
 
   @override
-  String get helpRevertWhy =>
-      'Use it when a commit you\'ve already pushed causes trouble. History isn\'t rewritten, so nobody else is affected and no force push is needed. For commits not yet pushed, amending is cleaner.';
+  String get helpRevertWhy => 'Use it when a commit you\'ve already pushed causes trouble. History isn\'t rewritten, so nobody else is affected and no force push is needed. For commits not yet pushed, amending is cleaner.';
 
   @override
   String get helpCherryPickTitle => 'Cherry-pick';
 
   @override
-  String get helpCherryPickWord =>
-      'To cherry-pick is to pick only the best cherries — take just what you want.';
+  String get helpCherryPickWord => 'To cherry-pick is to pick only the best cherries — take just what you want.';
 
   @override
-  String get helpCherryPickInGit =>
-      'Copies the change from one commit on another branch onto your current branch as a new commit. Same change, but a new commit (D\') with a different hash.';
+  String get helpCherryPickInGit => 'Copies the change from one commit on another branch onto your current branch as a new commit. Same change, but a new commit (D\') with a different hash.';
 
   @override
-  String get helpCherryPickWhy =>
-      'Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default.';
+  String get helpCherryPickWhy => 'Handy for pulling one urgent fix from another branch. If you merge that branch later the same change arrives twice and can conflict — merging is still the default.';
 
   @override
   String confirmTypeToContinue(String text) {
@@ -2551,8 +2429,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prReviewComment => 'Comment';
 
   @override
-  String get prReviewOwnPr =>
-      'You can\'t approve or request changes on your own PR, but you can comment.';
+  String get prReviewOwnPr => 'You can\'t approve or request changes on your own PR, but you can comment.';
 
   @override
   String get prReviewSend => 'Send';
@@ -2580,8 +2457,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get assetEmpty =>
-      'No assets. Build outputs uploaded by CI appear here.';
+  String get assetEmpty => 'No assets. Build outputs uploaded by CI appear here.';
 
   @override
   String assetMeta(String size, int count) {
@@ -2617,8 +2493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get assetDeleteMessage =>
-      'Removes this file from the release page. This can\'t be undone, and download links to it will break.';
+  String get assetDeleteMessage => 'Removes this file from the release page. This can\'t be undone, and download links to it will break.';
 
   @override
   String doneAssetDownloaded(String name) {
@@ -2780,8 +2655,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worktreeRemove => 'Remove';
 
   @override
-  String get worktreeClaudeWarning =>
-      'A Claude Code session may be using this folder. Make sure the session has finished first.';
+  String get worktreeClaudeWarning => 'A Claude Code session may be using this folder. Make sure the session has finished first.';
 
   @override
   String worktreeHeldTitle(String branch) {
@@ -2836,8 +2710,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get worktreeDeleteBranchTitle =>
-      'Remove the worktree and delete the branch?';
+  String get worktreeDeleteBranchTitle => 'Remove the worktree and delete the branch?';
 
   @override
   String worktreeDeleteBranchMessage(String branch, String path) {
@@ -2901,8 +2774,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get envCopyDiagnostics => 'Copy diagnostics';
 
   @override
-  String get envDiagnosticsCopied =>
-      'Diagnostics copied. Paste them into your report.';
+  String get envDiagnosticsCopied => 'Diagnostics copied. Paste them into your report.';
 
   @override
   String get envSearchPath => 'PATH used by the app';

@@ -55,8 +55,43 @@ class CommandRunner {
   String executableFor(String name) => switch (name) {
         'git' => gitPath ?? name,
         'gh' => ghPath ?? name,
+        'bash' when Platform.isWindows => gitBashPath() ??
+            (throw const ProcessException(
+              'bash',
+              [],
+              'Git for Windows의 bash를 찾을 수 없습니다. Git을 설치하거나 설정에서 git 경로를 지정하세요.',
+            )),
         _ => name,
       };
+
+  /// Windows에서 PATH의 `bash`는 WSL의 `System32\bash.exe`가 먼저 잡히는 일이 많다.
+  /// WSL의 git은 `core.autocrlf` 설정이 달라 CRLF 파일을 모두 수정됨으로 보므로
+  /// (bump-version.sh의 깨끗한 트리 검사가 실패한다), git과 같은 설치의 bash만 쓴다.
+  /// 찾지 못해도 PATH의 bash로 되돌아가지 않는다.
+  String? gitBashPath() {
+    final sep = Platform.pathSeparator;
+    final git = gitPath ?? findExecutable('git', path);
+    if (git != null) {
+      var dir = File(git).parent;
+      for (var i = 0; i < 3; i++) {
+        final bash = File('${dir.path}${sep}bin${sep}bash.exe');
+        if (bash.existsSync()) return bash.path;
+        dir = dir.parent;
+      }
+    }
+    // git이 shim(scoop 등)이거나 PATH에 없을 때의 표준 설치 위치.
+    for (final base in [
+      Platform.environment['ProgramFiles'],
+      Platform.environment['ProgramW6432'],
+      Platform.environment['ProgramFiles(x86)'],
+      if (Platform.environment['LOCALAPPDATA'] case final l?) '$l${sep}Programs',
+    ]) {
+      if (base == null) continue;
+      final bash = File('$base${sep}Git${sep}bin${sep}bash.exe');
+      if (bash.existsSync()) return bash.path;
+    }
+    return null;
+  }
 
   /// 프로세스에 넘기는 PATH. 지정한 실행 파일의 폴더를 앞에 둔다 — `gh`가 git을
   /// 부르거나 git이 인증 도우미로 `gh`를 부를 때도 같은 파일을 쓰게 한다.

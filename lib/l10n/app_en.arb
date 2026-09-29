@@ -354,6 +354,7 @@
   "checkOnDefault": "On the default branch ({branch})",
   "checkSynced": "Nothing to pull or push",
   "checkGitHub": "GitHub remote and gh login",
+  "checkGitBash": "Git for Windows bash (for the version bump script)",
   "checkChangesSince": "{count, plural, =1{1 commit} other{{count} commits}} since {tag}",
   "checkFirstRelease": "This is the first release",
   "checkNoWorkflow": "No workflow runs on tags, so the app creates the GitHub release.",
