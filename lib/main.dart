@@ -7,8 +7,10 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'about/about_dialog.dart';
@@ -37,7 +39,7 @@ Future<void> main() async {
   final prefs = await RepoPrefs.load();
   if (_isDesktop) {
     await windowManager.ensureInitialized();
-    final saved = prefs.windowBounds;
+    final saved = Platform.isWindows ? await _restorableWindowsBounds(prefs) : prefs.windowBounds;
     // Windows는 runner(main.cpp)가 첫 크기와 위치를 정한다. Dart 쪽 setSize/center는
     // devicePixelRatio 오차로 창을 화면 오른쪽 밖에 놓을 수 있다.
     final options = WindowOptions(
@@ -71,6 +73,29 @@ Future<void> main() async {
   runApp(ServicesScope(services: services, child: App(settings: settings)));
 }
 
+double _devicePixelRatio() => ui.PlatformDispatcher.instance.implicitView?.devicePixelRatio ?? 1.0;
+
+/// 저장한 물리 픽셀 위치가 지금 연결된 모니터 안에 있을 때만 window_manager 좌표(논리)로 바꿔 돌려준다.
+/// 보조 모니터에서 종료한 뒤 그 모니터가 없거나 배율이 다르면 null → runner가 정한 기본 위치를 쓴다.
+Future<Rect?> _restorableWindowsBounds(RepoPrefs prefs) async {
+  final px = prefs.windowPixelBounds;
+  if (px == null) return null;
+  final dpr = _devicePixelRatio();
+  final logical = Rect.fromLTWH(px.left / dpr, px.top / dpr, px.width / dpr, px.height / dpr);
+  if (logical.width < _minimumSize.width || logical.height < _minimumSize.height) return null;
+  try {
+    for (final d in await screenRetriever.getAllDisplays()) {
+      final scale = (d.scaleFactor ?? 1.0).toDouble();
+      final pos = d.visiblePosition ?? Offset.zero;
+      final size = d.visibleSize ?? d.size;
+      final area = Rect.fromLTWH(pos.dx * scale, pos.dy * scale, size.width * scale, size.height * scale);
+      final overlap = area.intersect(px);
+      if (overlap.width >= 100 && overlap.height >= 100) return logical;
+    }
+  } catch (_) {}
+  return null;
+}
+
 /// 창을 옮기거나 크기를 바꾸면 잠시 뒤 저장한다.
 class _BoundsSaver with WindowListener {
   _BoundsSaver(this.prefs);
@@ -81,7 +106,13 @@ class _BoundsSaver with WindowListener {
   void _schedule() {
     _timer?.cancel();
     _timer = Timer(const Duration(milliseconds: 500), () async {
-      prefs.setWindowBounds(await windowManager.getBounds());
+      final b = await windowManager.getBounds();
+      if (Platform.isWindows) {
+        final dpr = _devicePixelRatio();
+        prefs.setWindowPixelBounds(Rect.fromLTWH(b.left * dpr, b.top * dpr, b.width * dpr, b.height * dpr));
+      } else {
+        prefs.setWindowBounds(b);
+      }
     });
   }
 
