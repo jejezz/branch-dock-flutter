@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -55,7 +56,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutTagline => 'Git과 GitHub CLI를 위한 데스크톱 도우미';
 
   @override
-  String get aboutDescription => '편집기 옆에 세워 두고 브랜치, 태그, 병합, Pull/Push, 원격, 릴리스를 버튼으로 다룹니다. 버튼마다 실제로 실행되는 git·gh 명령을 보여 줍니다.';
+  String get aboutDescription =>
+      '편집기 옆에 세워 두고 브랜치, 태그, 병합, Pull/Push, 원격, 릴리스를 버튼으로 다룹니다. 버튼마다 실제로 실행되는 git·gh 명령을 보여 줍니다.';
 
   @override
   String get homeEmptyTitle => '시작하려면 저장소를 선택하세요';
@@ -131,7 +133,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get envGitRequired => 'Branch Dock은 설치된 git을 실행합니다. git을 먼저 설치하세요.';
 
   @override
-  String get envGitOnlyNote => 'gh가 없거나 로그인하지 않아도 브랜치·태그·Pull·Push는 쓸 수 있습니다. GitHub에 올리기, PR, 릴리스에는 gh 로그인이 필요합니다.';
+  String get envGitOnlyNote =>
+      'gh가 없거나 로그인하지 않아도 브랜치·태그·Pull·Push는 쓸 수 있습니다. GitHub에 올리기, PR, 릴리스에는 gh 로그인이 필요합니다.';
 
   @override
   String envVersion(String version) {
@@ -156,10 +159,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get envRecheck => '다시 확인';
 
   @override
-  String get envGhMissing => 'GitHub CLI(gh)가 설치되지 않아 쓸 수 없습니다. 메뉴의 환경 점검을 확인하세요.';
+  String get envGhMissing =>
+      'GitHub CLI(gh)가 설치되지 않아 쓸 수 없습니다. 메뉴의 환경 점검을 확인하세요.';
 
   @override
-  String get envGhLoggedOut => 'gh에 로그인해야 쓸 수 있습니다. 터미널에서 gh auth login을 실행하세요.';
+  String get envGhLoggedOut =>
+      'gh에 로그인해야 쓸 수 있습니다. 터미널에서 gh auth login을 실행하세요.';
 
   @override
   String get headerOpenFolder => '편집기에서 이 폴더 열기';
@@ -168,7 +173,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get vscodeMissingTitle => 'VS Code를 찾지 못했습니다';
 
   @override
-  String get vscodeMissingMessage => 'VS Code를 설치하면 이 버튼으로 현재 브랜치가 체크아웃된 폴더를 바로 열 수 있습니다. 다른 편집기를 쓰려면 저장소 메뉴의 ‘파일을 열 편집기…’에 명령(cursor, zed 등)을 적으세요.';
+  String get vscodeMissingMessage =>
+      'VS Code를 설치하면 이 버튼으로 현재 브랜치가 체크아웃된 폴더를 바로 열 수 있습니다. 다른 편집기를 쓰려면 저장소 메뉴의 ‘파일을 열 편집기…’에 명령(cursor, zed 등)을 적으세요.';
 
   @override
   String get vscodeDownload => 'VS Code 받기';
@@ -183,7 +189,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get headerNoUpstream => '원격에 없음';
 
   @override
-  String get headerNoUpstreamTooltip => '이 브랜치는 아직 원격에 올라가지 않았습니다. 게시(Publish)하면 올라갑니다.';
+  String get headerNoUpstreamTooltip =>
+      '이 브랜치는 아직 원격에 올라가지 않았습니다. 게시(Publish)하면 올라갑니다.';
 
   @override
   String headerAheadTooltip(int count) {
@@ -265,10 +272,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get operationAbortTitle => '진행 중인 작업을 중단할까요?';
 
   @override
-  String get operationAbortMergeMessage => '병합을 시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
+  String get operationAbortMergeMessage =>
+      '병합을 시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
 
   @override
-  String get operationAbortRebaseMessage => 'rebase를 시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
+  String get operationAbortRebaseMessage =>
+      'rebase를 시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
 
   @override
   String bannerConflicts(int count) {
@@ -434,7 +443,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get branchNameStartsWithDash => '-로 시작할 수 없습니다';
 
   @override
-  String get branchNameInvalidSequence => '.. 이나 //, .으로 시작하는 부분, .lock으로 끝나는 부분은 쓸 수 없습니다';
+  String get branchNameInvalidSequence =>
+      '.. 이나 //, .으로 시작하는 부분, .lock으로 끝나는 부분은 쓸 수 없습니다';
 
   @override
   String get branchNameInvalidEdge => '/ 로 시작하거나 / 또는 . 으로 끝날 수 없습니다';
@@ -494,7 +504,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get remotesPublishConfirm => '만들고 올리기';
 
   @override
-  String get remotesNotGitHubNote => 'GitHub 저장소가 아니라서 PR·릴리스·Actions는 쓸 수 없습니다 (gh는 GitHub 전용).';
+  String get remotesNotGitHubNote =>
+      'GitHub 저장소가 아니라서 PR·릴리스·Actions는 쓸 수 없습니다 (gh는 GitHub 전용).';
 
   @override
   String get remotesNameLabel => '원격 이름';
@@ -539,7 +550,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get editorTitle => '파일을 열 편집기';
 
   @override
-  String get editorMessage => '편집기 명령을 적으면 파일과 저장소 폴더를 그 편집기로 엽니다. 비워 두면 파일은 OS 기본 앱으로, 폴더는 VS Code로 엽니다.';
+  String get editorMessage =>
+      '편집기 명령을 적으면 파일과 저장소 폴더를 그 편집기로 엽니다. 비워 두면 파일은 OS 기본 앱으로, 폴더는 VS Code로 엽니다.';
 
   @override
   String get editorLabel => '편집기 명령';
@@ -628,10 +640,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorGeneric => '명령이 실패했습니다. 아래 원문을 확인하세요.';
 
   @override
-  String get errorPushRejected => 'Push가 거부됐습니다. 원격에 내게 없는 커밋이 있어서입니다. 먼저 Pull 하세요.';
+  String get errorPushRejected =>
+      'Push가 거부됐습니다. 원격에 내게 없는 커밋이 있어서입니다. 먼저 Pull 하세요.';
 
   @override
-  String get errorAuthFailed => '인증에 실패했습니다. gh auth login으로 로그인했는지, SSH 키가 등록됐는지 확인하세요.';
+  String get errorAuthFailed =>
+      '인증에 실패했습니다. gh auth login으로 로그인했는지, SSH 키가 등록됐는지 확인하세요.';
 
   @override
   String get errorConflict => '충돌이 났습니다. 변경 탭에서 충돌 파일을 편집기로 열어 고친 뒤 해결됨을 누르세요.';
@@ -640,10 +654,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorLocalChanges => '커밋하지 않은 변경이 덮어써질 수 있어서 멈췄습니다. 먼저 커밋하세요.';
 
   @override
-  String get errorNotFastForward => '기록이 갈라져서 fast-forward로 받을 수 없습니다. Pull 방식을 병합이나 rebase로 바꾸세요.';
+  String get errorNotFastForward =>
+      '기록이 갈라져서 fast-forward로 받을 수 없습니다. Pull 방식을 병합이나 rebase로 바꾸세요.';
 
   @override
-  String get errorProtectedBranch => '보호된 브랜치라서 직접 Push할 수 없습니다. 새 브랜치로 올리고 PR을 만드세요.';
+  String get errorProtectedBranch =>
+      '보호된 브랜치라서 직접 Push할 수 없습니다. 새 브랜치로 올리고 PR을 만드세요.';
 
   @override
   String get errorBranchNotMerged => '병합되지 않은 커밋이 있는 브랜치입니다.';
@@ -735,22 +751,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpFetchVsPullWord => 'fetch는 \'가서 가져오다\', pull은 \'끌어당기다\'.';
 
   @override
-  String get helpFetchVsPullInGit => 'Fetch는 원격(GitHub)에 새로 생긴 커밋을 내 컴퓨터로 가져와 origin/main 같은 \'원격 이름표\'만 옮깁니다. 내 브랜치와 파일은 건드리지 않습니다. Pull은 Fetch를 한 뒤, 가져온 커밋을 내 브랜치에 합칩니다.';
+  String get helpFetchVsPullInGit =>
+      'Fetch는 원격(GitHub)에 새로 생긴 커밋을 내 컴퓨터로 가져와 origin/main 같은 \'원격 이름표\'만 옮깁니다. 내 브랜치와 파일은 건드리지 않습니다. Pull은 Fetch를 한 뒤, 가져온 커밋을 내 브랜치에 합칩니다.';
 
   @override
-  String get helpFetchVsPullWhy => '무엇이 바뀌었는지 먼저 보고 싶으면 Fetch — 안전하고 언제 해도 됩니다. 바로 최신으로 맞추려면 Pull. 커밋하지 않은 변경이 있으면 Pull이 멈출 수 있으니 먼저 커밋하세요.';
+  String get helpFetchVsPullWhy =>
+      '무엇이 바뀌었는지 먼저 보고 싶으면 Fetch — 안전하고 언제 해도 됩니다. 바로 최신으로 맞추려면 Pull. 커밋하지 않은 변경이 있으면 Pull이 멈출 수 있으니 먼저 커밋하세요.';
 
   @override
   String get helpUpstreamTitle => '추적 브랜치 (upstream)와 origin';
 
   @override
-  String get helpUpstreamWord => 'upstream은 \'상류\'. 물이 흘러오는 쪽입니다. origin은 \'출처, 기원\'.';
+  String get helpUpstreamWord =>
+      'upstream은 \'상류\'. 물이 흘러오는 쪽입니다. origin은 \'출처, 기원\'.';
 
   @override
-  String get helpUpstreamInGit => 'origin은 저장소를 받아 온 원격(대개 GitHub)에 붙는 기본 이름입니다. 내 브랜치가 짝지어 둔 원격 브랜치(예: origin/feature)를 추적 브랜치, 곧 upstream이라고 합니다. ↑↓ 숫자는 이 짝과 비교한 것입니다.';
+  String get helpUpstreamInGit =>
+      'origin은 저장소를 받아 온 원격(대개 GitHub)에 붙는 기본 이름입니다. 내 브랜치가 짝지어 둔 원격 브랜치(예: origin/feature)를 추적 브랜치, 곧 upstream이라고 합니다. ↑↓ 숫자는 이 짝과 비교한 것입니다.';
 
   @override
-  String get helpUpstreamWhy => '짝이 있어야 그냥 Push, Pull만 눌러도 어디로 보내고 어디서 받을지 압니다. 새 브랜치에는 짝이 없어서 처음 한 번은 \'게시\'(git push -u)로 짝을 지어 줍니다.';
+  String get helpUpstreamWhy =>
+      '짝이 있어야 그냥 Push, Pull만 눌러도 어디로 보내고 어디서 받을지 압니다. 새 브랜치에는 짝이 없어서 처음 한 번은 \'게시\'(git push -u)로 짝을 지어 줍니다.';
 
   @override
   String get helpFastForwardTitle => 'Fast-forward (빨리 감기)';
@@ -759,10 +780,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpFastForwardWord => '테이프나 영상을 앞으로 빨리 감는 것.';
 
   @override
-  String get helpFastForwardInGit => '내 브랜치가 갈라진 적 없이 뒤처져 있기만 할 때, 새 커밋을 만들지 않고 브랜치 이름표를 최신 커밋 위치로 앞으로 옮기기만 합니다. 이미 있는 커밋을 따라 \'앞으로 감기\'만 하므로 이렇게 부릅니다.';
+  String get helpFastForwardInGit =>
+      '내 브랜치가 갈라진 적 없이 뒤처져 있기만 할 때, 새 커밋을 만들지 않고 브랜치 이름표를 최신 커밋 위치로 앞으로 옮기기만 합니다. 이미 있는 커밋을 따라 \'앞으로 감기\'만 하므로 이렇게 부릅니다.';
 
   @override
-  String get helpFastForwardWhy => '기록이 한 줄로 깔끔하고 합칠 것이 없으니 충돌도 없습니다. 양쪽에 서로 다른 새 커밋이 있으면(갈라졌으면) 빨리 감을 수 없어서, \'Fast-forward만\'은 멈추고 병합이나 rebase가 필요합니다. Push가 non-fast-forward로 거부되는 것도 같은 이유입니다.';
+  String get helpFastForwardWhy =>
+      '기록이 한 줄로 깔끔하고 합칠 것이 없으니 충돌도 없습니다. 양쪽에 서로 다른 새 커밋이 있으면(갈라졌으면) 빨리 감을 수 없어서, \'Fast-forward만\'은 멈추고 병합이나 rebase가 필요합니다. Push가 non-fast-forward로 거부되는 것도 같은 이유입니다.';
 
   @override
   String get helpMergeCommitTitle => '병합 커밋 (merge commit)';
@@ -771,10 +794,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpMergeCommitWord => 'merge는 \'합치다\', 두 길이 하나로 합류하는 것.';
 
   @override
-  String get helpMergeCommitInGit => '갈라진 두 기록을 그대로 두고, 둘을 부모로 가진 새 커밋(병합 커밋)을 하나 만들어 합칩니다. 누가 언제 무엇을 합쳤는지 기록에 그대로 남습니다.';
+  String get helpMergeCommitInGit =>
+      '갈라진 두 기록을 그대로 두고, 둘을 부모로 가진 새 커밋(병합 커밋)을 하나 만들어 합칩니다. 누가 언제 무엇을 합쳤는지 기록에 그대로 남습니다.';
 
   @override
-  String get helpMergeCommitWhy => '이미 올린 커밋을 바꾸지 않아 가장 안전합니다. 다른 사람과 같이 쓰는 브랜치에 알맞습니다. 대신 기록에 병합 커밋이 늘어 조금 복잡해 보입니다.';
+  String get helpMergeCommitWhy =>
+      '이미 올린 커밋을 바꾸지 않아 가장 안전합니다. 다른 사람과 같이 쓰는 브랜치에 알맞습니다. 대신 기록에 병합 커밋이 늘어 조금 복잡해 보입니다.';
 
   @override
   String get helpRebaseTitle => 'Rebase';
@@ -783,10 +808,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpRebaseWord => 'base는 \'밑받침\', rebase는 \'밑받침을 다시 놓다\'.';
 
   @override
-  String get helpRebaseInGit => '내 커밋들을 떼어 내서, 새로 받아온 커밋 뒤에 차례로 다시 붙입니다. 내용은 같지만 새 커밋(C\', D\')으로 다시 만들어지고, 기록은 한 줄이 됩니다.';
+  String get helpRebaseInGit =>
+      '내 커밋들을 떼어 내서, 새로 받아온 커밋 뒤에 차례로 다시 붙입니다. 내용은 같지만 새 커밋(C\', D\')으로 다시 만들어지고, 기록은 한 줄이 됩니다.';
 
   @override
-  String get helpRebaseWhy => '병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다.';
+  String get helpRebaseWhy =>
+      '병합 커밋 없이 기록이 깔끔합니다. 아직 Push하지 않은 내 커밋에만 쓰세요. 이미 올린 커밋을 rebase하면 다른 사람의 기록과 어긋나서 강제 Push가 필요해집니다.';
 
   @override
   String get tabTags => '태그';
@@ -904,7 +931,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tagsEmptyTitle => '아직 태그가 없습니다';
 
   @override
-  String get tagsEmptyMessage => '태그는 특정 커밋에 붙이는 이름표입니다. 보통 v1.0.0처럼 릴리스 버전에 씁니다.';
+  String get tagsEmptyMessage =>
+      '태그는 특정 커밋에 붙이는 이름표입니다. 보통 v1.0.0처럼 릴리스 버전에 씁니다.';
 
   @override
   String tagsPushAfter(String remote) {
@@ -921,7 +949,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tagNameInvalid => '공백, .., ~ ^ : ? * [ \\ 는 쓸 수 없습니다';
 
   @override
-  String get tagNameNotSemVer => '버전 형식(v1.2.3)이 아닙니다. 만들 수는 있지만 릴리스에는 버전 형식을 권합니다.';
+  String get tagNameNotSemVer =>
+      '버전 형식(v1.2.3)이 아닙니다. 만들 수는 있지만 릴리스에는 버전 형식을 권합니다.';
 
   @override
   String get tagNameMissingV => '릴리스 태그는 v를 붙이는 것이 관례입니다 (v1.2.3).';
@@ -982,7 +1011,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get prNotGitHubTitle => 'GitHub 저장소가 아닙니다';
 
   @override
-  String get prNotGitHubMessage => 'Pull Request는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
+  String get prNotGitHubMessage =>
+      'Pull Request는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
 
   @override
   String get prGhRequiredTitle => 'gh가 필요합니다';
@@ -1046,7 +1076,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get prReviewRequired => '리뷰 필요';
 
   @override
-  String get prBlockedDraft => '초안 PR은 병합할 수 없습니다. GitHub에서 \'검토 준비 완료\'로 바꾸세요.';
+  String get prBlockedDraft =>
+      '초안 PR은 병합할 수 없습니다. GitHub에서 \'검토 준비 완료\'로 바꾸세요.';
 
   @override
   String get prBlockedConflict => '기준 브랜치와 충돌이 있습니다. 기준 브랜치를 병합해 와서 충돌을 해결하세요.';
@@ -1105,7 +1136,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get releaseIntro => '버전 올리기 → PR → 병합 → 태그 → CI 확인을 차례로 안내합니다.';
 
   @override
-  String get releaseNeedsGitHub => '릴리스 마법사는 GitHub 저장소에서 쓸 수 있습니다. 태그는 태그 탭에서 만들 수 있습니다.';
+  String get releaseNeedsGitHub =>
+      '릴리스 마법사는 GitHub 저장소에서 쓸 수 있습니다. 태그는 태그 탭에서 만들 수 있습니다.';
 
   @override
   String get releaseStart => '새 릴리스';
@@ -1130,7 +1162,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get releaseCancelAfterTag => '태그는 이미 push되었습니다. 마법사만 닫고, CI와 릴리스는 GitHub에서 확인하세요.';
+  String get releaseCancelAfterTag =>
+      '태그는 이미 push되었습니다. 마법사만 닫고, CI와 릴리스는 GitHub에서 확인하세요.';
 
   @override
   String releaseDone(String tag) {
@@ -1226,7 +1259,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get manualBuildTitle => '태그 전 수동 빌드 (권장)';
 
   @override
-  String get manualBuildWhy => '지난 릴리스 이후 빌드에 영향을 주는 파일이 바뀌었습니다. 태그 전에 모든 플랫폼이 빌드되는지 확인하세요. 수동 실행은 릴리스를 만들지 않습니다.';
+  String get manualBuildWhy =>
+      '지난 릴리스 이후 빌드에 영향을 주는 파일이 바뀌었습니다. 태그 전에 모든 플랫폼이 빌드되는지 확인하세요. 수동 실행은 릴리스를 만들지 않습니다.';
 
   @override
   String get manualBuildStart => '빌드만 확인';
@@ -1386,7 +1420,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpCaptionAfterSquash => 'squash 병합 후 — main에 새 커밋 S 하나';
 
   @override
-  String get helpCaptionTag => 'v1.0.0과 v1.1.0은 옮겨지지 않는 이름표, main은 앞으로 나아가는 이름표';
+  String get helpCaptionTag =>
+      'v1.0.0과 v1.1.0은 옮겨지지 않는 이름표, main은 앞으로 나아가는 이름표';
 
   @override
   String get helpLinkGitHubMergeMethods => 'GitHub — 병합 방법 정보';
@@ -1401,10 +1436,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpSquashWord => '눌러서 납작하게 만들다, 찌그러뜨리다.';
 
   @override
-  String get helpSquashInGit => '브랜치의 여러 커밋을 눌러 커밋 하나로 합친 뒤 대상 브랜치에 올립니다. 변경 내용은 그대로이고 커밋 개수만 하나가 됩니다.';
+  String get helpSquashInGit =>
+      '브랜치의 여러 커밋을 눌러 커밋 하나로 합친 뒤 대상 브랜치에 올립니다. 변경 내용은 그대로이고 커밋 개수만 하나가 됩니다.';
 
   @override
-  String get helpSquashWhy => '\'오타 수정\', \'다시 시도\' 같은 작업 중 커밋을 기본 브랜치 기록에 남기지 않고, 기능 하나 = 커밋 하나로 정리합니다. PR을 병합할 때 많이 씁니다. 원래 커밋들은 기본 브랜치에 남지 않으니, 병합한 브랜치를 계속 쓰지 말고 지우세요.';
+  String get helpSquashWhy =>
+      '\'오타 수정\', \'다시 시도\' 같은 작업 중 커밋을 기본 브랜치 기록에 남기지 않고, 기능 하나 = 커밋 하나로 정리합니다. PR을 병합할 때 많이 씁니다. 원래 커밋들은 기본 브랜치에 남지 않으니, 병합한 브랜치를 계속 쓰지 말고 지우세요.';
 
   @override
   String get helpTagTitle => '태그 (주석 태그와 가벼운 태그)';
@@ -1413,16 +1450,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpTagWord => 'tag는 \'꼬리표, 이름표\'.';
 
   @override
-  String get helpTagInGit => '특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.';
+  String get helpTagInGit =>
+      '특정 커밋에 붙이는 이름표입니다. 브랜치 이름표는 새 커밋을 따라 앞으로 가지만, 태그는 한 번 붙이면 그 커밋에 머뭅니다. 주석 태그는 만든 사람·날짜·메시지를 함께 저장하고, 가벼운 태그는 이름만 저장합니다.';
 
   @override
-  String get helpTagWhy => '릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.';
+  String get helpTagWhy =>
+      '릴리스 버전(v1.2.0)에는 주석 태그를 씁니다 — 릴리스 기록이 남고, GitHub 릴리스와 CI가 태그를 기준으로 돕니다. 이미 push한 태그는 옮기거나 지우지 말고, 잘못됐으면 다음 번호로 새로 다세요.';
 
   @override
   String get headerMergedAndGone => '병합됨 · 원격 삭제됨';
 
   @override
-  String get headerMergedAndGoneTooltip => '이 브랜치는 이미 기본 브랜치에 병합되었고 원격에서 삭제되었습니다. 다시 게시하면 지운 브랜치가 되살아납니다.';
+  String get headerMergedAndGoneTooltip =>
+      '이 브랜치는 이미 기본 브랜치에 병합되었고 원격에서 삭제되었습니다. 다시 게시하면 지운 브랜치가 되살아납니다.';
 
   @override
   String bannerMergedAndGone(String branch) {
@@ -1454,7 +1494,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ciTitle => 'CI 실행';
 
   @override
-  String get ciNotGitHubMessage => 'Actions는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
+  String get ciNotGitHubMessage =>
+      'Actions는 GitHub 저장소에서만 쓸 수 있습니다 — gh는 GitHub 전용 도구입니다.';
 
   @override
   String ciEmptyTitle(String branch) {
@@ -1571,7 +1612,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get releaseDeleteMessage => 'GitHub 릴리스와 올라간 파일이 사라집니다. 이미 받아 간 사람이 있을 수 있습니다.';
+  String get releaseDeleteMessage =>
+      'GitHub 릴리스와 올라간 파일이 사라집니다. 이미 받아 간 사람이 있을 수 있습니다.';
 
   @override
   String releaseDeleteTagToo(String tag) {
@@ -1613,13 +1655,16 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get tagVersionMismatchWhy => '릴리스 태그는 버전을 먼저 올린 커밋에 달아야 합니다 — 릴리스 마법사가 버전 올림 PR부터 태그까지 차례로 합니다.';
+  String get tagVersionMismatchWhy =>
+      '릴리스 태그는 버전을 먼저 올린 커밋에 달아야 합니다 — 릴리스 마법사가 버전 올림 PR부터 태그까지 차례로 합니다.';
 
   @override
-  String get tagVersionMismatchCi => '이 저장소는 태그를 push하면 CI가 릴리스를 만드는데, 버전이 다르면 CI가 멈춥니다.';
+  String get tagVersionMismatchCi =>
+      '이 저장소는 태그를 push하면 CI가 릴리스를 만드는데, 버전이 다르면 CI가 멈춥니다.';
 
   @override
-  String get tagVersionMismatchBlocked => '그래서 push는 막았습니다. 로컬에만 만들려면 push를 끄세요.';
+  String get tagVersionMismatchBlocked =>
+      '그래서 push는 막았습니다. 로컬에만 만들려면 push를 끄세요.';
 
   @override
   String get tagOpenReleaseWizard => '릴리스 마법사 열기';
@@ -1637,7 +1682,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changesAmend => '직전 커밋 고치기';
 
   @override
-  String get changesAmendPushedWarning => '이미 원격에 올린 커밋입니다. 고치면 기록이 갈라져 강제 push(force-with-lease)가 필요합니다.';
+  String get changesAmendPushedWarning =>
+      '이미 원격에 올린 커밋입니다. 고치면 기록이 갈라져 강제 push(force-with-lease)가 필요합니다.';
 
   @override
   String get doneAmend => '직전 커밋을 고쳤습니다';
@@ -1716,7 +1762,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get doneStashDropped => '임시 저장을 삭제했습니다';
 
   @override
-  String get doneStashAndRetry => '변경을 임시 저장하고 다시 실행했습니다. 변경 탭의 임시 저장에서 되살릴 수 있습니다.';
+  String get doneStashAndRetry =>
+      '변경을 임시 저장하고 다시 실행했습니다. 변경 탭의 임시 저장에서 되살릴 수 있습니다.';
 
   @override
   String get pushOptionsTooltip => 'Push 옵션';
@@ -1734,7 +1781,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pushForceTitle => '강제 push (force-with-lease)';
 
   @override
-  String get pushForceWhy => 'amend나 rebase로 이미 올린 커밋을 고쳤을 때만 씁니다. 내가 모르는 원격 커밋이 있으면 git이 거부해서 다른 사람의 작업을 덮어쓰지 않습니다.';
+  String get pushForceWhy =>
+      'amend나 rebase로 이미 올린 커밋을 고쳤을 때만 씁니다. 내가 모르는 원격 커밋이 있으면 git이 거부해서 다른 사람의 작업을 덮어쓰지 않습니다.';
 
   @override
   String pushForceBlockedDefault(String branch) {
@@ -1835,7 +1883,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get tagsCheckoutMessage => '태그 위치의 파일을 그대로 볼 수 있습니다. 이때는 어느 브랜치에도 있지 않은 \'분리된 HEAD\' 상태라, 여기서 커밋하려면 먼저 브랜치를 만드세요.';
+  String get tagsCheckoutMessage =>
+      '태그 위치의 파일을 그대로 볼 수 있습니다. 이때는 어느 브랜치에도 있지 않은 \'분리된 HEAD\' 상태라, 여기서 커밋하려면 먼저 브랜치를 만드세요.';
 
   @override
   String doneCheckoutTag(String tag) {
@@ -1878,10 +1927,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpStashWord => 'stash는 \'넣어 두다, 숨겨 두다\'. 잠깐 서랍에 치워 두는 것.';
 
   @override
-  String get helpStashInGit => '커밋하지 않은 변경을 브랜치 기록에 남기지 않고 따로 저장한 뒤, 작업 트리를 깨끗하게 되돌립니다. 저장한 변경은 목록에 쌓이고(가장 최근 것이 맨 위), 나중에 어느 브랜치에서든 다시 적용할 수 있습니다.';
+  String get helpStashInGit =>
+      '커밋하지 않은 변경을 브랜치 기록에 남기지 않고 따로 저장한 뒤, 작업 트리를 깨끗하게 되돌립니다. 저장한 변경은 목록에 쌓이고(가장 최근 것이 맨 위), 나중에 어느 브랜치에서든 다시 적용할 수 있습니다.';
 
   @override
-  String get helpStashWhy => '하던 일을 커밋하기엔 이른데 브랜치를 바꾸거나 Pull해야 할 때 씁니다. \'pop\'은 적용하고 목록에서 지우고, \'apply\'는 목록에 남겨 둡니다. 오래 두면 무엇이었는지 잊기 쉬우니 메모를 남기세요.';
+  String get helpStashWhy =>
+      '하던 일을 커밋하기엔 이른데 브랜치를 바꾸거나 Pull해야 할 때 씁니다. \'pop\'은 적용하고 목록에서 지우고, \'apply\'는 목록에 남겨 둡니다. 오래 두면 무엇이었는지 잊기 쉬우니 메모를 남기세요.';
 
   @override
   String get helpCaptionDetached => 'HEAD가 브랜치가 아니라 v1.0.0 커밋을 직접 가리킴';
@@ -1890,25 +1941,31 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpDetachedTitle => '분리된 HEAD (detached HEAD)';
 
   @override
-  String get helpDetachedWord => 'detached는 \'떨어진, 분리된\'. HEAD는 \'지금 보고 있는 곳\'.';
+  String get helpDetachedWord =>
+      'detached는 \'떨어진, 분리된\'. HEAD는 \'지금 보고 있는 곳\'.';
 
   @override
-  String get helpDetachedInGit => '보통 HEAD는 브랜치 이름표를 가리키고, 커밋하면 그 이름표가 앞으로 갑니다. 태그나 커밋으로 직접 이동하면 HEAD가 브랜치에서 떨어져 커밋을 직접 가리킵니다.';
+  String get helpDetachedInGit =>
+      '보통 HEAD는 브랜치 이름표를 가리키고, 커밋하면 그 이름표가 앞으로 갑니다. 태그나 커밋으로 직접 이동하면 HEAD가 브랜치에서 떨어져 커밋을 직접 가리킵니다.';
 
   @override
-  String get helpDetachedWhy => '옛 버전을 실행해 보거나 비교할 때 안전하게 쓸 수 있습니다. 여기서 커밋하면 어느 브랜치에도 속하지 않아 다른 곳으로 옮기면 찾기 어려워지니, 커밋하려면 먼저 \'여기서 브랜치 만들기\'를 하세요.';
+  String get helpDetachedWhy =>
+      '옛 버전을 실행해 보거나 비교할 때 안전하게 쓸 수 있습니다. 여기서 커밋하면 어느 브랜치에도 속하지 않아 다른 곳으로 옮기면 찾기 어려워지니, 커밋하려면 먼저 \'여기서 브랜치 만들기\'를 하세요.';
 
   @override
   String get helpForceTitle => '강제 push (force-with-lease)';
 
   @override
-  String get helpForceWord => 'force는 \'억지로\', lease는 \'임대 계약\' — 내가 본 상태 그대로일 때만 바꾼다는 조건.';
+  String get helpForceWord =>
+      'force는 \'억지로\', lease는 \'임대 계약\' — 내가 본 상태 그대로일 때만 바꾼다는 조건.';
 
   @override
-  String get helpForceInGit => 'amend나 rebase로 이미 올린 커밋을 고치면 원격 기록과 갈라져 보통 push가 거부됩니다. 강제 push는 원격 브랜치를 내 기록으로 바꿉니다. --force-with-lease는 원격이 내가 마지막으로 fetch한 상태 그대로일 때만 바꾸고, 그 사이 누가 push했으면 거부합니다.';
+  String get helpForceInGit =>
+      'amend나 rebase로 이미 올린 커밋을 고치면 원격 기록과 갈라져 보통 push가 거부됩니다. 강제 push는 원격 브랜치를 내 기록으로 바꿉니다. --force-with-lease는 원격이 내가 마지막으로 fetch한 상태 그대로일 때만 바꾸고, 그 사이 누가 push했으면 거부합니다.';
 
   @override
-  String get helpForceWhy => '혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.';
+  String get helpForceWhy =>
+      '혼자 쓰는 작업 브랜치에서 기록을 정리했을 때만 씁니다. 여러 사람이 쓰는 브랜치, 특히 main에서는 쓰지 않습니다. 이 앱은 --force(무조건)는 제공하지 않고, 기본 브랜치에서는 막습니다.';
 
   @override
   String get menuBrowse => '브라우저에서 저장소 열기';
@@ -1961,7 +2018,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginSshRecommended => 'SSH 권장';
 
   @override
-  String get loginSshWhy => 'SSH 주소의 원격이나 SSH로 접속한 환경에서는 HTTPS로 로그인하면 push 때 인증이 따로 놀 수 있습니다.';
+  String get loginSshWhy =>
+      'SSH 주소의 원격이나 SSH로 접속한 환경에서는 HTTPS로 로그인하면 push 때 인증이 따로 놀 수 있습니다.';
 
   @override
   String get loginStepKey => 'SSH 키 확인';
@@ -1970,7 +2028,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginStepKeyFound => '이 키를 GitHub에 올립니다';
 
   @override
-  String get loginStepKeyMissing => '키가 없습니다. 터미널에서 아래 명령으로 만드세요 (암호 문구 권장). 앱은 키와 암호 문구를 받지 않습니다.';
+  String get loginStepKeyMissing =>
+      '키가 없습니다. 터미널에서 아래 명령으로 만드세요 (암호 문구 권장). 앱은 키와 암호 문구를 받지 않습니다.';
 
   @override
   String get loginStepLogin => '로그인';
@@ -1985,28 +2044,33 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginStart => '브라우저로 로그인';
 
   @override
-  String get loginDeviceHowTo => '브라우저가 열리지 않거나 원격 서버라면, 다른 기기의 브라우저에서 아래 주소를 열고 이 코드를 넣으세요.';
+  String get loginDeviceHowTo =>
+      '브라우저가 열리지 않거나 원격 서버라면, 다른 기기의 브라우저에서 아래 주소를 열고 이 코드를 넣으세요.';
 
   @override
   String get loginStepUpload => '공개 키 올리기';
 
   @override
-  String get loginStepUploadWhy => '골라 둔 공개 키를 내 GitHub 계정에 등록합니다. 이미 등록돼 있으면 건너뜁니다.';
+  String get loginStepUploadWhy =>
+      '골라 둔 공개 키를 내 GitHub 계정에 등록합니다. 이미 등록돼 있으면 건너뜁니다.';
 
   @override
   String get loginUploadKey => '공개 키 올리기';
 
   @override
-  String get loginNeedsKeyScope => '키를 올릴 권한이 없습니다. 터미널에서 아래 명령으로 권한을 더한 뒤 다시 시도하세요.';
+  String get loginNeedsKeyScope =>
+      '키를 올릴 권한이 없습니다. 터미널에서 아래 명령으로 권한을 더한 뒤 다시 시도하세요.';
 
   @override
   String get loginStepTest => '연결 확인';
 
   @override
-  String get loginStepTestWhy => 'GitHub에 SSH로 접속해 봅니다. 처음이면 github.com 호스트 키를 known_hosts에 더합니다.';
+  String get loginStepTestWhy =>
+      'GitHub에 SSH로 접속해 봅니다. 처음이면 github.com 호스트 키를 known_hosts에 더합니다.';
 
   @override
-  String get loginSshFailed => '연결하지 못했습니다. 키가 등록됐는지, ssh-agent에 키가 올라가 있는지 확인하세요.';
+  String get loginSshFailed =>
+      '연결하지 못했습니다. 키가 등록됐는지, ssh-agent에 키가 올라가 있는지 확인하세요.';
 
   @override
   String get loginTest => '연결 확인';
@@ -2018,13 +2082,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get loginStepProtocol => 'git 프로토콜을 SSH로';
 
   @override
-  String get loginStepProtocolWhy => 'gh가 앞으로 만드는 원격 주소를 SSH로 씁니다. 이미 있는 HTTPS 원격은 원격 탭의 URL 바꾸기에서 SSH로 바꿀 수 있습니다.';
+  String get loginStepProtocolWhy =>
+      'gh가 앞으로 만드는 원격 주소를 SSH로 씁니다. 이미 있는 HTTPS 원격은 원격 탭의 URL 바꾸기에서 SSH로 바꿀 수 있습니다.';
 
   @override
   String get loginUseSshProtocol => 'SSH로 설정';
 
   @override
-  String get loginAgentTip => '암호 문구를 매번 묻지 않게 하려면 macOS는 ssh-add --apple-use-keychain, 그 밖에는 ssh-agent를 쓰세요.';
+  String get loginAgentTip =>
+      '암호 문구를 매번 묻지 않게 하려면 macOS는 ssh-add --apple-use-keychain, 그 밖에는 ssh-agent를 쓰세요.';
 
   @override
   String get doneProtocolSsh => 'gh의 git 프로토콜을 SSH로 바꿨습니다';
@@ -2061,7 +2127,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get releaseNeedsRemote => '원격이 없어 릴리스할 수 없습니다. 원격 탭에서 먼저 올리세요.';
 
   @override
-  String get releaseDirectOnlyNotGitHub => 'GitHub 저장소가 아니라서 바로 커밋 방식(점검 → 버전 → 태그)으로 진행합니다. PR·릴리스 노트·CI는 호스팅 웹에서 하세요.';
+  String get releaseDirectOnlyNotGitHub =>
+      'GitHub 저장소가 아니라서 바로 커밋 방식(점검 → 버전 → 태그)으로 진행합니다. PR·릴리스 노트·CI는 호스팅 웹에서 하세요.';
 
   @override
   String get releaseDirectOnly => 'gh를 쓸 수 없어 바로 커밋 방식만 됩니다.';
@@ -2080,7 +2147,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get versionUsesScript => '저장소의 scripts/bump-version.sh로 버전을 올립니다 (lock 파일 포함, 규약과 같은 결과).';
+  String get versionUsesScript =>
+      '저장소의 scripts/bump-version.sh로 버전을 올립니다 (lock 파일 포함, 규약과 같은 결과).';
 
   @override
   String versionLockFiles(String files) {
@@ -2099,7 +2167,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get versionFileTitle => '버전 파일 지정';
 
   @override
-  String get versionFileWhy => '자동으로 찾지 못하거나 다른 파일을 쓸 때 정합니다. 정규식의 첫 번째 괄호가 버전입니다. 이 저장소에만 적용됩니다.';
+  String get versionFileWhy =>
+      '자동으로 찾지 못하거나 다른 파일을 쓸 때 정합니다. 정규식의 첫 번째 괄호가 버전입니다. 이 저장소에만 적용됩니다.';
 
   @override
   String get versionFilePath => '파일 (저장소 기준 경로)';
@@ -2158,7 +2227,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get operationAbortPickMessage => '시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
+  String get operationAbortPickMessage =>
+      '시작하기 전 상태로 되돌립니다. 충돌을 해결하던 내용은 사라집니다.';
 
   @override
   String get historyBranchLabel => '볼 브랜치';
@@ -2188,10 +2258,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get historyRevertMessage => '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록을 지우지 않으므로 이미 올린 커밋에도 안전합니다.';
+  String get historyRevertMessage =>
+      '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록을 지우지 않으므로 이미 올린 커밋에도 안전합니다.';
 
   @override
-  String get historyRevertUnpushed => '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 아직 올리지 않은 커밋이라면 \'직전 커밋 고치기\'나 새 커밋으로 고쳐도 됩니다.';
+  String get historyRevertUnpushed =>
+      '이 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 아직 올리지 않은 커밋이라면 \'직전 커밋 고치기\'나 새 커밋으로 고쳐도 됩니다.';
 
   @override
   String get historyCherryPick => '가져오기';
@@ -2207,7 +2279,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get historyCherryPickMessage => '이 커밋과 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 브랜치 전체를 병합하지 않고 필요한 커밋 하나만 가져올 때 씁니다.';
+  String get historyCherryPickMessage =>
+      '이 커밋과 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 브랜치 전체를 병합하지 않고 필요한 커밋 하나만 가져올 때 씁니다.';
 
   @override
   String doneRevert(String hash) {
@@ -2254,7 +2327,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpCaptionAfterRevert => 'C를 지우지 않고, C를 거꾸로 적용한 새 커밋 C⁻를 더함';
 
   @override
-  String get helpCaptionAfterCherryPick => 'feature의 D와 같은 변경이 main에 새 커밋 D\'로 복사됨';
+  String get helpCaptionAfterCherryPick =>
+      'feature의 D와 같은 변경이 main에 새 커밋 D\'로 복사됨';
 
   @override
   String get helpRevertTitle => 'Revert (되돌리기)';
@@ -2263,22 +2337,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpRevertWord => 'revert는 \'원래 상태로 되돌리다\'.';
 
   @override
-  String get helpRevertInGit => '커밋을 지우지 않고, 그 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록에는 원래 커밋과 되돌린 커밋이 모두 남습니다.';
+  String get helpRevertInGit =>
+      '커밋을 지우지 않고, 그 커밋의 변경을 거꾸로 적용한 새 커밋을 만듭니다. 기록에는 원래 커밋과 되돌린 커밋이 모두 남습니다.';
 
   @override
-  String get helpRevertWhy => '이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.';
+  String get helpRevertWhy =>
+      '이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.';
 
   @override
   String get helpCherryPickTitle => 'Cherry-pick (골라 가져오기)';
 
   @override
-  String get helpCherryPickWord => 'cherry-pick은 \'체리를 하나씩 골라 따다\' — 좋은 것만 골라 가져오기.';
+  String get helpCherryPickWord =>
+      'cherry-pick은 \'체리를 하나씩 골라 따다\' — 좋은 것만 골라 가져오기.';
 
   @override
-  String get helpCherryPickInGit => '다른 브랜치의 커밋 하나와 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 내용은 같지만 새 커밋(D\')이라 해시가 다릅니다.';
+  String get helpCherryPickInGit =>
+      '다른 브랜치의 커밋 하나와 같은 변경을 현재 브랜치에 새 커밋으로 복사합니다. 내용은 같지만 새 커밋(D\')이라 해시가 다릅니다.';
 
   @override
-  String get helpCherryPickWhy => '다른 브랜치의 버그 수정 하나만 급히 가져올 때 씁니다. 브랜치를 나중에 병합하면 같은 변경이 두 번 들어와 충돌할 수 있으니, 자주 쓰기보다 병합이 기본입니다.';
+  String get helpCherryPickWhy =>
+      '다른 브랜치의 버그 수정 하나만 급히 가져올 때 씁니다. 브랜치를 나중에 병합하면 같은 변경이 두 번 들어와 충돌할 수 있으니, 자주 쓰기보다 병합이 기본입니다.';
 
   @override
   String confirmTypeToContinue(String text) {
@@ -2327,7 +2406,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get prReviewComment => '코멘트';
 
   @override
-  String get prReviewOwnPr => '내가 만든 PR은 스스로 승인하거나 변경을 요청할 수 없습니다. 코멘트는 남길 수 있습니다.';
+  String get prReviewOwnPr =>
+      '내가 만든 PR은 스스로 승인하거나 변경을 요청할 수 없습니다. 코멘트는 남길 수 있습니다.';
 
   @override
   String get prReviewSend => '보내기';
@@ -2379,7 +2459,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get assetDeleteMessage => '릴리스 페이지에서 이 파일을 지웁니다. 되돌릴 수 없고, 이 파일로 연결된 다운로드 주소도 끊깁니다.';
+  String get assetDeleteMessage =>
+      '릴리스 페이지에서 이 파일을 지웁니다. 되돌릴 수 없고, 이 파일로 연결된 다운로드 주소도 끊깁니다.';
 
   @override
   String doneAssetDownloaded(String name) {
@@ -2505,7 +2586,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get worktreeRemove => '지우기';
 
   @override
-  String get worktreeClaudeWarning => 'Claude Code 세션이 쓰는 폴더일 수 있습니다. 세션이 끝났는지 먼저 확인하세요.';
+  String get worktreeClaudeWarning =>
+      'Claude Code 세션이 쓰는 폴더일 수 있습니다. 세션이 끝났는지 먼저 확인하세요.';
 
   @override
   String worktreeHeldTitle(String branch) {
