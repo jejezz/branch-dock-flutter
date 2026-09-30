@@ -222,6 +222,7 @@ abstract final class AppTheme {
         backgroundColor: scheme.surfaceContainerHighest,
         contentTextStyle: TextStyle(fontFamily: AppFonts.family, fontSize: body, color: hi),
         actionTextColor: scheme.primary,
+        closeIconColor: hi,
         behavior: SnackBarBehavior.floating,
       ),
       dialogTheme: DialogThemeData(
