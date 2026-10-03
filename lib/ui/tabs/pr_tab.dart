@@ -28,6 +28,15 @@ class _PrTabState extends State<PrTab> {
   PullRequest? _pr;
   String? _loadedFor;
   bool _loading = false;
+  final _list = GlobalKey<_PrListState>();
+
+  /// 병합·닫기 뒤: 아래 목록에서 그 PR을 바로 빼고 다시 읽는다. GitHub 목록이
+  /// 잠시 옛 상태(열림)를 돌려줘도 병합된 PR이 되살아나지 않게 한다.
+  void _changed(RepoController repo) {
+    final number = _pr?.number;
+    if (number != null) _list.currentState?.drop(number);
+    _load(repo);
+  }
 
   Future<void> _load(RepoController repo) async {
     final head = repo.status.head;
@@ -88,7 +97,7 @@ class _PrTabState extends State<PrTab> {
           else if (head == null)
             EmptyState(icon: Icons.merge_rounded, title: l10n.prDetached)
           else if (pr != null && pr.headRef == head && (pr.open || pr.merged))
-            PrCard(pr: pr, repo: repo, onChanged: () => _load(repo))
+            PrCard(pr: pr, repo: repo, onChanged: () => _changed(repo))
           else if (onDefault)
             EmptyState(
               icon: Icons.merge_rounded,
@@ -113,7 +122,7 @@ class _PrTabState extends State<PrTab> {
               ),
             ),
           const Divider(height: AppSpacing.xl),
-          PrList(repo: repo),
+          PrList(key: _list, repo: repo),
         ],
       ),
     );
@@ -590,17 +599,26 @@ class _PrListState extends State<PrList> {
   PrFilter _filter = PrFilter.mine;
   List<PullRequest>? _items;
 
+  /// 방금 병합·닫은 PR 번호 — 목록이 옛 상태로 돌아와도 숨긴다.
+  final _dropped = <int>{};
+
+  void drop(int number) {
+    _dropped.add(number);
+    setState(() => _items = _items?.where((p) => p.number != number).toList());
+    _load(keepItems: true);
+  }
+
   @override
   void initState() {
     super.initState();
     _load();
   }
 
-  Future<void> _load() async {
-    setState(() => _items = null);
+  Future<void> _load({bool keepItems = false}) async {
+    if (!keepItems) setState(() => _items = null);
     final r = await widget.repo.read(GhCommands.prList(_filter, PullRequest.listFields));
     if (!mounted) return;
-    setState(() => _items = r.ok ? PullRequest.parseList(r.stdout) : const []);
+    setState(() => _items = r.ok ? PullRequest.parseList(r.stdout).where((p) => !_dropped.contains(p.number)).toList() : const []);
   }
 
   @override
