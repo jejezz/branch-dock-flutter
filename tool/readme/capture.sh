@@ -2,17 +2,20 @@
 #
 # README screenshots and demo GIF (conventions/readme-guide.md §4). macOS only.
 #
-#   tool/readme/capture.sh shot <name>          window → docs/screenshots/raw/<name>.png
-#   tool/readme/capture.sh record <seconds>     window area → docs/screenshots/raw/demo.mov
-#   tool/readme/capture.sh gif [in.mov]         raw/demo.mov → docs/screenshots/demo.gif
+#   tool/readme/capture.sh shot <name>          window → docs/screenshots/raw/<lang>/<name>.png
+#   tool/readme/capture.sh record <seconds>     window area → docs/screenshots/raw/<lang>/demo.mov
+#   tool/readme/capture.sh gif [in.mov]         raw/<lang>/demo.mov → docs/screenshots/<lang>/demo.gif
+#
+# <lang> is README_LANG (en or ko, default en): run the app in that language and
+# capture with README_LANG=<lang>, so README.md and README.ko.md each show their own.
 #
 # Run the app first (flutter run -d macos, release mode looks best) and
 # size its window with the app's default size. `shot` and `record` find the
 # window by the app's display name (AppInfo.xcconfig PRODUCT_NAME), so the
 # app doesn't need to be in front. Then frame the raw shots:
 #
-#   python3 tool/readme/frame.py docs/screenshots/raw/home.png
-#   python3 tool/readme/frame.py --split docs/screenshots/raw/home-light.png docs/screenshots/raw/home-dark.png -o home.png
+#   python3 tool/readme/frame.py --lang en docs/screenshots/raw/en/home.png
+#   python3 tool/readme/frame.py --lang en --split docs/screenshots/raw/en/home-light.png docs/screenshots/raw/en/home-dark.png -o home.png
 #
 # The first `shot`/`record` asks for the Screen Recording permission for the
 # terminal app — grant it in System Settings → Privacy & Security, then rerun.
@@ -23,8 +26,9 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 here="$root/tool/readme"
-raw="$root/docs/screenshots/raw"
-out="$root/docs/screenshots"
+lang="${README_LANG:-en}"
+raw="$root/docs/screenshots/raw/$lang"
+out="$root/docs/screenshots/$lang"
 # The Flutter app: the repository root, or its one */pubspec.yaml subfolder
 # (e.g. gui/ beside a Rust crate) — same rule as scripts/bump-version.sh.
 app="$root"

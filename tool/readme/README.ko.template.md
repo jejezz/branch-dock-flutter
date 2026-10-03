@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="{{DISPLAY_NAME}} 데모: {{TODO: GIF가 보여주는 흐름}}">
+  <img src="docs/screenshots/ko/demo.gif" width="720" alt="{{DISPLAY_NAME}} 데모: {{TODO: GIF가 보여주는 흐름}}">
 </p>
 
 ## 기능
@@ -36,8 +36,8 @@
 - **라이트·다크, 한국어·English** — 시스템 설정을 따르거나 툴바에서 고를 수 있습니다
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="360" alt="{{TODO: 화면 1}}">
-  <img src="docs/screenshots/detail.png" width="360" alt="{{TODO: 화면 2}}">
+  <img src="docs/screenshots/ko/home.png" width="360" alt="{{TODO: 화면 1}}">
+  <img src="docs/screenshots/ko/detail.png" width="360" alt="{{TODO: 화면 2}}">
 </p>
 
 ## 설치
