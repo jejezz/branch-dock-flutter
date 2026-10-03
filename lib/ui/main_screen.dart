@@ -58,6 +58,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   ReleaseFlow? _flow;
   OpenFailure? _failure;
   String? _failedPath;
+
+  /// 폴더를 여는 중인 경로. 읽는 동안 이전 저장소 화면 대신 로딩을 보여 준다.
+  String? _opening;
   bool _logExpanded = false;
   bool _dragging = false;
   bool _pinned = false;
@@ -141,14 +144,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   }
 
   Future<void> _open(String path, {bool quietFailure = false}) async {
+    setState(() => _opening = path);
     final (repo, failure) = await RepoController.open(_services.runner, path);
     if (!mounted) {
       repo?.dispose();
       return;
     }
+    if (_opening != path) {
+      // 그 사이 다른 폴더를 열었다 — 이 결과는 버린다.
+      repo?.dispose();
+      return;
+    }
     if (repo == null) {
-      if (quietFailure) return;
+      if (quietFailure) {
+        setState(() => _opening = null);
+        return;
+      }
       setState(() {
+        _opening = null;
         _failure = failure;
         _failedPath = path;
       });
@@ -165,6 +178,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     setState(() {
       _repo = repo;
       _flow = flow;
+      _opening = null;
       _failure = null;
       _failedPath = null;
       _dismissed.clear();
@@ -389,7 +403,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
         },
         child: Column(children: [
           Expanded(
-            child: repo == null
+            child: _opening != null
+                ? const Center(child: CircularProgressIndicator())
+                : repo == null
                 ? StartScreen(
                     recent: _services.prefs.recent,
                     environment: _env,
