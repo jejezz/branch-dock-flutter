@@ -653,12 +653,17 @@ class _RepoView extends StatelessWidget {
           controller: state._tabs,
           // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
           isScrollable: width < 560,
-          tabAlignment: width < 560 ? TabAlignment.start : TabAlignment.fill,
+          tabAlignment: width < 560 ? TabAlignment.center : TabAlignment.fill,
           labelPadding: const EdgeInsets.symmetric(horizontal: 10),
           labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
           unselectedLabelStyle: theme.textTheme.labelMedium,
           tabs: [
-            for (var i = 0; i < labels.length; i++) Tab(height: 48, icon: icon(i), text: labels[i]),
+            for (var i = 0; i < labels.length; i++)
+              // 스크롤 모드에서는 글자 수대로 폭이 달라지므로 같은 폭으로 맞춘다.
+              SizedBox(
+                width: width < 560 ? 68 : null,
+                child: Tab(height: 48, icon: icon(i), text: labels[i]),
+              ),
           ],
         ),
       Expanded(
