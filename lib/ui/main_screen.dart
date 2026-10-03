@@ -633,6 +633,19 @@ class _RepoView extends StatelessWidget {
       ],
     );
 
+    // 스크롤 모드에서 모든 탭을 가장 긴 라벨에 맞춘 같은 폭으로 (언어마다 길이가 다르다).
+    final labelStyle = theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700);
+    final tabWidth = labels
+            .map((t) => (TextPainter(
+                  text: TextSpan(text: t, style: labelStyle),
+                  textDirection: TextDirection.ltr,
+                  textScaler: MediaQuery.textScalerOf(context),
+                )..layout())
+                    .width)
+            .reduce((a, b) => a > b ? a : b)
+            .ceilToDouble() +
+        20;
+
     return Column(children: [
       StatusHeader(onBranchTap: () => state._tabs.animateTo(_MainScreenState._tabBranches)),
       _DelayedProgress(visible: repo.busy),
@@ -653,12 +666,17 @@ class _RepoView extends StatelessWidget {
           controller: state._tabs,
           // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
           isScrollable: width < 560,
-          tabAlignment: width < 560 ? TabAlignment.start : TabAlignment.fill,
+          tabAlignment: width < 560 ? TabAlignment.center : TabAlignment.fill,
           labelPadding: const EdgeInsets.symmetric(horizontal: 10),
           labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
           unselectedLabelStyle: theme.textTheme.labelMedium,
           tabs: [
-            for (var i = 0; i < labels.length; i++) Tab(height: 48, icon: icon(i), text: labels[i]),
+            for (var i = 0; i < labels.length; i++)
+              // 스크롤 모드에서는 글자 수대로 폭이 달라지므로 같은 폭으로 맞춘다.
+              SizedBox(
+                width: width < 560 ? tabWidth : null,
+                child: Tab(height: 48, icon: icon(i), text: labels[i]),
+              ),
           ],
         ),
       Expanded(
