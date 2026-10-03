@@ -644,7 +644,7 @@ class _RepoView extends StatelessWidget {
                     .width)
             .reduce((a, b) => a > b ? a : b)
             .ceilToDouble() +
-        20;
+        2;
 
     return Column(children: [
       StatusHeader(onBranchTap: () => state._tabs.animateTo(_MainScreenState._tabBranches)),
@@ -667,7 +667,7 @@ class _RepoView extends StatelessWidget {
           // 탭이 8개라 좁은 창(560px 미만)에서는 가로로 스크롤한다 (UI_UX.md §2).
           isScrollable: width < 560,
           tabAlignment: width < 560 ? TabAlignment.center : TabAlignment.fill,
-          labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           labelStyle: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
           unselectedLabelStyle: theme.textTheme.labelMedium,
           tabs: [
