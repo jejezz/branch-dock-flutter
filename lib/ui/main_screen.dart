@@ -100,6 +100,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
       if (_services.prefs.autoFetch) _repo?.backgroundFetch();
     });
     // 편집기 옆에 띄워 두고 쓰는 앱이라 마지막 저장소를 다시 연다.
+    await _services.prefs.pruneMissingRecent();
     final recent = _services.prefs.recent;
     if (_env.hasGit && recent.isNotEmpty) await _open(recent.first, quietFailure: true);
   }
@@ -156,6 +157,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
       return;
     }
     if (repo == null) {
+      if (!Directory(path).existsSync()) await _services.prefs.removeRecent(path);
       if (quietFailure) {
         setState(() => _opening = null);
         return;
