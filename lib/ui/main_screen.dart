@@ -633,6 +633,19 @@ class _RepoView extends StatelessWidget {
       ],
     );
 
+    // 스크롤 모드에서 모든 탭을 가장 긴 라벨에 맞춘 같은 폭으로 (언어마다 길이가 다르다).
+    final labelStyle = theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700);
+    final tabWidth = labels
+            .map((t) => (TextPainter(
+                  text: TextSpan(text: t, style: labelStyle),
+                  textDirection: TextDirection.ltr,
+                  textScaler: MediaQuery.textScalerOf(context),
+                )..layout())
+                    .width)
+            .reduce((a, b) => a > b ? a : b)
+            .ceilToDouble() +
+        20;
+
     return Column(children: [
       StatusHeader(onBranchTap: () => state._tabs.animateTo(_MainScreenState._tabBranches)),
       _DelayedProgress(visible: repo.busy),
@@ -661,7 +674,7 @@ class _RepoView extends StatelessWidget {
             for (var i = 0; i < labels.length; i++)
               // 스크롤 모드에서는 글자 수대로 폭이 달라지므로 같은 폭으로 맞춘다.
               SizedBox(
-                width: width < 560 ? 68 : null,
+                width: width < 560 ? tabWidth : null,
                 child: Tab(height: 48, icon: icon(i), text: labels[i]),
               ),
           ],
