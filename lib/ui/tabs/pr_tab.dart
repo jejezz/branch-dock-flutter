@@ -599,8 +599,10 @@ class _PrListState extends State<PrList> {
   PrFilter _filter = PrFilter.mine;
   List<PullRequest>? _items;
 
-  /// 방금 병합·닫은 PR 번호 — 목록이 옛 상태로 돌아와도 숨긴다.
-  final _dropped = <int>{};
+  /// 방금 병합·닫은 PR 번호 — 목록이 옛 상태로 돌아와도 숨긴다. 탭을 오가며 이
+  /// 위젯이 새로 만들어져도 남도록 저장소별로 앱이 도는 동안 기억한다.
+  static final _droppedByRepo = <String, Set<int>>{};
+  Set<int> get _dropped => _droppedByRepo.putIfAbsent(widget.repo.root, () => {});
 
   void drop(int number) {
     _dropped.add(number);
@@ -657,17 +659,19 @@ class _PrListState extends State<PrList> {
           child: Text(l10n.prListEmpty, style: theme.textTheme.bodySmall),
         )
       else
-        for (final pr in items) _PrRow(pr: pr, repo: widget.repo, onChanged: _load),
+        for (final pr in items)
+          _PrRow(pr: pr, repo: widget.repo, onChanged: _load, onMerged: () => _dropped.add(pr.number)),
     ]);
   }
 }
 
 class _PrRow extends StatelessWidget {
-  const _PrRow({required this.pr, required this.repo, required this.onChanged});
+  const _PrRow({required this.pr, required this.repo, required this.onChanged, required this.onMerged});
 
   final PullRequest pr;
   final RepoController repo;
   final VoidCallback onChanged;
+  final VoidCallback onMerged;
 
   @override
   Widget build(BuildContext context) {
@@ -676,7 +680,7 @@ class _PrRow extends StatelessWidget {
     final c = pr.checks;
     final current = repo.status.head == pr.headRef;
     return InkWell(
-      onTap: () => showPrSheet(context, repo, pr.number, onChanged: onChanged),
+      onTap: () => showPrSheet(context, repo, pr.number, onChanged: onChanged, onMerged: onMerged),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 6, 4, 6),
         child: Row(children: [
@@ -717,7 +721,8 @@ class _PrRow extends StatelessWidget {
 }
 
 /// PR 하나: 카드 + 체크아웃 (`gh pr checkout`) + 병합.
-Future<void> showPrSheet(BuildContext context, RepoController repo, int number, {VoidCallback? onChanged}) async {
+Future<void> showPrSheet(BuildContext context, RepoController repo, int number,
+    {VoidCallback? onChanged, VoidCallback? onMerged}) async {
   final r = await repo.read(GhCommands.prView('$number', PullRequest.jsonFields));
   if (!context.mounted) return;
   final pr = r.ok ? PullRequest.parse(r.stdout) : null;
@@ -725,11 +730,11 @@ Future<void> showPrSheet(BuildContext context, RepoController repo, int number, 
     showCommandError(context, r);
     return;
   }
-  await showPrSheetWith(context, repo, pr, onChanged: onChanged);
+  await showPrSheetWith(context, repo, pr, onChanged: onChanged, onMerged: onMerged);
 }
 
 Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequest pr,
-    {VoidCallback? onChanged, List<PrActivity>? activity}) {
+    {VoidCallback? onChanged, VoidCallback? onMerged, List<PrActivity>? activity}) {
   return showActionSheet<void>(context, (context) {
     final l10n = AppLocalizations.of(context);
     final current = repo.status.head == pr.headRef;
@@ -744,6 +749,7 @@ Future<void> showPrSheetWith(BuildContext context, RepoController repo, PullRequ
             activity: activity,
             onChanged: () {
               Navigator.pop(context);
+              onMerged?.call();
               onChanged?.call();
             },
           ),
