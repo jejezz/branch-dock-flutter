@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +29,18 @@ class RepoPrefs {
 
   Future<void> removeRecent(String path) =>
       _prefs.setStringList(_recentKey, recent.where((p) => p != path).toList());
+
+  /// 이미 사라진 폴더를 최근 목록에서 뺀다. 저장소별로 기억한 값도 함께 지운다.
+  Future<void> pruneMissingRecent() async {
+    final missing = recent.where((p) => !Directory(p).existsSync()).toList();
+    if (missing.isEmpty) return;
+    await _prefs.setStringList(_recentKey, recent.where((p) => !missing.contains(p)).toList());
+    for (final path in missing) {
+      for (final key in _prefs.getKeys().where((k) => k.endsWith(':$path')).toList()) {
+        await _prefs.remove(key);
+      }
+    }
+  }
 
   PullMode pullMode(String repo) =>
       PullMode.values.asNameMap()[_prefs.getString('pull_mode:$repo')] ?? PullMode.merge;
