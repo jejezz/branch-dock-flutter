@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Frame raw window screenshots for the README (conventions/readme-guide.md §4).
 
-    python3 tool/readme/frame.py docs/screenshots/raw/home.png [more.png …]
-    python3 tool/readme/frame.py --split raw/home-light.png raw/home-dark.png -o home.png
+    python3 tool/readme/frame.py [--lang en|ko] docs/screenshots/raw/en/home.png [more.png …]
+    python3 tool/readme/frame.py [--lang en|ko] --split raw/en/home-light.png raw/en/home-dark.png -o home.png
 
 Every output is 1200px wide (the README shows it at 360 or 720, so it stays
 sharp on Retina) with rounded corners and a soft shadow on a transparent
@@ -12,7 +12,7 @@ margin, so the same file reads well on GitHub's light and dark themes.
 cut on a diagonal — one image that shows both themes (conventions/theming.md §6).
 Capture both at the same window size.
 
-Outputs go to docs/screenshots/<name>.png. Needs Pillow.
+Outputs go to docs/screenshots/<lang>/<name>.png (--lang, default en). Needs Pillow.
 
 From jejezz/application-release-templates common/ @ conventions-v1.
 """
@@ -24,7 +24,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'docs/screenshots'
+SHOTS = ROOT / 'docs/screenshots'
 
 WIDTH = 1200          # content width
 RADIUS = 20           # macOS window corner at this scale
@@ -76,15 +76,17 @@ def split(light: Image.Image, dark: Image.Image) -> Image.Image:
     return out
 
 
-def save(img: Image.Image, name: str) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    path = OUT / name
+def save(img: Image.Image, name: str, lang: str) -> None:
+    out = SHOTS / lang
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / name
     img.save(path, optimize=True)
     print(f'wrote {path.relative_to(ROOT)} {img.size[0]}x{img.size[1]} ({path.stat().st_size // 1024} KB)')
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
+    ap.add_argument('--lang', default='en', choices=['en', 'ko'], help='README language (default en)')
     ap.add_argument('images', nargs='+', type=Path)
     ap.add_argument('--split', action='store_true', help='two images: light then dark')
     ap.add_argument('-o', '--output', help='output file name (with --split)')
@@ -95,11 +97,11 @@ def main() -> None:
             raise SystemExit('--split takes exactly two images: light, dark')
         light, dark = (scaled(Image.open(p)) for p in args.images)
         name = args.output or args.images[0].name.replace('-light', '')
-        save(framed(rounded(split(light, dark), RADIUS)), name)
+        save(framed(rounded(split(light, dark), RADIUS)), name, args.lang)
         return
 
     for p in args.images:
-        save(framed(rounded(scaled(Image.open(p)), RADIUS)), p.name)
+        save(framed(rounded(scaled(Image.open(p)), RADIUS)), p.name, args.lang)
 
 
 if __name__ == '__main__':

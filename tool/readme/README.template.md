@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="{{DISPLAY_NAME}} demo: {{TODO: what the GIF shows, e.g. open, scan, clean}}">
+  <img src="docs/screenshots/en/demo.gif" width="720" alt="{{DISPLAY_NAME}} demo: {{TODO: what the GIF shows, e.g. open, scan, clean}}">
 </p>
 
 ## Features
@@ -36,8 +36,8 @@
 - **Light & dark, English & 한국어** — follows the system, or pick one in the toolbar
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="360" alt="{{TODO: screen 1}}">
-  <img src="docs/screenshots/detail.png" width="360" alt="{{TODO: screen 2}}">
+  <img src="docs/screenshots/en/home.png" width="360" alt="{{TODO: screen 1}}">
+  <img src="docs/screenshots/en/detail.png" width="360" alt="{{TODO: screen 2}}">
 </p>
 
 ## Install

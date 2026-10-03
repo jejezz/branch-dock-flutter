@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock demo: create and switch to a new branch feature/hourly from the Branches tab, then publish it to the remote">
+  <img src="docs/screenshots/en/demo.gif" width="720" alt="Branch Dock demo: create and switch to a new branch feature/hourly from the Branches tab, then publish it to the remote">
 </p>
 
 ## Features
@@ -39,8 +39,8 @@
 - **Light & dark, English & 한국어** — follows the system, or pick one in the toolbar
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="360" alt="Changes tab: the status header with main → origin/main, ↑2, 4 changed and Fetch, Pull and Push, a suggestion banner, and the staged and changed files (light and dark)">
-  <img src="docs/screenshots/detail.png" width="360" alt="New branch form: branch name, prefix chips, start point, switch after creating, and the command to run: git switch -c feature/hourly">
+  <img src="docs/screenshots/en/home.png" width="360" alt="Changes tab: the status header with main → origin/main, ↑2, 4 changed and Fetch, Pull and Push, a suggestion banner, and the staged and changed files (light and dark)">
+  <img src="docs/screenshots/en/detail.png" width="360" alt="New branch form: branch name, prefix chips, start point, switch after creating, and the command to run: git switch -c feature/hourly">
 </p>
 
 ## Install

@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" width="720" alt="Branch Dock 데모: 브랜치 탭에서 새 브랜치 feature/hourly를 만들어 전환하고, 게시(Publish)로 원격에 올리는 흐름">
+  <img src="docs/screenshots/ko/demo.gif" width="720" alt="Branch Dock 데모: 브랜치 탭에서 새 브랜치 feature/hourly를 만들어 전환하고, 게시(Publish)로 원격에 올리는 흐름">
 </p>
 
 ## 기능
@@ -39,8 +39,8 @@
 - **라이트·다크, 한국어·English** — 시스템 설정을 따르거나 툴바에서 고를 수 있습니다
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="360" alt="변경 탭: 상태 헤더에 main → origin/main, ↑2, 변경 4와 Fetch·Pull·Push 버튼, 추천 배너, 스테이징된 파일과 변경된 파일 목록 (라이트·다크)">
-  <img src="docs/screenshots/detail.png" width="360" alt="새 브랜치 양식: 브랜치 이름, 접두어 칩, 시작 브랜치, 만든 뒤 전환 체크, 실행될 명령 git switch -c feature/hourly">
+  <img src="docs/screenshots/ko/home.png" width="360" alt="변경 탭: 상태 헤더에 main → origin/main, ↑2, 변경 4와 Fetch·Pull·Push 버튼, 추천 배너, 스테이징된 파일과 변경된 파일 목록 (라이트·다크)">
+  <img src="docs/screenshots/ko/detail.png" width="360" alt="새 브랜치 양식: 브랜치 이름, 접두어 칩, 시작 브랜치, 만든 뒤 전환 체크, 실행될 명령 git switch -c feature/hourly">
 </p>
 
 ## 설치
