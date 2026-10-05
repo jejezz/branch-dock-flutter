@@ -99,10 +99,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     _autoFetch = Timer.periodic(const Duration(minutes: 5), (_) {
       if (_services.prefs.autoFetch) _repo?.backgroundFetch();
     });
-    // 편집기 옆에 띄워 두고 쓰는 앱이라 마지막 저장소를 다시 연다.
+    // 마지막 저장소를 자동으로 열지 않고, 시작 화면의 최근 목록에서 고르게 한다.
     await _services.prefs.pruneMissingRecent();
-    final recent = _services.prefs.recent;
-    if (_env.hasGit && recent.isNotEmpty) await _open(recent.first, quietFailure: true);
+    if (mounted) setState(() {});
   }
 
   @override
