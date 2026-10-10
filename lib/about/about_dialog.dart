@@ -24,6 +24,7 @@ Future<void> showAppAboutDialog(
   required String description,
   List<String> features = const [],
   List<String> assetCredits = const [],
+  VoidCallback? onCheckForUpdates,
 }) async {
   // 버전은 실제 빌드에서 읽는다 — 코드에 적어 두면 pubspec과 어긋난다.
   final info = await PackageInfo.fromPlatform();
@@ -38,6 +39,7 @@ Future<void> showAppAboutDialog(
       description: description,
       features: features,
       assetCredits: assetCredits,
+      onCheckForUpdates: onCheckForUpdates,
     ),
   );
 }
@@ -51,6 +53,7 @@ class AppAboutDialog extends StatelessWidget {
     required this.description,
     this.features = const [],
     this.assetCredits = const [],
+    this.onCheckForUpdates,
   });
 
   final String version;
@@ -59,6 +62,9 @@ class AppAboutDialog extends StatelessWidget {
   final String description;
   final List<String> features;
   final List<String> assetCredits;
+
+  /// 있으면 "업데이트 확인" 단추를 보인다 (conventions/updating.md). 업데이트를 안 쓰는 앱은 null.
+  final VoidCallback? onCheckForUpdates;
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +146,11 @@ class AppAboutDialog extends StatelessWidget {
           onPressed: () => launchUrl(Uri.parse(AppIdentity.repositoryUrl)),
           child: Text(l10n.aboutRepository),
         ),
+        if (onCheckForUpdates != null)
+          TextButton(
+            onPressed: onCheckForUpdates,
+            child: Text(l10n.updateCheckMenuItem),
+          ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.commonClose),

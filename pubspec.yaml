@@ -39,6 +39,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   window_manager: ^0.5.2
+  # 임시: 로컬 경로. application-release-templates 의 updater/ 가 GitHub 에 올라가면 git 의존성(ref: conventions-v1)으로 바꾼다.
+  app_updater:
+    path: ../application-release-templates/updater
   file_selector: ^1.1.0
   desktop_drop: ^0.8.4
   flutter_markdown_plus: ^1.0.12

@@ -25,6 +25,7 @@ import 'settings/app_settings.dart';
 import 'theme/app_theme.dart';
 import 'ui/main_screen.dart';
 import 'ui/services.dart';
+import 'update/update_service.dart';
 
 final bool _isDesktop = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
@@ -70,7 +71,9 @@ Future<void> main() async {
     prefs: prefs,
   );
   final settings = await AppSettings.load();
-  runApp(ServicesScope(services: services, child: App(settings: settings)));
+  // 데스크톱이 아니거나 UPDATE_SERVER 가 비어 있으면 null — 업데이트 확인 없음.
+  final updates = await UpdateService.create();
+  runApp(ServicesScope(services: services, child: App(settings: settings, updates: updates)));
 }
 
 double _devicePixelRatio() => ui.PlatformDispatcher.instance.implicitView?.devicePixelRatio ?? 1.0;
@@ -124,9 +127,10 @@ class _BoundsSaver with WindowListener {
 }
 
 class App extends StatefulWidget {
-  const App({super.key, required this.settings});
+  const App({super.key, required this.settings, this.updates});
 
   final AppSettings settings;
+  final UpdateService? updates;
 
   @override
   State<App> createState() => _AppState();
@@ -141,6 +145,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     widget.settings.addListener(_syncWindowBrightness);
     _syncWindowBrightness();
+    widget.updates?.startAutomaticCheck(_navigatorKey);
   }
 
   @override
@@ -168,7 +173,17 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     final context = _navigatorKey.currentContext;
     if (context == null) return;
     final l10n = AppLocalizations.of(context);
-    showAppAboutDialog(context, tagline: l10n.aboutTagline, description: l10n.aboutDescription);
+    showAppAboutDialog(
+      context,
+      tagline: l10n.aboutTagline,
+      description: l10n.aboutDescription,
+      onCheckForUpdates: widget.updates == null ? null : () => widget.updates!.checkManually(context),
+    );
+  }
+
+  void _checkForUpdates() {
+    final context = _navigatorKey.currentContext;
+    if (context != null) widget.updates?.checkManually(context);
   }
 
   @override
@@ -188,7 +203,11 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           localeResolutionCallback: AppSettings.resolveLocale,
-          builder: (context, child) => AppMenuBar(onAbout: _showAbout, child: child!),
+          builder: (context, child) => AppMenuBar(
+            onAbout: _showAbout,
+            onCheckForUpdates: widget.updates == null ? null : _checkForUpdates,
+            child: child!,
+          ),
           home: MainScreen(onAbout: _showAbout),
         ),
       ),
