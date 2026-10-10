@@ -39,6 +39,12 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   window_manager: ^0.5.2
+  # 업데이트 확인·내려받기·검증 (application-release-templates 의 updater/). 태그로 고정한다.
+  app_updater:
+    git:
+      url: https://github.com/jejezz/application-release-templates
+      path: updater
+      ref: updater-v0.1.0
   file_selector: ^1.1.0
   desktop_drop: ^0.8.4
   flutter_markdown_plus: ^1.0.12
