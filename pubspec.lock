@@ -4,9 +4,11 @@ packages:
   app_updater:
     dependency: "direct main"
     description:
-      path: "../application-release-templates/updater"
-      relative: true
-    source: path
+      path: updater
+      ref: "updater-v0.1.0"
+      resolved-ref: "33e26a11f65760f775ff3ac6bc3b19aed4ce75b0"
+      url: "https://github.com/jejezz/application-release-templates"
+    source: git
     version: "0.1.0"
   args:
     dependency: transitive
