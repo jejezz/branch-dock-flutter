@@ -175,6 +175,8 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
+        // 앱 바 높이는 앱마다 따로 정하지 않고 여기서만 정한다 (ui-ux.md §4).
+        toolbarHeight: dense ? 44 : kToolbarHeight,
         foregroundColor: hi,
         titleTextStyle: TextStyle(fontFamily: AppFonts.family, fontSize: dense ? 16 : 20, fontWeight: FontWeight.w700, color: hi),
       ),
