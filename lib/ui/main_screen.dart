@@ -39,6 +39,7 @@ import 'tabs/remotes_tab.dart';
 import 'tabs/tags_tab.dart';
 import 'widgets.dart';
 import 'shortcut_label.dart';
+import '../window/focus_tint.dart';
 
 /// 앱의 유일한 화면 (UI_UX.md §3): 앱 바 → 상태 헤더 → 추천 배너 → 섹션 탭 →
 /// 내용 → 명령 바. 저장소가 없으면 시작 화면.
@@ -446,6 +447,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   PreferredSizeWidget _appBar(BuildContext context, AppLocalizations l10n) {
     final repo = _repo;
     return AppBar(
+      flexibleSpace: const FocusTint(),
       titleSpacing: AppSpacing.sm,
       title: repo == null
           ? const Text(AppIdentity.displayName)
