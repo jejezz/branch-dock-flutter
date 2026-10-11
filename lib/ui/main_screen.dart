@@ -446,7 +446,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   PreferredSizeWidget _appBar(BuildContext context, AppLocalizations l10n) {
     final repo = _repo;
     return AppBar(
-      toolbarHeight: 44,
       titleSpacing: AppSpacing.sm,
       title: repo == null
           ? const Text(AppIdentity.displayName)
