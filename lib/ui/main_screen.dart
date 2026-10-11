@@ -468,8 +468,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
             selectedIcon: const Icon(Icons.push_pin_rounded),
             onPressed: _togglePin,
           ),
-        const ThemeMenuButton(),
-        const LanguageMenuButton(),
+        // 테마·언어 버튼은 크기를 지정하지 않아 24로 남으므로, 다른 앱 바 버튼과 같은 18로 맞춘다.
+        IconButtonTheme(
+          data: IconButtonThemeData(style: IconButton.styleFrom(iconSize: 18)),
+          child: const Row(mainAxisSize: MainAxisSize.min, children: [ThemeMenuButton(), LanguageMenuButton()]),
+        ),
         IconButton(
           tooltip: l10n.aboutTooltip,
           iconSize: 18,
