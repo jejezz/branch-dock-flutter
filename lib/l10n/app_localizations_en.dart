@@ -2612,6 +2612,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'When you think \'I made a mistake\', look at the reflog first. It exists only on this computer, not on the remote or another machine, and git cleans up old entries.';
 
   @override
+  String get historyGraph => 'Graph';
+
+  @override
+  String get historyAllBranches => 'All branches';
+
+  @override
+  String get helpCaptionGraphMerged =>
+      'main and feature split apart and meet again at M (the hollow dot is a merge commit)';
+
+  @override
+  String get helpCommitGraphTitle => 'Reading the commit graph';
+
+  @override
+  String get helpCommitGraphWord =>
+      'A graph is a picture made of dots and lines.';
+
+  @override
+  String get helpCommitGraphInGit =>
+      'Dots are commits and lines connect each commit to its parent. Newest is at the top. A line that splits is where a branch began; two lines that join are a merge. A hollow dot is a merge commit, and a dot with a ring is where you are now (HEAD).';
+
+  @override
+  String get helpCommitGraphWhy =>
+      'See at a glance where your branch left main and where merges happened. In a narrow window only six lines are drawn; any more overlap on the right-most one.';
+
+  @override
   String get recoveryTitle => 'Undo a mistake';
 
   @override

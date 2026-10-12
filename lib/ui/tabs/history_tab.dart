@@ -4,11 +4,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../git/commands.dart';
 import '../../git/diff.dart';
+import '../../git/graph_layout.dart';
 import '../../git/history.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../commit_graph_gutter.dart';
 import '../diff_view.dart';
 import '../help/concepts.dart';
 import '../recovery_sheet.dart';
@@ -29,6 +31,9 @@ class HistoryTab extends StatefulWidget {
 
 class _HistoryTabState extends State<HistoryTab> {
   List<LogEntry>? _entries;
+
+  /// 그래프로 그릴 때의 줄 배치. 목록 모드면 null.
+  CommitGraphLayout? _layout;
   Set<String> _unpushed = const {};
   String? _loadedFor;
   bool _loading = false;
@@ -36,18 +41,32 @@ class _HistoryTabState extends State<HistoryTab> {
   /// 볼 브랜치. null이면 현재 브랜치 (다른 브랜치에서 cherry-pick할 커밋 고르기).
   String? _ref;
 
+  /// 커밋 그래프로 보기 (PLAN.md 3.11 P2). 끄면 이전처럼 목록.
+  bool _graph = true;
+
+  /// 그래프에서 모든 브랜치를 함께 보기. 켜면 [_ref]는 쓰지 않는다.
+  bool _all = false;
+
+  /// 다시 읽어야 하는지 판단하는 표식. 모든 브랜치를 볼 때는 fetch로 바뀌는 다른 브랜치도 반영한다.
+  String _key(RepoController repo) {
+    final others =
+        _all ? Object.hashAll(repo.branches.map((b) => '${b.name}:${b.lastCommit?.millisecondsSinceEpoch}')) : 0;
+    return '${repo.status.head}@${repo.status.oid}@$_ref@$_graph@$_all@$others';
+  }
+
   Future<void> _load(RepoController repo) async {
     if (_loading) return;
     _loading = true;
-    final key = '${repo.status.head}@${repo.status.oid}@$_ref';
+    final key = _key(repo);
     final results = await Future.wait([
-      repo.read(GitCommands.history(ref: _ref)),
+      repo.read(GitCommands.history(ref: _all ? null : _ref, all: _all, topo: _graph)),
       if (repo.status.hasUpstream && _ref == null) repo.read(GitCommands.unpushed),
     ]);
     _loading = false;
     if (!mounted) return;
     setState(() {
       _entries = results[0].ok ? LogEntry.parse(results[0].stdout) : const [];
+      _layout = _graph ? CommitGraphLayout.of(_entries!) : null;
       _unpushed = results.length > 1 && results[1].ok
           ? results[1].stdout.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toSet()
           : const {};
@@ -59,7 +78,7 @@ class _HistoryTabState extends State<HistoryTab> {
   Widget build(BuildContext context) {
     final repo = RepoScope.of(context);
     final l10n = AppLocalizations.of(context);
-    final key = '${repo.status.head}@${repo.status.oid}@$_ref';
+    final key = _key(repo);
     // 커밋·전환·pull로 HEAD가 바뀌거나 볼 브랜치를 바꾸면 다시 읽는다.
     if (key != _loadedFor && !_loading && !repo.status.unborn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -75,6 +94,7 @@ class _HistoryTabState extends State<HistoryTab> {
       children: [
         SectionHeader(
           title: l10n.historyTitle,
+          help: _graph ? Concept.commitGraph : null,
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
             Flexible(
               child: Text(
@@ -93,6 +113,32 @@ class _HistoryTabState extends State<HistoryTab> {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
+          child: Wrap(spacing: AppSpacing.sm, runSpacing: 4, children: [
+            FilterChip(
+              label: Text(l10n.historyGraph),
+              avatar: const Icon(Icons.account_tree_outlined, size: 16),
+              selected: _graph,
+              onSelected: (v) => setState(() {
+                _graph = v;
+                if (!v) _all = false;
+                _entries = null;
+              }),
+            ),
+            if (_graph)
+              FilterChip(
+                label: Text(l10n.historyAllBranches),
+                selected: _all,
+                onSelected: (v) => setState(() {
+                  _all = v;
+                  if (v) _ref = null;
+                  _entries = null;
+                }),
+              ),
+          ]),
+        ),
+        if (!_all) ...[
+          Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
           child: DropdownButtonFormField<String?>(
             initialValue: _ref,
             isExpanded: true,
@@ -108,6 +154,7 @@ class _HistoryTabState extends State<HistoryTab> {
             }),
           ),
         ),
+        ],
         if (_ref != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.md, AppSpacing.sm),
@@ -116,8 +163,15 @@ class _HistoryTabState extends State<HistoryTab> {
         if (entries == null)
           const Padding(padding: EdgeInsets.all(AppSpacing.xl), child: Center(child: CircularProgressIndicator()))
         else
-          for (final e in entries)
-            _CommitRow(entry: e, unpushed: _unpushed.contains(e.hash), repo: repo, otherBranch: _ref != null),
+          for (final (i, e) in entries.indexed)
+            _CommitRow(
+              entry: e,
+              unpushed: _unpushed.contains(e.hash),
+              repo: repo,
+              otherBranch: _ref != null,
+              graphRow: _layout != null && i < _layout!.rows.length ? _layout!.rows[i] : null,
+              graphLanes: CommitGraphGutter.visibleLanes(_layout?.laneCount ?? 1),
+            ),
       ],
     );
   }
@@ -126,7 +180,18 @@ class _HistoryTabState extends State<HistoryTab> {
 enum _CommitMenu { changes, revert, cherryPick, copy, branch, tag, github }
 
 class _CommitRow extends StatelessWidget {
-  const _CommitRow({required this.entry, required this.unpushed, required this.repo, this.otherBranch = false});
+  const _CommitRow({
+    required this.entry,
+    required this.unpushed,
+    required this.repo,
+    this.otherBranch = false,
+    this.graphRow,
+    this.graphLanes = 1,
+  });
+
+  /// 그래프 모드의 이 줄 배치. null이면 목록 모드.
+  final GraphRow? graphRow;
+  final int graphLanes;
 
   final LogEntry entry;
   final bool unpushed;
@@ -186,59 +251,85 @@ class _CommitRow extends StatelessWidget {
     final theme = Theme.of(context);
     final e = entry;
     final primary = toneColor(context, Tone.primary);
+    final graph = graphRow;
+
+    final text = Expanded(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(e.subject, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppFonts.userContent.copyWith(fontSize: 13)),
+        if (e.branches.isNotEmpty || e.tags.isNotEmpty || e.isHead) ...[
+          const SizedBox(height: 3),
+          Wrap(spacing: 4, runSpacing: 4, children: [
+            if (e.isHead && e.branches.isEmpty) StatusPill(label: 'HEAD', tone: Tone.warning),
+            for (final b in e.branches)
+              StatusPill(label: b, tone: b.contains('/') ? Tone.neutral : Tone.primary, icon: Icons.call_split_rounded),
+            for (final t in e.tags) StatusPill(label: t, tone: Tone.success, icon: Icons.sell_outlined),
+          ]),
+        ],
+        const SizedBox(height: 2),
+        // 그래프 모드에서는 해시 열이 없으므로 여기에 같이 보여 준다.
+        Text(
+            '${graph != null ? '${e.shortHash} · ' : ''}${e.author} · ${relativeTime(l10n, e.date)}${unpushed ? ' · ${l10n.historyNotPushed}' : ''}',
+            style: theme.textTheme.labelSmall),
+      ]),
+    );
+    final menu = PopupMenuButton<_CommitMenu>(
+      tooltip: l10n.commonMore,
+      icon: const Icon(Icons.more_horiz_rounded, size: 18),
+      enabled: !repo.busy,
+      onSelected: (m) => _onMenu(context, m),
+      itemBuilder: (context) => [
+        PopupMenuItem(value: _CommitMenu.changes, child: Text(l10n.historyViewChanges)),
+        if (!otherBranch && !repo.status.detached)
+          PopupMenuItem(value: _CommitMenu.revert, child: Text(l10n.historyRevert)),
+        if (otherBranch && !repo.status.detached)
+          PopupMenuItem(value: _CommitMenu.cherryPick, child: Text(l10n.historyCherryPickMenu(repo.status.head ?? ''))),
+        const PopupMenuDivider(),
+        PopupMenuItem(value: _CommitMenu.copy, child: Text(l10n.historyCopyHash)),
+        PopupMenuItem(value: _CommitMenu.branch, child: Text(l10n.historyBranchHere)),
+        PopupMenuItem(value: _CommitMenu.tag, child: Text(l10n.historyTagHere)),
+        if (repo.githubRemote != null) PopupMenuItem(value: _CommitMenu.github, child: Text(l10n.prOpenOnGitHub)),
+      ],
+    );
+
     return Container(
       decoration: BoxDecoration(
         // 아직 올리지 않은 커밋은 왼쪽 줄로 강조한다.
         border: Border(left: BorderSide(color: unpushed ? primary : Colors.transparent, width: 3)),
       ),
-      padding: const EdgeInsets.fromLTRB(AppSpacing.md, 5, 0, 5),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: Text(e.shortHash,
-              style: AppFonts.mono.copyWith(fontSize: 11.5, color: unpushed ? primary : theme.colorScheme.onSurfaceVariant)),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(e.subject, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppFonts.userContent.copyWith(fontSize: 13)),
-            if (e.branches.isNotEmpty || e.tags.isNotEmpty || e.isHead) ...[
-              const SizedBox(height: 3),
-              Wrap(spacing: 4, runSpacing: 4, children: [
-                if (e.isHead && e.branches.isEmpty) StatusPill(label: 'HEAD', tone: Tone.warning),
-                for (final b in e.branches)
-                  StatusPill(label: b, tone: b.contains('/') ? Tone.neutral : Tone.primary, icon: Icons.call_split_rounded),
-                for (final t in e.tags) StatusPill(label: t, tone: Tone.success, icon: Icons.sell_outlined),
+      child: graph == null
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.md, 5, 0, 5),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(e.shortHash,
+                      style: AppFonts.mono
+                          .copyWith(fontSize: 11.5, color: unpushed ? primary : theme.colorScheme.onSurfaceVariant)),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                text,
+                menu,
               ]),
-            ],
-            const SizedBox(height: 2),
-            Text('${e.author} · ${relativeTime(l10n, e.date)}${unpushed ? ' · ${l10n.historyNotPushed}' : ''}',
-                style: theme.textTheme.labelSmall),
-          ]),
-        ),
-        PopupMenuButton<_CommitMenu>(
-          tooltip: l10n.commonMore,
-          icon: const Icon(Icons.more_horiz_rounded, size: 18),
-          enabled: !repo.busy,
-          onSelected: (m) => _onMenu(context, m),
-          itemBuilder: (context) => [
-            PopupMenuItem(value: _CommitMenu.changes, child: Text(l10n.historyViewChanges)),
-            if (!otherBranch && !repo.status.detached)
-              PopupMenuItem(value: _CommitMenu.revert, child: Text(l10n.historyRevert)),
-            if (otherBranch && !repo.status.detached)
-              PopupMenuItem(value: _CommitMenu.cherryPick, child: Text(l10n.historyCherryPickMenu(repo.status.head ?? ''))),
-            const PopupMenuDivider(),
-            PopupMenuItem(value: _CommitMenu.copy, child: Text(l10n.historyCopyHash)),
-            PopupMenuItem(value: _CommitMenu.branch, child: Text(l10n.historyBranchHere)),
-            PopupMenuItem(value: _CommitMenu.tag, child: Text(l10n.historyTagHere)),
-            if (repo.githubRemote != null) PopupMenuItem(value: _CommitMenu.github, child: Text(l10n.prOpenOnGitHub)),
-          ],
-        ),
-      ]),
+            )
+          // 그래프 열은 줄 높이만큼 늘어나야 선이 이어진다 — 세로 여백은 열 바깥(글 쪽)에 준다.
+          : Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.sm),
+              child: IntrinsicHeight(
+                child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  CommitGraphGutter(row: graph, lanes: graphLanes, isHead: e.isHead, isMerge: e.isMerge),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [text, menu]),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
     );
   }
 }
-
 
 /// revert·cherry-pick 확인: 무엇이 일어나는지 + 실행될 명령 + 개념 도움말.
 Future<bool> _confirm(

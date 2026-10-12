@@ -127,6 +127,9 @@ void main() {
       expect(File('$dir/b.txt').readAsStringSync(), 'b1\nedited\n');
 
       File('$dir/b.txt').writeAsStringSync('b1\n');
+      // 파일을 원래대로 되돌린 직후에는 git의 상태 캐시가 낡아 "not uptodate"로 거부할 수 있다 —
+      // 앱에서는 상태 새로고침이 자주 돌지만, 테스트는 그 타이밍에 기대지 않고 직접 갱신한다.
+      await git(dir, ['status', '--short']);
       final r2 = await repo.execute(GitCommands.resetKeep(hashes.first));
       expect(r2.ok, isTrue, reason: r2.stderr);
       expect(await git(dir, ['rev-parse', 'HEAD']), hashes.first);
