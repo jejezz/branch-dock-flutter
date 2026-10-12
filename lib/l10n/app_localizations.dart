@@ -4244,6 +4244,48 @@ abstract class AppLocalizations {
   /// **'\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.'**
   String get helpReflogWhy;
 
+  /// No description provided for @historyGraph.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래프'**
+  String get historyGraph;
+
+  /// No description provided for @historyAllBranches.
+  ///
+  /// In ko, this message translates to:
+  /// **'모든 브랜치'**
+  String get historyAllBranches;
+
+  /// No description provided for @helpCaptionGraphMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'main과 feature가 갈라졌다가 M에서 합쳐진 기록 (속이 빈 점이 병합 커밋)'**
+  String get helpCaptionGraphMerged;
+
+  /// No description provided for @helpCommitGraphTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 그래프 읽는 법'**
+  String get helpCommitGraphTitle;
+
+  /// No description provided for @helpCommitGraphWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'graph는 \'점과 선으로 그린 그림\'.'**
+  String get helpCommitGraphWord;
+
+  /// No description provided for @helpCommitGraphInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'점은 커밋, 선은 부모와의 이음입니다. 위가 최신입니다. 선이 둘로 갈라지면 브랜치가 갈라진 곳, 두 선이 하나로 합쳐지면 병합입니다. 속이 빈 점은 병합 커밋, 고리가 둘러진 점은 지금 있는 자리(HEAD)입니다.'**
+  String get helpCommitGraphInGit;
+
+  /// No description provided for @helpCommitGraphWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'내 브랜치가 main과 어디서 갈라졌는지\', \'병합이 어디서 일어났는지\'를 한눈에 봅니다. 좁은 창에서는 선을 6줄까지만 그립니다. 그보다 많으면 맨 오른쪽 줄에 겹쳐 보입니다.'**
+  String get helpCommitGraphWhy;
+
   /// No description provided for @recoveryTitle.
   ///
   /// In ko, this message translates to:

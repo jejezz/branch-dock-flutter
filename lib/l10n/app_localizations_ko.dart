@@ -2464,6 +2464,30 @@ class AppLocalizationsKo extends AppLocalizations {
       '\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.';
 
   @override
+  String get historyGraph => '그래프';
+
+  @override
+  String get historyAllBranches => '모든 브랜치';
+
+  @override
+  String get helpCaptionGraphMerged =>
+      'main과 feature가 갈라졌다가 M에서 합쳐진 기록 (속이 빈 점이 병합 커밋)';
+
+  @override
+  String get helpCommitGraphTitle => '커밋 그래프 읽는 법';
+
+  @override
+  String get helpCommitGraphWord => 'graph는 \'점과 선으로 그린 그림\'.';
+
+  @override
+  String get helpCommitGraphInGit =>
+      '점은 커밋, 선은 부모와의 이음입니다. 위가 최신입니다. 선이 둘로 갈라지면 브랜치가 갈라진 곳, 두 선이 하나로 합쳐지면 병합입니다. 속이 빈 점은 병합 커밋, 고리가 둘러진 점은 지금 있는 자리(HEAD)입니다.';
+
+  @override
+  String get helpCommitGraphWhy =>
+      '\'내 브랜치가 main과 어디서 갈라졌는지\', \'병합이 어디서 일어났는지\'를 한눈에 봅니다. 좁은 창에서는 선을 6줄까지만 그립니다. 그보다 많으면 맨 오른쪽 줄에 겹쳐 보입니다.';
+
+  @override
   String get recoveryTitle => '실수 복구';
 
   @override

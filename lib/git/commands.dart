@@ -150,8 +150,16 @@ abstract final class GitCommands {
   /// 태그나 커밋 위치로 이동 (분리된 HEAD).
   static List<String> switchDetach(String ref) => ['git', 'switch', '--detach', ref];
   /// [ref]를 주면 그 브랜치의 기록 (cherry-pick할 커밋 고르기, PLAN.md 3.11 P2).
-  static List<String> history({int limit = 200, String? ref}) =>
-      ['git', 'log', '-n', '$limit', '--format=$historyFormat', ?ref];
+  ///
+  /// [all]이면 모든 브랜치·태그를 함께. [topo]면 부모가 항상 자식 뒤에 오는 순서 (그래프용 —
+  /// 시계가 어긋난 커밋이 있어도 선이 뒤엉키지 않는다). [all]은 [topo]를 함께 쓴다.
+  static List<String> history({int limit = 200, String? ref, bool all = false, bool topo = false}) => [
+        'git', 'log', '-n', '$limit',
+        if (all) '--all',
+        if (all || topo) '--topo-order',
+        '--format=$historyFormat',
+        ?ref,
+      ];
 
   // --- 실수 복구 (3.14) ---------------------------------------------------
 

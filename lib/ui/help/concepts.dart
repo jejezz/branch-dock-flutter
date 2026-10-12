@@ -17,6 +17,7 @@ enum Concept {
   cherryPick,
   reset,
   reflog,
+  commitGraph,
 }
 
 /// 커밋 그래프 한 장면. 커밋은 왼쪽(오래됨) → 오른쪽(최신), 줄(lane)은 위에서 아래.
@@ -350,6 +351,28 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
           ),
         ],
         links: [gitPush],
+      ),
+    Concept.commitGraph => ConceptCard(
+        title: l10n.helpCommitGraphTitle,
+        word: l10n.helpCommitGraphWord,
+        inGit: l10n.helpCommitGraphInGit,
+        why: l10n.helpCommitGraphWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionGraphMerged,
+            commits: const [
+              _a,
+              _b,
+              GraphCommit('E', 2, 0),
+              GraphCommit('C', 2, 1),
+              GraphCommit('D', 3, 1),
+              GraphCommit('M', 4, 0, highlight: true),
+            ],
+            edges: const [('A', 'B'), ('B', 'E'), ('B', 'C'), ('C', 'D'), ('E', 'M'), ('D', 'M')],
+            labels: const [GraphLabel('main', 'M', highlight: true), GraphLabel('feature', 'D')],
+          ),
+        ],
+        links: [const ConceptLink('git-log --graph', 'https://git-scm.com/docs/git-log#Documentation/git-log.txt---graph')],
       ),
     Concept.reset => ConceptCard(
         title: l10n.helpResetTitle,
