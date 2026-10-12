@@ -135,6 +135,12 @@ abstract final class GitCommands {
 
   /// 충돌 파일을 한쪽 버전으로 고른다. rebase 중에는 git의 ours/theirs가
   /// 뒤바뀌므로(ours = 옮겨 붙일 바탕, theirs = 내 커밋) 호출하는 쪽이 고른다.
+  /// 해결한 충돌을 다시 충돌 상태로 (병합 직후의 표시가 든 파일로). 병합·rebase 중에만 쓸 수 있다.
+  static List<String> reconflict(String path) => ['git', 'checkout', '-m', '--', path];
+
+  /// 이미 해결(스테이징)한 충돌 파일 목록. 출력은 `<mode> <object> <stage>\t<path>` 줄들.
+  static const resolveUndo = ['git', 'ls-files', '--resolve-undo'];
+
   static List<String> checkoutSide(String path, {required bool ours}) =>
       ['git', 'checkout', ours ? '--ours' : '--theirs', '--', path];
   static const rebaseSkip = ['git', '-c', 'core.editor=true', 'rebase', '--skip'];

@@ -399,7 +399,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changesOpenInEditor => 'Open in editor';
 
   @override
-  String get changesMarkResolved => 'Resolved';
+  String get changesMarkResolved => 'Mark resolved';
 
   @override
   String get changesCleanTitle => 'Nothing to commit';
@@ -1821,6 +1821,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get conflictUseIncoming => 'Use incoming';
+
+  @override
+  String get conflictByBlock => 'Resolve block by block';
+
+  @override
+  String conflictSheetTitle(String name) {
+    return 'Resolve conflicts in $name';
+  }
+
+  @override
+  String conflictBlockTitle(int index, int total) {
+    return 'Conflict $index of $total';
+  }
+
+  @override
+  String get conflictSideMine => 'Mine';
+
+  @override
+  String get conflictSideIncoming => 'Incoming';
+
+  @override
+  String get conflictKeepBoth => 'Keep both (top, then bottom)';
+
+  @override
+  String get conflictEmptySide => '(empty)';
+
+  @override
+  String conflictPickHint(int left) {
+    return 'Pick a side for each block. $left left.';
+  }
+
+  @override
+  String get conflictApply => 'Apply and mark resolved';
+
+  @override
+  String get conflictApplyNote =>
+      'Rewrites the file as you chose and runs git add. To edit by hand, open it in your editor.';
+
+  @override
+  String get conflictBroken =>
+      'The conflict markers are damaged, so the app can\'t read them. Fix the file in your editor.';
+
+  @override
+  String get conflictNone =>
+      'This file has no conflict markers. If you already fixed it, just press Mark resolved.';
+
+  @override
+  String get conflictUnreadable =>
+      'Can\'t read the file (it may be binary or deleted). Use \"Use mine\" or \"Use incoming\" instead.';
+
+  @override
+  String doneConflictResolved(String name) {
+    return '$name: conflict resolved';
+  }
+
+  @override
+  String get changesOperationTitle => 'The operation isn\'t finished yet';
+
+  @override
+  String get changesOperationMessage =>
+      'All conflicts are resolved. Press Continue above to finish, or Abort to go back to before it started.';
+
+  @override
+  String get conflictReopen => 'Back to conflicted';
+
+  @override
+  String conflictReopenMessage(String path) {
+    return 'Puts $path back the way it was right after the conflict. What you resolved so far is lost and the conflict markers come back.';
+  }
+
+  @override
+  String get conflictReopenConfirm => 'Reopen conflict';
+
+  @override
+  String get conflictMarkersLeftTitle =>
+      'Conflict markers are still in the file';
+
+  @override
+  String conflictMarkersLeftMessage(String path, int count) {
+    return '$path still has $count `<<<<<<<` marker(s). If you mark it resolved now, the markers get committed as they are. Clean it up first with \"Resolve block by block\" or in your editor.';
+  }
+
+  @override
+  String get conflictMarkersLeftConfirm => 'Mark resolved anyway';
 
   @override
   String doneFileAction(String name) {

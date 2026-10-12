@@ -725,7 +725,7 @@ abstract class AppLocalizations {
   /// No description provided for @changesMarkResolved.
   ///
   /// In ko, this message translates to:
-  /// **'해결됨'**
+  /// **'해결됨 표시'**
   String get changesMarkResolved;
 
   /// No description provided for @changesCleanTitle.
@@ -3001,6 +3001,138 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'들어오는 것 사용'**
   String get conflictUseIncoming;
+
+  /// No description provided for @conflictByBlock.
+  ///
+  /// In ko, this message translates to:
+  /// **'구간별로 해결'**
+  String get conflictByBlock;
+
+  /// No description provided for @conflictSheetTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 충돌 해결'**
+  String conflictSheetTitle(String name);
+
+  /// No description provided for @conflictBlockTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 {index}/{total}'**
+  String conflictBlockTitle(int index, int total);
+
+  /// No description provided for @conflictSideMine.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 것'**
+  String get conflictSideMine;
+
+  /// No description provided for @conflictSideIncoming.
+  ///
+  /// In ko, this message translates to:
+  /// **'들어오는 것'**
+  String get conflictSideIncoming;
+
+  /// No description provided for @conflictKeepBoth.
+  ///
+  /// In ko, this message translates to:
+  /// **'둘 다 유지 (위, 아래 순서)'**
+  String get conflictKeepBoth;
+
+  /// No description provided for @conflictEmptySide.
+  ///
+  /// In ko, this message translates to:
+  /// **'(비어 있음)'**
+  String get conflictEmptySide;
+
+  /// No description provided for @conflictPickHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'구간마다 어느 쪽을 쓸지 골라 주세요. {left}개 남았습니다.'**
+  String conflictPickHint(int left);
+
+  /// No description provided for @conflictApply.
+  ///
+  /// In ko, this message translates to:
+  /// **'적용하고 해결됨 표시'**
+  String get conflictApply;
+
+  /// No description provided for @conflictApplyNote.
+  ///
+  /// In ko, this message translates to:
+  /// **'고른 대로 파일을 다시 쓰고 git add 합니다. 직접 고쳐 쓰려면 편집기로 여세요.'**
+  String get conflictApplyNote;
+
+  /// No description provided for @conflictBroken.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 표시가 온전하지 않아 앱에서 읽을 수 없습니다. 편집기에서 직접 고쳐 주세요.'**
+  String get conflictBroken;
+
+  /// No description provided for @conflictNone.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 파일에는 충돌 표시가 없습니다. 이미 고쳤다면 \'해결됨 표시\'만 누르면 됩니다.'**
+  String get conflictNone;
+
+  /// No description provided for @conflictUnreadable.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일을 읽을 수 없습니다 (이진 파일이거나 삭제된 파일일 수 있습니다). \'내 것 사용\' 또는 \'들어오는 것 사용\'으로 해결하세요.'**
+  String get conflictUnreadable;
+
+  /// No description provided for @doneConflictResolved.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}: 충돌 해결됨'**
+  String doneConflictResolved(String name);
+
+  /// No description provided for @changesOperationTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 작업이 끝나지 않았습니다'**
+  String get changesOperationTitle;
+
+  /// No description provided for @changesOperationMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌은 모두 해결됐습니다. 위의 \'계속\'으로 마무리하거나 \'중단\'으로 시작하기 전 상태로 되돌리세요.'**
+  String get changesOperationMessage;
+
+  /// No description provided for @conflictReopen.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 충돌 상태로'**
+  String get conflictReopen;
+
+  /// No description provided for @conflictReopenMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}을(를) 충돌이 난 직후의 모습으로 되돌립니다. 지금까지 해결한 내용은 사라지고, 충돌 표시가 다시 들어갑니다.'**
+  String conflictReopenMessage(String path);
+
+  /// No description provided for @conflictReopenConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 충돌'**
+  String get conflictReopenConfirm;
+
+  /// No description provided for @conflictMarkersLeftTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 표시가 남아 있습니다'**
+  String get conflictMarkersLeftTitle;
+
+  /// No description provided for @conflictMarkersLeftMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}에 아직 `<<<<<<<` 표시가 {count}군데 남아 있습니다. 이대로 해결됨으로 표시하면 표시가 그대로 커밋됩니다. 먼저 \'구간별로 해결\'이나 편집기로 정리하세요.'**
+  String conflictMarkersLeftMessage(String path, int count);
+
+  /// No description provided for @conflictMarkersLeftConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래도 해결됨 표시'**
+  String get conflictMarkersLeftConfirm;
 
   /// No description provided for @doneFileAction.
   ///
