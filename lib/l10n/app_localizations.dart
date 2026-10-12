@@ -4178,6 +4178,258 @@ abstract class AppLocalizations {
   /// **'이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.'**
   String get helpRevertWhy;
 
+  /// No description provided for @helpCaptionBeforeReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'전: main이 D를 가리킴'**
+  String get helpCaptionBeforeReset;
+
+  /// No description provided for @helpCaptionAfterReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'후: main이 B로 옮겨짐. C·D는 사라진 것 같지만 reflog에 남아 있음'**
+  String get helpCaptionAfterReset;
+
+  /// No description provided for @helpCaptionReflog.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD가 지나온 자리가 순서대로 적혀 있어, D로 다시 돌아갈 수 있음'**
+  String get helpCaptionReflog;
+
+  /// No description provided for @helpResetTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Reset (브랜치 옮기기)'**
+  String get helpResetTitle;
+
+  /// No description provided for @helpResetWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'reset은 \'처음 자리로 되돌려 놓다\'.'**
+  String get helpResetWord;
+
+  /// No description provided for @helpResetInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치가 가리키는 커밋을 뒤로 옮깁니다. 커밋이 지워진 것처럼 보이지만 reflog에 남아 있어 한동안 되살릴 수 있습니다. --soft는 변경을 스테이징한 채 남기고, --keep은 작업 중인 변경을 지키며, --hard는 작업 중인 변경까지 버립니다.'**
+  String get helpResetInGit;
+
+  /// No description provided for @helpResetWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 올리지 않은 커밋을 취소할 때 씁니다. 이미 올린 커밋에는 쓰지 마세요. 다른 사람의 기록과 어긋나니 revert를 쓰세요. 이 앱은 안전한 --soft와 --keep만 씁니다.'**
+  String get helpResetWhy;
+
+  /// No description provided for @helpReflogTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Reflog (실수 복구 기록)'**
+  String get helpReflogTitle;
+
+  /// No description provided for @helpReflogWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'reflog는 \'reference log\', 가리키던 자리의 기록.'**
+  String get helpReflogWord;
+
+  /// No description provided for @helpReflogInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD와 브랜치가 어디를 가리켰는지 이 컴퓨터에만 적어 둔 기록입니다. 커밋을 취소하거나 브랜치를 지워도 보통 90일 동안은 그 시점을 찾아 되돌아갈 수 있습니다.'**
+  String get helpReflogInGit;
+
+  /// No description provided for @helpReflogWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.'**
+  String get helpReflogWhy;
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'실수 복구'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoveryIntro.
+  ///
+  /// In ko, this message translates to:
+  /// **'실수했어도 대부분 되돌릴 수 있습니다. 상황에 맞는 것을 고르세요.'**
+  String get recoveryIntro;
+
+  /// No description provided for @recoveryUndoCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 커밋 취소'**
+  String get recoveryUndoCommit;
+
+  /// No description provided for @recoveryUndoCommitWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'{subject}\' 커밋만 취소합니다. 바꾼 내용은 스테이징된 채 남습니다.'**
+  String recoveryUndoCommitWhy(String subject);
+
+  /// No description provided for @recoveryUndoCommitMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'{subject}\' 커밋을 취소합니다. 그 커밋에서 바꾼 내용은 지워지지 않고 스테이징된 채 남아, 고쳐서 다시 커밋할 수 있습니다.'**
+  String recoveryUndoCommitMessage(String subject);
+
+  /// No description provided for @recoveryUndoCommitPushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 커밋은 이미 원격에 올라가 있습니다. 취소해도 원격에는 남아 있어 다시 올리려면 강제 push가 필요하고, 다른 사람의 기록과 어긋납니다. 올린 커밋은 기록 탭의 \'되돌리기(revert)\'가 더 안전합니다.'**
+  String get recoveryUndoCommitPushed;
+
+  /// No description provided for @recoveryUndoCommitConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 취소'**
+  String get recoveryUndoCommitConfirm;
+
+  /// No description provided for @recoveryNoParent.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 커밋은 취소할 수 없습니다.'**
+  String get recoveryNoParent;
+
+  /// No description provided for @recoveryStash.
+  ///
+  /// In ko, this message translates to:
+  /// **'작업 중인 변경을 잠시 치우기'**
+  String get recoveryStash;
+
+  /// No description provided for @recoveryStashWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장(stash)에 보관했다가 나중에 다시 꺼냅니다.'**
+  String get recoveryStashWhy;
+
+  /// No description provided for @recoveryHistory.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 상태로 돌아가기'**
+  String get recoveryHistory;
+
+  /// No description provided for @recoveryHistoryHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD가 지나온 자리입니다. 커밋을 취소하거나 브랜치를 지운 뒤에도 보통 90일 동안 남아 있습니다.'**
+  String get recoveryHistoryHint;
+
+  /// No description provided for @recoveryNow.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금'**
+  String get recoveryNow;
+
+  /// No description provided for @recoveryEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 기록이 없습니다.'**
+  String get recoveryEmpty;
+
+  /// No description provided for @recoveryKindCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋'**
+  String get recoveryKindCommit;
+
+  /// No description provided for @recoveryKindAmend.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 고침'**
+  String get recoveryKindAmend;
+
+  /// No description provided for @recoveryKindCheckout.
+  ///
+  /// In ko, this message translates to:
+  /// **'전환'**
+  String get recoveryKindCheckout;
+
+  /// No description provided for @recoveryKindReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'되돌림'**
+  String get recoveryKindReset;
+
+  /// No description provided for @recoveryKindMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합'**
+  String get recoveryKindMerge;
+
+  /// No description provided for @recoveryKindPull.
+  ///
+  /// In ko, this message translates to:
+  /// **'pull'**
+  String get recoveryKindPull;
+
+  /// No description provided for @recoveryKindRebase.
+  ///
+  /// In ko, this message translates to:
+  /// **'rebase'**
+  String get recoveryKindRebase;
+
+  /// No description provided for @recoveryKindCherryPick.
+  ///
+  /// In ko, this message translates to:
+  /// **'cherry-pick'**
+  String get recoveryKindCherryPick;
+
+  /// No description provided for @recoveryKindRevert.
+  ///
+  /// In ko, this message translates to:
+  /// **'revert'**
+  String get recoveryKindRevert;
+
+  /// No description provided for @recoveryKindOther.
+  ///
+  /// In ko, this message translates to:
+  /// **'기타'**
+  String get recoveryKindOther;
+
+  /// No description provided for @recoveryGoBack.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기로 되돌리기'**
+  String get recoveryGoBack;
+
+  /// No description provided for @recoveryGoBackMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}를 {target} 시점으로 되돌립니다. 그 뒤의 커밋은 브랜치에서 빠지지만 reflog에 남아 있습니다. 작업 중인 변경은 그대로 두며, 겹치는 파일이 있으면 아무것도 바꾸지 않고 멈춥니다.'**
+  String recoveryGoBackMessage(String branch, String target);
+
+  /// No description provided for @recoveryGoBackConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'되돌리기'**
+  String get recoveryGoBackConfirm;
+
+  /// No description provided for @recoveryRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기서 새 브랜치 만들기'**
+  String get recoveryRescue;
+
+  /// No description provided for @doneUndoCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 커밋을 취소했습니다 (변경은 스테이징된 채 남음)'**
+  String get doneUndoCommit;
+
+  /// No description provided for @doneGoBack.
+  ///
+  /// In ko, this message translates to:
+  /// **'{target} 시점으로 되돌렸습니다'**
+  String doneGoBack(String target);
+
+  /// No description provided for @doneRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치 {name}을 만들었습니다'**
+  String doneRescue(String name);
+
   /// No description provided for @helpCherryPickTitle.
   ///
   /// In ko, this message translates to:

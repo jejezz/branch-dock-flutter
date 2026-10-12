@@ -11,6 +11,7 @@ import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
 import '../diff_view.dart';
 import '../help/concepts.dart';
+import '../recovery_sheet.dart';
 import '../repo_actions.dart';
 import '../repo_scope.dart';
 import '../widgets.dart';
@@ -74,10 +75,21 @@ class _HistoryTabState extends State<HistoryTab> {
       children: [
         SectionHeader(
           title: l10n.historyTitle,
-          trailing: Text(
-            _unpushed.isEmpty ? '' : l10n.historyUnpushed(_unpushed.length),
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: toneColor(context, Tone.primary)),
-          ),
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            Flexible(
+              child: Text(
+                _unpushed.isEmpty ? '' : l10n.historyUnpushed(_unpushed.length),
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: toneColor(context, Tone.primary)),
+              ),
+            ),
+            IconButton(
+              tooltip: l10n.recoveryTitle,
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.restore_rounded, size: 20),
+              onPressed: repo.busy ? null : () => showRecoverySheet(context, repo),
+            ),
+          ]),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),

@@ -2426,6 +2426,149 @@ class AppLocalizationsKo extends AppLocalizations {
       '이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.';
 
   @override
+  String get helpCaptionBeforeReset => '전: main이 D를 가리킴';
+
+  @override
+  String get helpCaptionAfterReset =>
+      '후: main이 B로 옮겨짐. C·D는 사라진 것 같지만 reflog에 남아 있음';
+
+  @override
+  String get helpCaptionReflog => 'HEAD가 지나온 자리가 순서대로 적혀 있어, D로 다시 돌아갈 수 있음';
+
+  @override
+  String get helpResetTitle => 'Reset (브랜치 옮기기)';
+
+  @override
+  String get helpResetWord => 'reset은 \'처음 자리로 되돌려 놓다\'.';
+
+  @override
+  String get helpResetInGit =>
+      '브랜치가 가리키는 커밋을 뒤로 옮깁니다. 커밋이 지워진 것처럼 보이지만 reflog에 남아 있어 한동안 되살릴 수 있습니다. --soft는 변경을 스테이징한 채 남기고, --keep은 작업 중인 변경을 지키며, --hard는 작업 중인 변경까지 버립니다.';
+
+  @override
+  String get helpResetWhy =>
+      '아직 올리지 않은 커밋을 취소할 때 씁니다. 이미 올린 커밋에는 쓰지 마세요. 다른 사람의 기록과 어긋나니 revert를 쓰세요. 이 앱은 안전한 --soft와 --keep만 씁니다.';
+
+  @override
+  String get helpReflogTitle => 'Reflog (실수 복구 기록)';
+
+  @override
+  String get helpReflogWord => 'reflog는 \'reference log\', 가리키던 자리의 기록.';
+
+  @override
+  String get helpReflogInGit =>
+      'HEAD와 브랜치가 어디를 가리켰는지 이 컴퓨터에만 적어 둔 기록입니다. 커밋을 취소하거나 브랜치를 지워도 보통 90일 동안은 그 시점을 찾아 되돌아갈 수 있습니다.';
+
+  @override
+  String get helpReflogWhy =>
+      '\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.';
+
+  @override
+  String get recoveryTitle => '실수 복구';
+
+  @override
+  String get recoveryIntro => '실수했어도 대부분 되돌릴 수 있습니다. 상황에 맞는 것을 고르세요.';
+
+  @override
+  String get recoveryUndoCommit => '마지막 커밋 취소';
+
+  @override
+  String recoveryUndoCommitWhy(String subject) {
+    return '\'$subject\' 커밋만 취소합니다. 바꾼 내용은 스테이징된 채 남습니다.';
+  }
+
+  @override
+  String recoveryUndoCommitMessage(String subject) {
+    return '\'$subject\' 커밋을 취소합니다. 그 커밋에서 바꾼 내용은 지워지지 않고 스테이징된 채 남아, 고쳐서 다시 커밋할 수 있습니다.';
+  }
+
+  @override
+  String get recoveryUndoCommitPushed =>
+      '이 커밋은 이미 원격에 올라가 있습니다. 취소해도 원격에는 남아 있어 다시 올리려면 강제 push가 필요하고, 다른 사람의 기록과 어긋납니다. 올린 커밋은 기록 탭의 \'되돌리기(revert)\'가 더 안전합니다.';
+
+  @override
+  String get recoveryUndoCommitConfirm => '커밋 취소';
+
+  @override
+  String get recoveryNoParent => '첫 커밋은 취소할 수 없습니다.';
+
+  @override
+  String get recoveryStash => '작업 중인 변경을 잠시 치우기';
+
+  @override
+  String get recoveryStashWhy => '임시 저장(stash)에 보관했다가 나중에 다시 꺼냅니다.';
+
+  @override
+  String get recoveryHistory => '이전 상태로 돌아가기';
+
+  @override
+  String get recoveryHistoryHint =>
+      'HEAD가 지나온 자리입니다. 커밋을 취소하거나 브랜치를 지운 뒤에도 보통 90일 동안 남아 있습니다.';
+
+  @override
+  String get recoveryNow => '지금';
+
+  @override
+  String get recoveryEmpty => '아직 기록이 없습니다.';
+
+  @override
+  String get recoveryKindCommit => '커밋';
+
+  @override
+  String get recoveryKindAmend => '커밋 고침';
+
+  @override
+  String get recoveryKindCheckout => '전환';
+
+  @override
+  String get recoveryKindReset => '되돌림';
+
+  @override
+  String get recoveryKindMerge => '병합';
+
+  @override
+  String get recoveryKindPull => 'pull';
+
+  @override
+  String get recoveryKindRebase => 'rebase';
+
+  @override
+  String get recoveryKindCherryPick => 'cherry-pick';
+
+  @override
+  String get recoveryKindRevert => 'revert';
+
+  @override
+  String get recoveryKindOther => '기타';
+
+  @override
+  String get recoveryGoBack => '여기로 되돌리기';
+
+  @override
+  String recoveryGoBackMessage(String branch, String target) {
+    return '$branch를 $target 시점으로 되돌립니다. 그 뒤의 커밋은 브랜치에서 빠지지만 reflog에 남아 있습니다. 작업 중인 변경은 그대로 두며, 겹치는 파일이 있으면 아무것도 바꾸지 않고 멈춥니다.';
+  }
+
+  @override
+  String get recoveryGoBackConfirm => '되돌리기';
+
+  @override
+  String get recoveryRescue => '여기서 새 브랜치 만들기';
+
+  @override
+  String get doneUndoCommit => '마지막 커밋을 취소했습니다 (변경은 스테이징된 채 남음)';
+
+  @override
+  String doneGoBack(String target) {
+    return '$target 시점으로 되돌렸습니다';
+  }
+
+  @override
+  String doneRescue(String name) {
+    return '브랜치 $name을 만들었습니다';
+  }
+
+  @override
   String get helpCherryPickTitle => 'Cherry-pick (골라 가져오기)';
 
   @override

@@ -728,6 +728,86 @@
   "helpRevertWord": "To revert is to go back to how something was.",
   "helpRevertInGit": "Doesn't delete the commit — it adds a new commit that applies the opposite change. Both the original and the revert stay in history.",
   "helpRevertWhy": "Use it when a commit you've already pushed causes trouble. History isn't rewritten, so nobody else is affected and no force push is needed. For commits not yet pushed, amending is cleaner.",
+  "helpCaptionBeforeReset": "Before: main points at D",
+  "helpCaptionAfterReset": "After: main moved to B. C and D look gone but are still in the reflog",
+  "helpCaptionReflog": "The places HEAD has been are listed in order, so you can go back to D",
+  "helpResetTitle": "Reset",
+  "helpResetWord": "To reset is to put something back where it was.",
+  "helpResetInGit": "Moves the branch back to an earlier commit. The commits look deleted but stay in the reflog for a while. --soft keeps the changes staged, --keep protects your uncommitted work, and --hard throws that work away too.",
+  "helpResetWhy": "Use it to undo commits you haven't pushed yet. Don't use it on pushed commits: it disagrees with everyone else's history, so use revert. This app only uses the safe --soft and --keep.",
+  "helpReflogTitle": "Reflog",
+  "helpReflogWord": "Reflog is short for 'reference log': a record of where a name pointed.",
+  "helpReflogInGit": "A record, kept only on this computer, of where HEAD and your branches pointed. Even after you undo a commit or delete a branch, you can usually find that point again for about 90 days.",
+  "helpReflogWhy": "When you think 'I made a mistake', look at the reflog first. It exists only on this computer, not on the remote or another machine, and git cleans up old entries.",
+  "recoveryTitle": "Undo a mistake",
+  "recoveryIntro": "Most mistakes can be undone. Pick what fits.",
+  "recoveryUndoCommit": "Undo the last commit",
+  "recoveryUndoCommitWhy": "Undoes only \"{subject}\". Its changes stay staged.",
+  "@recoveryUndoCommitWhy": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryUndoCommitMessage": "Undoes the commit \"{subject}\". Its changes aren't deleted — they stay staged so you can fix them and commit again.",
+  "@recoveryUndoCommitMessage": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryUndoCommitPushed": "This commit is already on the remote. Undoing it here leaves it there, so pushing again needs a force push and your history no longer matches everyone else's. For a pushed commit, Revert in the History tab is safer.",
+  "recoveryUndoCommitConfirm": "Undo commit",
+  "recoveryNoParent": "The first commit can't be undone.",
+  "recoveryStash": "Set my changes aside for now",
+  "recoveryStashWhy": "Keeps them in a stash so you can bring them back later.",
+  "recoveryHistory": "Go back to an earlier state",
+  "recoveryHistoryHint": "Where HEAD has been. Even after undoing commits or deleting a branch, it usually stays for 90 days.",
+  "recoveryNow": "Now",
+  "recoveryEmpty": "Nothing recorded yet.",
+  "recoveryKindCommit": "Commit",
+  "recoveryKindAmend": "Amend",
+  "recoveryKindCheckout": "Switch",
+  "recoveryKindReset": "Reset",
+  "recoveryKindMerge": "Merge",
+  "recoveryKindPull": "Pull",
+  "recoveryKindRebase": "Rebase",
+  "recoveryKindCherryPick": "Cherry-pick",
+  "recoveryKindRevert": "Revert",
+  "recoveryKindOther": "Other",
+  "recoveryGoBack": "Go back here",
+  "recoveryGoBackMessage": "Moves {branch} back to {target}. The commits after it leave the branch but stay in the reflog. Your uncommitted work is kept, and if a file overlaps, nothing changes and git stops.",
+  "@recoveryGoBackMessage": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryGoBackConfirm": "Go back",
+  "recoveryRescue": "Create a branch here",
+  "doneUndoCommit": "Undid the last commit (its changes stay staged)",
+  "doneGoBack": "Went back to {target}",
+  "@doneGoBack": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "doneRescue": "Created branch {name}",
+  "@doneRescue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "helpCherryPickTitle": "Cherry-pick",
   "helpCherryPickWord": "To cherry-pick is to pick only the best cherries — take just what you want.",
   "helpCherryPickInGit": "Copies the change from one commit on another branch onto your current branch as a new commit. Same change, but a new commit (D') with a different hash.",

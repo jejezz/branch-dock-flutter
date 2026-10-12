@@ -15,6 +15,8 @@ enum Concept {
   forceWithLease,
   revert,
   cherryPick,
+  reset,
+  reflog,
 }
 
 /// 커밋 그래프 한 장면. 커밋은 왼쪽(오래됨) → 오른쪽(최신), 줄(lane)은 위에서 아래.
@@ -348,6 +350,42 @@ ConceptCard conceptCard(AppLocalizations l10n, Concept concept) {
           ),
         ],
         links: [gitPush],
+      ),
+    Concept.reset => ConceptCard(
+        title: l10n.helpResetTitle,
+        word: l10n.helpResetWord,
+        inGit: l10n.helpResetInGit,
+        why: l10n.helpResetWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionBeforeReset,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit('D', 3, 0)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D')],
+            labels: const [GraphLabel('main', 'D')],
+          ),
+          GraphScene(
+            caption: l10n.helpCaptionAfterReset,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit('D', 3, 0)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D')],
+            labels: const [GraphLabel('main', 'B', highlight: true)],
+          ),
+        ],
+        links: [const ConceptLink('git-reset', 'https://git-scm.com/docs/git-reset')],
+      ),
+    Concept.reflog => ConceptCard(
+        title: l10n.helpReflogTitle,
+        word: l10n.helpReflogWord,
+        inGit: l10n.helpReflogInGit,
+        why: l10n.helpReflogWhy,
+        scenes: [
+          GraphScene(
+            caption: l10n.helpCaptionReflog,
+            commits: const [_a, _b, GraphCommit('C', 2, 0), GraphCommit('D', 3, 0)],
+            edges: const [('A', 'B'), ('B', 'C'), ('C', 'D')],
+            labels: const [GraphLabel('HEAD@{0}', 'B', highlight: true), GraphLabel('HEAD@{1}', 'D')],
+          ),
+        ],
+        links: [const ConceptLink('git-reflog', 'https://git-scm.com/docs/git-reflog')],
       ),
     Concept.revert => ConceptCard(
         title: l10n.helpRevertTitle,
