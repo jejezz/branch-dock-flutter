@@ -104,7 +104,7 @@
   "changesStage": "Stage",
   "changesUnstage": "Unstage",
   "changesOpenInEditor": "Open in editor",
-  "changesMarkResolved": "Resolved",
+  "changesMarkResolved": "Mark resolved",
   "changesCleanTitle": "Nothing to commit",
   "changesCleanMessage": "Save a file in your editor and it shows up here.",
   "branchesTitle": "Branches",
@@ -484,6 +484,76 @@
   "changesDeleteUntrackedMessage": "Deletes {path}, which git doesn't track. It doesn't go to the trash.",
   "conflictUseMine": "Use mine",
   "conflictUseIncoming": "Use incoming",
+  "conflictByBlock": "Resolve block by block",
+  "conflictSheetTitle": "Resolve conflicts in {name}",
+  "@conflictSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "conflictBlockTitle": "Conflict {index} of {total}",
+  "@conflictBlockTitle": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "conflictSideMine": "Mine",
+  "conflictSideIncoming": "Incoming",
+  "conflictKeepBoth": "Keep both (top, then bottom)",
+  "conflictEmptySide": "(empty)",
+  "conflictPickHint": "Pick a side for each block. {left} left.",
+  "@conflictPickHint": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "conflictApply": "Apply and mark resolved",
+  "conflictApplyNote": "Rewrites the file as you chose and runs git add. To edit by hand, open it in your editor.",
+  "conflictBroken": "The conflict markers are damaged, so the app can't read them. Fix the file in your editor.",
+  "conflictNone": "This file has no conflict markers. If you already fixed it, just press Mark resolved.",
+  "conflictUnreadable": "Can't read the file (it may be binary or deleted). Use \"Use mine\" or \"Use incoming\" instead.",
+  "doneConflictResolved": "{name}: conflict resolved",
+  "@doneConflictResolved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "changesOperationTitle": "The operation isn't finished yet",
+  "changesOperationMessage": "All conflicts are resolved. Press Continue above to finish, or Abort to go back to before it started.",
+  "conflictReopen": "Back to conflicted",
+  "conflictReopenMessage": "Puts {path} back the way it was right after the conflict. What you resolved so far is lost and the conflict markers come back.",
+  "@conflictReopenMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "conflictReopenConfirm": "Reopen conflict",
+  "conflictMarkersLeftTitle": "Conflict markers are still in the file",
+  "conflictMarkersLeftMessage": "{path} still has {count} `<<<<<<<` marker(s). If you mark it resolved now, the markers get committed as they are. Clean it up first with \"Resolve block by block\" or in your editor.",
+  "@conflictMarkersLeftMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "conflictMarkersLeftConfirm": "Mark resolved anyway",
   "doneFileAction": "{name}: done",
   "stashTitle": "Stashes",
   "stashSave": "Stash changes",
