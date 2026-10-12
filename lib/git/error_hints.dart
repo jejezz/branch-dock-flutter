@@ -65,6 +65,10 @@ GitErrorKind? classifyError(String output, {int? exitCode}) {
   if (o.contains('not possible to fast-forward') || o.contains('diverging branches')) {
     return GitErrorKind.notFastForward;
   }
+  // `git reset --keep`이 작업 중인 변경과 겹칠 때: "Entry 'x' not uptodate. Cannot merge."
+  if (o.contains('not uptodate. cannot merge') || o.contains('could not reset index file')) {
+    return GitErrorKind.localChangesWouldBeOverwritten;
+  }
   if (o.contains('would be overwritten by') || o.contains('please commit your changes or stash them')) {
     return GitErrorKind.localChangesWouldBeOverwritten;
   }

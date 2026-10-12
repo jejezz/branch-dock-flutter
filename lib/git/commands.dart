@@ -4,6 +4,7 @@ library;
 
 import 'commits.dart';
 import 'history.dart';
+import 'reflog.dart';
 import 'refs.dart';
 import 'tags.dart';
 
@@ -145,6 +146,27 @@ abstract final class GitCommands {
   /// [ref]를 주면 그 브랜치의 기록 (cherry-pick할 커밋 고르기, PLAN.md 3.11 P2).
   static List<String> history({int limit = 200, String? ref}) =>
       ['git', 'log', '-n', '$limit', '--format=$historyFormat', ?ref];
+
+  // --- 실수 복구 (3.14) ---------------------------------------------------
+
+  /// HEAD가 지나간 자리. 최근 [limit]개.
+  static List<String> reflog({int limit = 40}) => ['git', 'reflog', '-n', '$limit', '--format=$reflogFormat'];
+
+  /// 마지막 커밋만 취소한다. 그 커밋의 변경은 스테이징된 채로 남는다.
+  static const undoLastCommit = ['git', 'reset', '--soft', 'HEAD~1'];
+
+  /// 종료 코드 0이면 HEAD 앞 커밋(부모)이 있다 — 첫 커밋은 취소할 수 없다.
+  static const hasParent = ['git', 'rev-parse', '--verify', '--quiet', 'HEAD~1'];
+
+  /// HEAD 커밋의 제목.
+  static const headSubject = ['git', 'log', '-1', '--format=%s'];
+
+  /// 브랜치를 [hash]로 옮긴다. `--keep`은 커밋하지 않은 변경을 지키고, 그 변경을
+  /// 덮어써야 하면 아무것도 하지 않고 멈춘다.
+  static List<String> resetKeep(String hash) => ['git', 'reset', '--keep', hash];
+
+  /// [hash]에서 새 브랜치를 만든다 (전환하지 않음). 지운 커밋·브랜치를 되살릴 때.
+  static List<String> rescueBranch(String name, String hash) => ['git', 'branch', name, hash];
 
   // --- diff (3.2 P2) ------------------------------------------------------
 

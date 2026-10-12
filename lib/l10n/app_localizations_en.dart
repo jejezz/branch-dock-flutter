@@ -2488,6 +2488,153 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use it when a commit you\'ve already pushed causes trouble. History isn\'t rewritten, so nobody else is affected and no force push is needed. For commits not yet pushed, amending is cleaner.';
 
   @override
+  String get helpCaptionBeforeReset => 'Before: main points at D';
+
+  @override
+  String get helpCaptionAfterReset =>
+      'After: main moved to B. C and D look gone but are still in the reflog';
+
+  @override
+  String get helpCaptionReflog =>
+      'The places HEAD has been are listed in order, so you can go back to D';
+
+  @override
+  String get helpResetTitle => 'Reset';
+
+  @override
+  String get helpResetWord => 'To reset is to put something back where it was.';
+
+  @override
+  String get helpResetInGit =>
+      'Moves the branch back to an earlier commit. The commits look deleted but stay in the reflog for a while. --soft keeps the changes staged, --keep protects your uncommitted work, and --hard throws that work away too.';
+
+  @override
+  String get helpResetWhy =>
+      'Use it to undo commits you haven\'t pushed yet. Don\'t use it on pushed commits: it disagrees with everyone else\'s history, so use revert. This app only uses the safe --soft and --keep.';
+
+  @override
+  String get helpReflogTitle => 'Reflog';
+
+  @override
+  String get helpReflogWord =>
+      'Reflog is short for \'reference log\': a record of where a name pointed.';
+
+  @override
+  String get helpReflogInGit =>
+      'A record, kept only on this computer, of where HEAD and your branches pointed. Even after you undo a commit or delete a branch, you can usually find that point again for about 90 days.';
+
+  @override
+  String get helpReflogWhy =>
+      'When you think \'I made a mistake\', look at the reflog first. It exists only on this computer, not on the remote or another machine, and git cleans up old entries.';
+
+  @override
+  String get recoveryTitle => 'Undo a mistake';
+
+  @override
+  String get recoveryIntro => 'Most mistakes can be undone. Pick what fits.';
+
+  @override
+  String get recoveryUndoCommit => 'Undo the last commit';
+
+  @override
+  String recoveryUndoCommitWhy(String subject) {
+    return 'Undoes only \"$subject\". Its changes stay staged.';
+  }
+
+  @override
+  String recoveryUndoCommitMessage(String subject) {
+    return 'Undoes the commit \"$subject\". Its changes aren\'t deleted — they stay staged so you can fix them and commit again.';
+  }
+
+  @override
+  String get recoveryUndoCommitPushed =>
+      'This commit is already on the remote. Undoing it here leaves it there, so pushing again needs a force push and your history no longer matches everyone else\'s. For a pushed commit, Revert in the History tab is safer.';
+
+  @override
+  String get recoveryUndoCommitConfirm => 'Undo commit';
+
+  @override
+  String get recoveryNoParent => 'The first commit can\'t be undone.';
+
+  @override
+  String get recoveryStash => 'Set my changes aside for now';
+
+  @override
+  String get recoveryStashWhy =>
+      'Keeps them in a stash so you can bring them back later.';
+
+  @override
+  String get recoveryHistory => 'Go back to an earlier state';
+
+  @override
+  String get recoveryHistoryHint =>
+      'Where HEAD has been. Even after undoing commits or deleting a branch, it usually stays for 90 days.';
+
+  @override
+  String get recoveryNow => 'Now';
+
+  @override
+  String get recoveryEmpty => 'Nothing recorded yet.';
+
+  @override
+  String get recoveryKindCommit => 'Commit';
+
+  @override
+  String get recoveryKindAmend => 'Amend';
+
+  @override
+  String get recoveryKindCheckout => 'Switch';
+
+  @override
+  String get recoveryKindReset => 'Reset';
+
+  @override
+  String get recoveryKindMerge => 'Merge';
+
+  @override
+  String get recoveryKindPull => 'Pull';
+
+  @override
+  String get recoveryKindRebase => 'Rebase';
+
+  @override
+  String get recoveryKindCherryPick => 'Cherry-pick';
+
+  @override
+  String get recoveryKindRevert => 'Revert';
+
+  @override
+  String get recoveryKindOther => 'Other';
+
+  @override
+  String get recoveryGoBack => 'Go back here';
+
+  @override
+  String recoveryGoBackMessage(String branch, String target) {
+    return 'Moves $branch back to $target. The commits after it leave the branch but stay in the reflog. Your uncommitted work is kept, and if a file overlaps, nothing changes and git stops.';
+  }
+
+  @override
+  String get recoveryGoBackConfirm => 'Go back';
+
+  @override
+  String get recoveryRescue => 'Create a branch here';
+
+  @override
+  String get doneUndoCommit =>
+      'Undid the last commit (its changes stay staged)';
+
+  @override
+  String doneGoBack(String target) {
+    return 'Went back to $target';
+  }
+
+  @override
+  String doneRescue(String name) {
+    return 'Created branch $name';
+  }
+
+  @override
   String get helpCherryPickTitle => 'Cherry-pick';
 
   @override

@@ -23,6 +23,7 @@ import '../theme/app_theme.dart';
 import 'command_bar.dart';
 import 'command_palette.dart';
 import 'onboarding.dart';
+import 'recovery_sheet.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
@@ -221,6 +222,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
         PaletteItem(title: l10n.tagsNew, icon: Icons.sell_outlined, group: actions, shortcut: shortcutLabel('T'), onRun: () => showCreateTagSheet(context, repo, onOpenReleaseWizard: _openReleaseWizard), enabled: !repo.status.unborn, keywords: 'tag create'),
         PaletteItem(title: l10n.releaseStart, icon: Icons.rocket_launch_outlined, group: actions, shortcut: shortcutLabel('R', shift: true), onRun: _openReleaseWizard, keywords: 'release'),
         PaletteItem(title: l10n.stashSave, icon: Icons.inventory_2_outlined, group: actions, onRun: () => showStashSheet(context, repo), enabled: !repo.status.clean, keywords: 'stash'),
+        PaletteItem(title: l10n.recoveryTitle, icon: Icons.restore_rounded, group: actions, onRun: () => showRecoverySheet(context, repo), enabled: !repo.status.unborn, keywords: 'undo reset reflog recover mistake'),
         PaletteItem(title: l10n.branchesCleanup, icon: Icons.cleaning_services_outlined, group: actions, onRun: () => showCleanupSheet(context, repo), keywords: 'cleanup prune'),
         if (repo.githubRemote != null && _env.ghReady && !repo.status.detached && repo.status.head != repo.defaultBranch)
           PaletteItem(title: l10n.prCreate, icon: Icons.merge_rounded, group: actions, onRun: () => showCreatePrSheet(context, repo), keywords: 'pr pull request'),
