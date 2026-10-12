@@ -364,7 +364,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changesOpenInEditor => '편집기로 열기';
 
   @override
-  String get changesMarkResolved => '해결됨';
+  String get changesMarkResolved => '해결됨 표시';
 
   @override
   String get changesCleanTitle => '커밋할 변경이 없습니다';
@@ -1709,6 +1709,87 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get conflictUseIncoming => '들어오는 것 사용';
+
+  @override
+  String get conflictByBlock => '구간별로 해결';
+
+  @override
+  String conflictSheetTitle(String name) {
+    return '$name 충돌 해결';
+  }
+
+  @override
+  String conflictBlockTitle(int index, int total) {
+    return '충돌 $index/$total';
+  }
+
+  @override
+  String get conflictSideMine => '내 것';
+
+  @override
+  String get conflictSideIncoming => '들어오는 것';
+
+  @override
+  String get conflictKeepBoth => '둘 다 유지 (위, 아래 순서)';
+
+  @override
+  String get conflictEmptySide => '(비어 있음)';
+
+  @override
+  String conflictPickHint(int left) {
+    return '구간마다 어느 쪽을 쓸지 골라 주세요. $left개 남았습니다.';
+  }
+
+  @override
+  String get conflictApply => '적용하고 해결됨 표시';
+
+  @override
+  String get conflictApplyNote =>
+      '고른 대로 파일을 다시 쓰고 git add 합니다. 직접 고쳐 쓰려면 편집기로 여세요.';
+
+  @override
+  String get conflictBroken => '충돌 표시가 온전하지 않아 앱에서 읽을 수 없습니다. 편집기에서 직접 고쳐 주세요.';
+
+  @override
+  String get conflictNone => '이 파일에는 충돌 표시가 없습니다. 이미 고쳤다면 \'해결됨 표시\'만 누르면 됩니다.';
+
+  @override
+  String get conflictUnreadable =>
+      '파일을 읽을 수 없습니다 (이진 파일이거나 삭제된 파일일 수 있습니다). \'내 것 사용\' 또는 \'들어오는 것 사용\'으로 해결하세요.';
+
+  @override
+  String doneConflictResolved(String name) {
+    return '$name: 충돌 해결됨';
+  }
+
+  @override
+  String get changesOperationTitle => '아직 작업이 끝나지 않았습니다';
+
+  @override
+  String get changesOperationMessage =>
+      '충돌은 모두 해결됐습니다. 위의 \'계속\'으로 마무리하거나 \'중단\'으로 시작하기 전 상태로 되돌리세요.';
+
+  @override
+  String get conflictReopen => '다시 충돌 상태로';
+
+  @override
+  String conflictReopenMessage(String path) {
+    return '$path을(를) 충돌이 난 직후의 모습으로 되돌립니다. 지금까지 해결한 내용은 사라지고, 충돌 표시가 다시 들어갑니다.';
+  }
+
+  @override
+  String get conflictReopenConfirm => '다시 충돌';
+
+  @override
+  String get conflictMarkersLeftTitle => '충돌 표시가 남아 있습니다';
+
+  @override
+  String conflictMarkersLeftMessage(String path, int count) {
+    return '$path에 아직 `<<<<<<<` 표시가 $count군데 남아 있습니다. 이대로 해결됨으로 표시하면 표시가 그대로 커밋됩니다. 먼저 \'구간별로 해결\'이나 편집기로 정리하세요.';
+  }
+
+  @override
+  String get conflictMarkersLeftConfirm => '그래도 해결됨 표시';
 
   @override
   String doneFileAction(String name) {

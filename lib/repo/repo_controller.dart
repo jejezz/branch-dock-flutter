@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../core/command_runner.dart';
 import '../git/commands.dart';
+import '../git/conflicts.dart';
 import '../git/history.dart';
 import '../git/refs.dart';
 import '../git/remotes.dart';
@@ -67,6 +68,9 @@ class RepoController extends ChangeNotifier {
   DateTime? _headPrAt;
   bool _loadingHeadPr = false;
   RepoOperation operation = RepoOperation.none;
+
+  /// 병합·rebase 중에 이미 해결한 충돌 파일 (다시 충돌 상태로 되돌릴 수 있는 것). 진행 중이 아니면 비어 있다.
+  Set<String> resolvedPaths = const {};
   bool loaded = false;
 
   /// 지금 실행 중인 명령 (진행 표시줄·취소용).
@@ -155,6 +159,7 @@ class RepoController extends ChangeNotifier {
       if (results[2].ok) remotes = Remote.parse(results[2].stdout);
       if (results[5].ok) worktrees = Worktree.parse(results[5].stdout);
       operation = _readOperation();
+      resolvedPaths = operation == RepoOperation.none ? const {} : await _readResolvedPaths();
       defaultBranch = await _readDefaultBranch();
       headMergedAndGone = await _readHeadMergedAndGone();
       loaded = true;
@@ -254,6 +259,11 @@ class RepoController extends ChangeNotifier {
     final local = localBranches.where((b) => b.name == base);
     if (local.isNotEmpty) return switchTo(local.first);
     return execute(GitCommands.switchTrack('${defaultRemote ?? 'origin'}/$base'));
+  }
+
+  Future<Set<String>> _readResolvedPaths() async {
+    final r = await runner.run(GitCommands.resolveUndo, workingDirectory: root, quiet: true);
+    return r.ok ? parseResolveUndo(r.stdout) : const {};
   }
 
   RepoOperation _readOperation() {

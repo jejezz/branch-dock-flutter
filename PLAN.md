@@ -209,6 +209,9 @@ branch … used by worktree at …`)도 거부된다. Claude Code 같은 도구�
   상단에 "병합 중" 상태를 계속 표시한다.
 - `P1` 충돌 파일에 "내 것 사용 / 들어오는 것 사용"
   (`git checkout --ours/--theirs`).
+- `P1` 충돌 파일을 **구간별로 해결**: `<<<<<<<` 구간마다 "내 것 / 들어오는 것 / 둘 다"를
+  고르면 파일을 다시 쓰고 `git add` 한다 (`lib/git/conflicts.dart`, `lib/ui/conflict_sheet.dart`).
+  직접 고쳐 쓰는 편집은 여전히 편집기에 맡긴다. 표시가 깨진 파일은 편집기로 넘긴다.
 - `P1` rebase 중 상태도 같은 방식으로 표시 (계속 / 건너뛰기 / 중단).
   대화형 rebase는 범위 밖.
 - `P1` GitHub에서 병합하기: 3.9 PR 병합으로 연결.
