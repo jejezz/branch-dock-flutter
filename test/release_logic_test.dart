@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 Commit c(String subject, {String body = ''}) => Commit(hash: 'h', shortHash: 'abc1234', subject: subject, body: body);
 
 void main() {
+  _missingReleaseFilesTests();
   group('SemVer', () {
     test('parse and compare', () {
       final v = SemVer.tryParse('v1.4.2-rc.1+37')!;
@@ -209,5 +210,52 @@ void main() {
     expect(syncProblem(st(ahead: 1), allowAhead: true), isNull);
     expect(syncProblem(st(upstream: null), allowAhead: true), isNull);
     expect(syncProblem(st(behind: 1), allowAhead: true), SyncProblem.behind);
+  });
+}
+
+void _missingReleaseFilesTests() {
+  group('missingReleaseFiles', () {
+    late Directory root;
+    setUp(() => root = Directory.systemTemp.createTempSync('bd_missing'));
+    tearDown(() => root.deleteSync(recursive: true));
+
+    void write(String rel, String text) {
+      File('${root.path}/$rel')
+        ..createSync(recursive: true)
+        ..writeAsStringSync(text);
+    }
+
+    const tagWorkflow = 'on:\n  push:\n    tags:\n      - "v*.*.*"\n'
+        '# installer/windows/app.iss linux/install.sh linux/CMakeLists.txt\n';
+
+    test('태그 워크플로가 없으면 빠진 파일이 없다', () {
+      expect(missingReleaseFiles(root.path), isEmpty);
+      write('.github/workflows/ci.yml', 'on:\n  push:\n    branches: [main]\n# installer/windows/app.iss\n');
+      expect(missingReleaseFiles(root.path), isEmpty);
+    });
+
+    test('워크플로가 쓰는 파일이 없으면 알려 준다', () {
+      write('.github/workflows/release.yml', tagWorkflow);
+      expect(missingReleaseFiles(root.path),
+          ['installer/windows/app.iss', 'linux/CMakeLists.txt', 'linux/install.sh']);
+    });
+
+    test('파일이 있으면 통과, 기본 APPLICATION_ID는 막는다', () {
+      write('.github/workflows/release.yml', tagWorkflow);
+      write('installer/windows/app.iss', '');
+      write('linux/install.sh', '');
+      write('linux/CMakeLists.txt', 'set(APPLICATION_ID "com.example.app")\n');
+      expect(missingReleaseFiles(root.path), ['linux/CMakeLists.txt (APPLICATION_ID)']);
+      write('linux/CMakeLists.txt', 'set(APPLICATION_ID "art.zoomon.branchdock")\n');
+      expect(missingReleaseFiles(root.path), isEmpty);
+    });
+
+    test('앱이 하위 폴더에 있어도 찾는다', () {
+      write('.github/workflows/release.yml', tagWorkflow);
+      write('gui/linux/install.sh', '');
+      write('gui/linux/CMakeLists.txt', 'set(APPLICATION_ID "art.x.y")\n');
+      write('installer/windows/app.iss', '');
+      expect(missingReleaseFiles(root.path), isEmpty);
+    });
   });
 }

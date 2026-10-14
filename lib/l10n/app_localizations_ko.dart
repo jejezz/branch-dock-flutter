@@ -2208,6 +2208,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get releaseNeedsRemote => '원격이 없어 릴리스할 수 없습니다. 원격 탭에서 먼저 올리세요.';
 
   @override
+  String releaseNeedsFiles(String files) {
+    return '릴리스 워크플로가 쓰는 파일이 없어 릴리스할 수 없습니다: $files. 태그를 달아도 CI가 패키지를 만들지 못합니다.';
+  }
+
+  @override
   String get releaseDirectOnlyNotGitHub =>
       'GitHub 저장소가 아니라서 바로 커밋 방식(점검 → 버전 → 태그)으로 진행합니다. PR·릴리스 노트·CI는 호스팅 웹에서 하세요.';
 

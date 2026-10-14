@@ -250,6 +250,14 @@ branch … used by worktree at …`)도 거부된다. Claude Code 같은 도구�
   (ahead 0 / behind 0).
 - 마지막 릴리스 태그와 그 이후 커밋 수.
 - 실패한 항목마다 해결 버튼을 붙인다 (커밋하기, Pull, 브랜치 전환).
+- **CI 필요 파일**: 태그 push 워크플로(`on: push: tags`)가 있으면, 그 본문에 적힌
+  `AppInfo.xcconfig`, `Release.entitlements`, `windows/linux CMakeLists.txt`,
+  `linux/install.sh`, `app_icon.png`, `installer/windows/app.iss` 중 저장소에 없는
+  파일이 있거나 `linux/CMakeLists.txt`의 `APPLICATION_ID`가 `com.example.*`이면
+  태그를 달아도 CI가 패키지를 만들지 못한다. 이 경우 "새 릴리스" 버튼(와 단축키·
+  팔레트의 자동 점검)을 **비활성**으로 두고 빠진 파일을 이유로 보여 준다. 태그
+  push 워크플로가 없으면 앱이 직접 릴리스를 만들므로 이 점검은 없다. 앱이 한 단계
+  아래 폴더(`gui/`)에 있어도 찾는다.
 - 원격과 같지 않으면 ↑↓ 숫자 대신 이유를 적는다: 추적 브랜치 없음 · 받을 커밋
   N개(Pull) · 보낼 커밋 N개(PR 방식이면 "PR 없이 기본 브랜치에 올라간다"는 확인
   뒤 Push) · 갈라짐(Pull) · **내용은 같고 커밋만 다름** — PR을 squash·rebase로

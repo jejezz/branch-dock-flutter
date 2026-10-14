@@ -70,7 +70,10 @@ class _Overview extends StatelessWidget {
     final note = repo.githubRemote == null
         ? l10n.releaseDirectOnlyNotGitHub
         : (!env.ghReady ? '${ghUnavailableText(l10n, env)} ${l10n.releaseDirectOnly}' : null);
-    final reason = repo.remotes.isEmpty ? l10n.releaseNeedsRemote : null;
+    final missing = missingReleaseFiles(repo.root);
+    final reason = repo.remotes.isEmpty
+        ? l10n.releaseNeedsRemote
+        : (missing.isNotEmpty ? l10n.releaseNeedsFiles(missing.join(', ')) : null);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
