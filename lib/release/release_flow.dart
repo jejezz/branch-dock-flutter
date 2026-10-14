@@ -323,11 +323,40 @@ class ReleaseFlow extends ChangeNotifier {
   /// 브랜치에 만든다. bump-version.sh가 있으면 그것을, 없으면 버전 파일과
   /// lock 파일을 직접 고친다.
   Future<CommandResult> createReleaseCommit() async {
+    // 버튼을 연달아 누르면 두 번째가 같은 브랜치를 또 만들려다 실패한다.
+    if (_creatingCommit) return const CommandResult(1, '', 'busy');
+    _creatingCommit = true;
+    try {
+      return await _createReleaseCommit();
+    } finally {
+      _creatingCommit = false;
+    }
+  }
+
+  bool _creatingCommit = false;
+
+  Future<CommandResult> _createReleaseCommit() async {
     final n = next!;
     var r = const CommandResult(0, '', '');
     if (!direct) {
-      r = await repo.execute(GitCommands.createBranch(releaseBranch));
-      if (!r.ok) return r;
+      // 이전 시도가 브랜치까지 만들고 멈췄다면 이어서 한다.
+      if (!repo.localBranches.any((b) => b.name == releaseBranch)) {
+        r = await repo.execute(GitCommands.createBranch(releaseBranch));
+        if (!r.ok) return r;
+      } else {
+        if (repo.status.head != releaseBranch) {
+          r = await repo.execute(GitCommands.switchTo(releaseBranch));
+          if (!r.ok) return r;
+        }
+        // 버전 올림 커밋까지 이미 있으면 다시 만들지 않는다.
+        final last = await repo.read(['git', 'log', '-1', '--format=%s']);
+        if (last.ok && last.stdout.trim() == prTitle) {
+          step = ReleaseStep.pr;
+          await _save();
+          notifyListeners();
+          return r;
+        }
+      }
     }
     if (usesBumpScript) {
       r = await repo.execute(bumpScriptCommand);

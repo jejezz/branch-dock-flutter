@@ -172,6 +172,36 @@ void main() {
     repo.dispose();
   });
 
+  test('release commit: double press and an existing release branch do not fail', () async {
+    final repo = await setUpRepo();
+    final dir = repo.root;
+    await repo.execute(GitCommands.createTag('v0.1.0', message: 'X 0.1.0'));
+    await commitFile(dir, 'a.txt', 'a\n', 'feat: 태그 탭');
+    await repo.refresh();
+
+    final base = repo.status.head!;
+    final flow = ReleaseFlow(repo, ghReady: false);
+    await flow.runChecks();
+    flow.proceedToVersion();
+
+    // 연달아 눌러도 한 번만 실행되고, 두 번째는 건너뛴다.
+    final results = await Future.wait([flow.createReleaseCommit(), flow.createReleaseCommit()]);
+    expect(results.where((r) => r.ok).length, 1);
+    expect(repo.status.head, flow.releaseBranch);
+    final count = (await repo.read(['git', 'rev-list', '--count', 'HEAD'])).stdout.trim();
+
+    // 브랜치와 커밋이 이미 있는 상태에서 다시 눌러도 이어서 진행하고 커밋을 더 만들지 않는다.
+    await repo.execute(GitCommands.switchTo(base));
+    flow.step = ReleaseStep.version;
+    expect((await flow.createReleaseCommit()).ok, isTrue);
+    expect(repo.status.head, flow.releaseBranch);
+    expect(flow.step, ReleaseStep.pr);
+    expect((await repo.read(['git', 'rev-list', '--count', 'HEAD'])).stdout.trim(), count);
+
+    flow.dispose();
+    repo.dispose();
+  });
+
   test('tag checks: version must match on the default branch', () async {
     final repo = await setUpRepo();
     final flow = ReleaseFlow(repo, ghReady: false);
