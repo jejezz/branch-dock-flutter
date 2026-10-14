@@ -322,14 +322,41 @@ class ReleaseFlow extends ChangeNotifier {
   /// 버전 올림 커밋. PR 경유면 release/vX.Y.Z 브랜치에, 바로 커밋이면 기본
   /// 브랜치에 만든다. bump-version.sh가 있으면 그것을, 없으면 버전 파일과
   /// lock 파일을 직접 고친다.
-  Future<CommandResult> createReleaseCommit() => repo.hold(() => _createReleaseCommit());
+  Future<CommandResult> createReleaseCommit() async {
+    // 버튼을 연달아 누르면 두 번째가 같은 브랜치를 또 만들려다 실패한다.
+    if (_creatingCommit) return const CommandResult(1, '', 'busy');
+    _creatingCommit = true;
+    try {
+      return await _createReleaseCommit();
+    } finally {
+      _creatingCommit = false;
+    }
+  }
+
+  bool _creatingCommit = false;
 
   Future<CommandResult> _createReleaseCommit() async {
     final n = next!;
     var r = const CommandResult(0, '', '');
     if (!direct) {
-      r = await repo.execute(GitCommands.createBranch(releaseBranch));
-      if (!r.ok) return r;
+      // 이전 시도가 브랜치까지 만들고 멈췄다면 이어서 한다.
+      if (!repo.localBranches.any((b) => b.name == releaseBranch)) {
+        r = await repo.execute(GitCommands.createBranch(releaseBranch));
+        if (!r.ok) return r;
+      } else {
+        if (repo.status.head != releaseBranch) {
+          r = await repo.execute(GitCommands.switchTo(releaseBranch));
+          if (!r.ok) return r;
+        }
+        // 버전 올림 커밋까지 이미 있으면 다시 만들지 않는다.
+        final last = await repo.read(['git', 'log', '-1', '--format=%s']);
+        if (last.ok && last.stdout.trim() == prTitle) {
+          step = ReleaseStep.pr;
+          await _save();
+          notifyListeners();
+          return r;
+        }
+      }
     }
     if (usesBumpScript) {
       r = await repo.execute(bumpScriptCommand);
@@ -393,9 +420,7 @@ class ReleaseFlow extends ChangeNotifier {
         GhCommands.prCreate(base: defaultBranch, head: releaseBranch, title: prTitle),
       ];
 
-  Future<CommandResult> createPr(String body) => repo.hold(() => _createPr(body));
-
-  Future<CommandResult> _createPr(String body) async {
+  Future<CommandResult> createPr(String body) async {
     var r = await repo.execute(GitCommands.publish(remote, releaseBranch));
     if (!r.ok) return r;
     r = await repo.execute(GhCommands.prCreate(base: defaultBranch, head: releaseBranch, title: prTitle), stdin: body);
@@ -424,9 +449,7 @@ class ReleaseFlow extends ChangeNotifier {
         GitCommands.pullFastForward,
       ];
 
-  Future<CommandResult> mergePr() => repo.hold(() => _mergePr());
-
-  Future<CommandResult> _mergePr() async {
+  Future<CommandResult> mergePr() async {
     final r = await repo.execute(GhCommands.prMerge(pr!.number, PrMergeMethod.merge));
     if (!r.ok) return r;
     await refreshPr();
@@ -501,9 +524,7 @@ class ReleaseFlow extends ChangeNotifier {
       GhCommands.releaseCreate(tag ?? '', title: '$displayName ${tag ?? ''}', prerelease: next?.pre != null);
 
   /// 앱이 릴리스를 만드는 저장소 (CI가 만들지 않음).
-  Future<CommandResult> createRelease(String body) => repo.hold(() => _createRelease(body));
-
-  Future<CommandResult> _createRelease(String body) async {
+  Future<CommandResult> createRelease(String body) async {
     final r = await repo.execute(releaseCreateCommand, stdin: body);
     if (!r.ok) return r;
     await _loadRelease();
