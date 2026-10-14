@@ -364,7 +364,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changesOpenInEditor => '편집기로 열기';
 
   @override
-  String get changesMarkResolved => '해결됨';
+  String get changesMarkResolved => '해결됨 표시';
 
   @override
   String get changesCleanTitle => '커밋할 변경이 없습니다';
@@ -1711,6 +1711,87 @@ class AppLocalizationsKo extends AppLocalizations {
   String get conflictUseIncoming => '들어오는 것 사용';
 
   @override
+  String get conflictByBlock => '구간별로 해결';
+
+  @override
+  String conflictSheetTitle(String name) {
+    return '$name 충돌 해결';
+  }
+
+  @override
+  String conflictBlockTitle(int index, int total) {
+    return '충돌 $index/$total';
+  }
+
+  @override
+  String get conflictSideMine => '내 것';
+
+  @override
+  String get conflictSideIncoming => '들어오는 것';
+
+  @override
+  String get conflictKeepBoth => '둘 다 유지 (위, 아래 순서)';
+
+  @override
+  String get conflictEmptySide => '(비어 있음)';
+
+  @override
+  String conflictPickHint(int left) {
+    return '구간마다 어느 쪽을 쓸지 골라 주세요. $left개 남았습니다.';
+  }
+
+  @override
+  String get conflictApply => '적용하고 해결됨 표시';
+
+  @override
+  String get conflictApplyNote =>
+      '고른 대로 파일을 다시 쓰고 git add 합니다. 직접 고쳐 쓰려면 편집기로 여세요.';
+
+  @override
+  String get conflictBroken => '충돌 표시가 온전하지 않아 앱에서 읽을 수 없습니다. 편집기에서 직접 고쳐 주세요.';
+
+  @override
+  String get conflictNone => '이 파일에는 충돌 표시가 없습니다. 이미 고쳤다면 \'해결됨 표시\'만 누르면 됩니다.';
+
+  @override
+  String get conflictUnreadable =>
+      '파일을 읽을 수 없습니다 (이진 파일이거나 삭제된 파일일 수 있습니다). \'내 것 사용\' 또는 \'들어오는 것 사용\'으로 해결하세요.';
+
+  @override
+  String doneConflictResolved(String name) {
+    return '$name: 충돌 해결됨';
+  }
+
+  @override
+  String get changesOperationTitle => '아직 작업이 끝나지 않았습니다';
+
+  @override
+  String get changesOperationMessage =>
+      '충돌은 모두 해결됐습니다. 위의 \'계속\'으로 마무리하거나 \'중단\'으로 시작하기 전 상태로 되돌리세요.';
+
+  @override
+  String get conflictReopen => '다시 충돌 상태로';
+
+  @override
+  String conflictReopenMessage(String path) {
+    return '$path을(를) 충돌이 난 직후의 모습으로 되돌립니다. 지금까지 해결한 내용은 사라지고, 충돌 표시가 다시 들어갑니다.';
+  }
+
+  @override
+  String get conflictReopenConfirm => '다시 충돌';
+
+  @override
+  String get conflictMarkersLeftTitle => '충돌 표시가 남아 있습니다';
+
+  @override
+  String conflictMarkersLeftMessage(String path, int count) {
+    return '$path에 아직 `<<<<<<<` 표시가 $count군데 남아 있습니다. 이대로 해결됨으로 표시하면 표시가 그대로 커밋됩니다. 먼저 \'구간별로 해결\'이나 편집기로 정리하세요.';
+  }
+
+  @override
+  String get conflictMarkersLeftConfirm => '그래도 해결됨 표시';
+
+  @override
   String doneFileAction(String name) {
     return '$name: 완료';
   }
@@ -2345,6 +2426,173 @@ class AppLocalizationsKo extends AppLocalizations {
       '이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.';
 
   @override
+  String get helpCaptionBeforeReset => '전: main이 D를 가리킴';
+
+  @override
+  String get helpCaptionAfterReset =>
+      '후: main이 B로 옮겨짐. C·D는 사라진 것 같지만 reflog에 남아 있음';
+
+  @override
+  String get helpCaptionReflog => 'HEAD가 지나온 자리가 순서대로 적혀 있어, D로 다시 돌아갈 수 있음';
+
+  @override
+  String get helpResetTitle => 'Reset (브랜치 옮기기)';
+
+  @override
+  String get helpResetWord => 'reset은 \'처음 자리로 되돌려 놓다\'.';
+
+  @override
+  String get helpResetInGit =>
+      '브랜치가 가리키는 커밋을 뒤로 옮깁니다. 커밋이 지워진 것처럼 보이지만 reflog에 남아 있어 한동안 되살릴 수 있습니다. --soft는 변경을 스테이징한 채 남기고, --keep은 작업 중인 변경을 지키며, --hard는 작업 중인 변경까지 버립니다.';
+
+  @override
+  String get helpResetWhy =>
+      '아직 올리지 않은 커밋을 취소할 때 씁니다. 이미 올린 커밋에는 쓰지 마세요. 다른 사람의 기록과 어긋나니 revert를 쓰세요. 이 앱은 안전한 --soft와 --keep만 씁니다.';
+
+  @override
+  String get helpReflogTitle => 'Reflog (실수 복구 기록)';
+
+  @override
+  String get helpReflogWord => 'reflog는 \'reference log\', 가리키던 자리의 기록.';
+
+  @override
+  String get helpReflogInGit =>
+      'HEAD와 브랜치가 어디를 가리켰는지 이 컴퓨터에만 적어 둔 기록입니다. 커밋을 취소하거나 브랜치를 지워도 보통 90일 동안은 그 시점을 찾아 되돌아갈 수 있습니다.';
+
+  @override
+  String get helpReflogWhy =>
+      '\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.';
+
+  @override
+  String get historyGraph => '그래프';
+
+  @override
+  String get historyAllBranches => '모든 브랜치';
+
+  @override
+  String get helpCaptionGraphMerged =>
+      'main과 feature가 갈라졌다가 M에서 합쳐진 기록 (속이 빈 점이 병합 커밋)';
+
+  @override
+  String get helpCommitGraphTitle => '커밋 그래프 읽는 법';
+
+  @override
+  String get helpCommitGraphWord => 'graph는 \'점과 선으로 그린 그림\'.';
+
+  @override
+  String get helpCommitGraphInGit =>
+      '점은 커밋, 선은 부모와의 이음입니다. 위가 최신입니다. 선이 둘로 갈라지면 브랜치가 갈라진 곳, 두 선이 하나로 합쳐지면 병합입니다. 속이 빈 점은 병합 커밋, 고리가 둘러진 점은 지금 있는 자리(HEAD)입니다.';
+
+  @override
+  String get helpCommitGraphWhy =>
+      '\'내 브랜치가 main과 어디서 갈라졌는지\', \'병합이 어디서 일어났는지\'를 한눈에 봅니다. 좁은 창에서는 선을 6줄까지만 그립니다. 그보다 많으면 맨 오른쪽 줄에 겹쳐 보입니다.';
+
+  @override
+  String get recoveryTitle => '실수 복구';
+
+  @override
+  String get recoveryIntro => '실수했어도 대부분 되돌릴 수 있습니다. 상황에 맞는 것을 고르세요.';
+
+  @override
+  String get recoveryUndoCommit => '마지막 커밋 취소';
+
+  @override
+  String recoveryUndoCommitWhy(String subject) {
+    return '\'$subject\' 커밋만 취소합니다. 바꾼 내용은 스테이징된 채 남습니다.';
+  }
+
+  @override
+  String recoveryUndoCommitMessage(String subject) {
+    return '\'$subject\' 커밋을 취소합니다. 그 커밋에서 바꾼 내용은 지워지지 않고 스테이징된 채 남아, 고쳐서 다시 커밋할 수 있습니다.';
+  }
+
+  @override
+  String get recoveryUndoCommitPushed =>
+      '이 커밋은 이미 원격에 올라가 있습니다. 취소해도 원격에는 남아 있어 다시 올리려면 강제 push가 필요하고, 다른 사람의 기록과 어긋납니다. 올린 커밋은 기록 탭의 \'되돌리기(revert)\'가 더 안전합니다.';
+
+  @override
+  String get recoveryUndoCommitConfirm => '커밋 취소';
+
+  @override
+  String get recoveryNoParent => '첫 커밋은 취소할 수 없습니다.';
+
+  @override
+  String get recoveryStash => '작업 중인 변경을 잠시 치우기';
+
+  @override
+  String get recoveryStashWhy => '임시 저장(stash)에 보관했다가 나중에 다시 꺼냅니다.';
+
+  @override
+  String get recoveryHistory => '이전 상태로 돌아가기';
+
+  @override
+  String get recoveryHistoryHint =>
+      'HEAD가 지나온 자리입니다. 커밋을 취소하거나 브랜치를 지운 뒤에도 보통 90일 동안 남아 있습니다.';
+
+  @override
+  String get recoveryNow => '지금';
+
+  @override
+  String get recoveryEmpty => '아직 기록이 없습니다.';
+
+  @override
+  String get recoveryKindCommit => '커밋';
+
+  @override
+  String get recoveryKindAmend => '커밋 고침';
+
+  @override
+  String get recoveryKindCheckout => '전환';
+
+  @override
+  String get recoveryKindReset => '되돌림';
+
+  @override
+  String get recoveryKindMerge => '병합';
+
+  @override
+  String get recoveryKindPull => 'pull';
+
+  @override
+  String get recoveryKindRebase => 'rebase';
+
+  @override
+  String get recoveryKindCherryPick => 'cherry-pick';
+
+  @override
+  String get recoveryKindRevert => 'revert';
+
+  @override
+  String get recoveryKindOther => '기타';
+
+  @override
+  String get recoveryGoBack => '여기로 되돌리기';
+
+  @override
+  String recoveryGoBackMessage(String branch, String target) {
+    return '$branch를 $target 시점으로 되돌립니다. 그 뒤의 커밋은 브랜치에서 빠지지만 reflog에 남아 있습니다. 작업 중인 변경은 그대로 두며, 겹치는 파일이 있으면 아무것도 바꾸지 않고 멈춥니다.';
+  }
+
+  @override
+  String get recoveryGoBackConfirm => '되돌리기';
+
+  @override
+  String get recoveryRescue => '여기서 새 브랜치 만들기';
+
+  @override
+  String get doneUndoCommit => '마지막 커밋을 취소했습니다 (변경은 스테이징된 채 남음)';
+
+  @override
+  String doneGoBack(String target) {
+    return '$target 시점으로 되돌렸습니다';
+  }
+
+  @override
+  String doneRescue(String name) {
+    return '브랜치 $name을 만들었습니다';
+  }
+
+  @override
   String get helpCherryPickTitle => 'Cherry-pick (골라 가져오기)';
 
   @override
@@ -2743,4 +2991,116 @@ class AppLocalizationsKo extends AppLocalizations {
   String doneToolPathReset(String tool) {
     return '$tool을(를) PATH에서 찾습니다';
   }
+
+  @override
+  String get updateCheckMenuItem => '업데이트 확인';
+
+  @override
+  String get updateChecking => '업데이트를 확인하는 중…';
+
+  @override
+  String get updateAvailableTitle => '새 버전이 있습니다';
+
+  @override
+  String updateAvailableBody(String appName, String current, String latest) {
+    return '$appName $latest 버전이 나왔습니다. (현재 $current)';
+  }
+
+  @override
+  String get updateReleaseNotes => '변경 내용';
+
+  @override
+  String get updateNow => '지금 업데이트';
+
+  @override
+  String get updateLater => '나중에';
+
+  @override
+  String get updateSkipVersion => '이 버전 건너뛰기';
+
+  @override
+  String get updateDownloading => '내려받는 중…';
+
+  @override
+  String get updateVerifying => '파일을 확인하는 중…';
+
+  @override
+  String updateDownloadProgress(String received, String total) {
+    return '$received / $total';
+  }
+
+  @override
+  String get updateCancel => '취소';
+
+  @override
+  String get updateFailedTitle => '업데이트하지 못했습니다';
+
+  @override
+  String get updateCheckFailedTitle => '업데이트를 확인하지 못했습니다';
+
+  @override
+  String get updateErrorNetwork =>
+      '업데이트 서버에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
+
+  @override
+  String get updateErrorChecksum =>
+      '내려받은 파일이 올바르지 않아 설치하지 않았습니다. 잠시 뒤에 다시 시도해 주세요.';
+
+  @override
+  String get updateErrorInstall => '설치를 시작하지 못했습니다.';
+
+  @override
+  String get updateErrorGeneric =>
+      '업데이트 서버에서 예상하지 못한 응답을 받았습니다. 잠시 뒤에 다시 시도해 주세요.';
+
+  @override
+  String get updateUpToDateTitle => '최신 버전입니다';
+
+  @override
+  String updateUpToDateBody(String version) {
+    return '$version 버전을 사용 중입니다.';
+  }
+
+  @override
+  String get updateUnavailableTitle => '직접 설치해 주세요';
+
+  @override
+  String updateUnavailableBody(String latest) {
+    return '$latest 버전이 있지만 앱에서 자동으로 설치할 수 없습니다. 릴리스 페이지에서 받아 주세요.';
+  }
+
+  @override
+  String get updateOpenReleasePage => '릴리스 페이지 열기';
+
+  @override
+  String get updateMacosOpenedTitle => '설치 창이 열렸습니다';
+
+  @override
+  String updateMacosOpenedBody(String appName) {
+    return '열린 창에서 $appName 을(를) Applications 폴더로 끌어다 놓아 주세요. 실행 중이면 종료한 뒤 덮어쓰세요.';
+  }
+
+  @override
+  String get updateWindowsInstallTitle => '설치 프로그램을 열었습니다';
+
+  @override
+  String updateWindowsInstallBody(String appName) {
+    return '설치하려면 $appName 을(를) 종료해야 합니다. 설치 프로그램의 안내를 따라 주세요.';
+  }
+
+  @override
+  String updateQuitApp(String appName) {
+    return '$appName 종료';
+  }
+
+  @override
+  String get updateLinuxInstallTitle => '설치를 준비했습니다';
+
+  @override
+  String updateLinuxInstallBody(String appName) {
+    return '$appName 을(를) 종료하고 설치합니다. 설치가 끝나면 자동으로 다시 시작됩니다.';
+  }
+
+  @override
+  String get updateQuitAndInstall => '종료하고 설치';
 }

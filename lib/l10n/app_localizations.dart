@@ -725,7 +725,7 @@ abstract class AppLocalizations {
   /// No description provided for @changesMarkResolved.
   ///
   /// In ko, this message translates to:
-  /// **'해결됨'**
+  /// **'해결됨 표시'**
   String get changesMarkResolved;
 
   /// No description provided for @changesCleanTitle.
@@ -3002,6 +3002,138 @@ abstract class AppLocalizations {
   /// **'들어오는 것 사용'**
   String get conflictUseIncoming;
 
+  /// No description provided for @conflictByBlock.
+  ///
+  /// In ko, this message translates to:
+  /// **'구간별로 해결'**
+  String get conflictByBlock;
+
+  /// No description provided for @conflictSheetTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 충돌 해결'**
+  String conflictSheetTitle(String name);
+
+  /// No description provided for @conflictBlockTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 {index}/{total}'**
+  String conflictBlockTitle(int index, int total);
+
+  /// No description provided for @conflictSideMine.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 것'**
+  String get conflictSideMine;
+
+  /// No description provided for @conflictSideIncoming.
+  ///
+  /// In ko, this message translates to:
+  /// **'들어오는 것'**
+  String get conflictSideIncoming;
+
+  /// No description provided for @conflictKeepBoth.
+  ///
+  /// In ko, this message translates to:
+  /// **'둘 다 유지 (위, 아래 순서)'**
+  String get conflictKeepBoth;
+
+  /// No description provided for @conflictEmptySide.
+  ///
+  /// In ko, this message translates to:
+  /// **'(비어 있음)'**
+  String get conflictEmptySide;
+
+  /// No description provided for @conflictPickHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'구간마다 어느 쪽을 쓸지 골라 주세요. {left}개 남았습니다.'**
+  String conflictPickHint(int left);
+
+  /// No description provided for @conflictApply.
+  ///
+  /// In ko, this message translates to:
+  /// **'적용하고 해결됨 표시'**
+  String get conflictApply;
+
+  /// No description provided for @conflictApplyNote.
+  ///
+  /// In ko, this message translates to:
+  /// **'고른 대로 파일을 다시 쓰고 git add 합니다. 직접 고쳐 쓰려면 편집기로 여세요.'**
+  String get conflictApplyNote;
+
+  /// No description provided for @conflictBroken.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 표시가 온전하지 않아 앱에서 읽을 수 없습니다. 편집기에서 직접 고쳐 주세요.'**
+  String get conflictBroken;
+
+  /// No description provided for @conflictNone.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 파일에는 충돌 표시가 없습니다. 이미 고쳤다면 \'해결됨 표시\'만 누르면 됩니다.'**
+  String get conflictNone;
+
+  /// No description provided for @conflictUnreadable.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일을 읽을 수 없습니다 (이진 파일이거나 삭제된 파일일 수 있습니다). \'내 것 사용\' 또는 \'들어오는 것 사용\'으로 해결하세요.'**
+  String get conflictUnreadable;
+
+  /// No description provided for @doneConflictResolved.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}: 충돌 해결됨'**
+  String doneConflictResolved(String name);
+
+  /// No description provided for @changesOperationTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 작업이 끝나지 않았습니다'**
+  String get changesOperationTitle;
+
+  /// No description provided for @changesOperationMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌은 모두 해결됐습니다. 위의 \'계속\'으로 마무리하거나 \'중단\'으로 시작하기 전 상태로 되돌리세요.'**
+  String get changesOperationMessage;
+
+  /// No description provided for @conflictReopen.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 충돌 상태로'**
+  String get conflictReopen;
+
+  /// No description provided for @conflictReopenMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}을(를) 충돌이 난 직후의 모습으로 되돌립니다. 지금까지 해결한 내용은 사라지고, 충돌 표시가 다시 들어갑니다.'**
+  String conflictReopenMessage(String path);
+
+  /// No description provided for @conflictReopenConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 충돌'**
+  String get conflictReopenConfirm;
+
+  /// No description provided for @conflictMarkersLeftTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'충돌 표시가 남아 있습니다'**
+  String get conflictMarkersLeftTitle;
+
+  /// No description provided for @conflictMarkersLeftMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}에 아직 `<<<<<<<` 표시가 {count}군데 남아 있습니다. 이대로 해결됨으로 표시하면 표시가 그대로 커밋됩니다. 먼저 \'구간별로 해결\'이나 편집기로 정리하세요.'**
+  String conflictMarkersLeftMessage(String path, int count);
+
+  /// No description provided for @conflictMarkersLeftConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래도 해결됨 표시'**
+  String get conflictMarkersLeftConfirm;
+
   /// No description provided for @doneFileAction.
   ///
   /// In ko, this message translates to:
@@ -4046,6 +4178,300 @@ abstract class AppLocalizations {
   /// **'이미 올린 커밋이 문제를 일으켰을 때 씁니다. 기록을 고치지 않아 다른 사람과 어긋나지 않고 강제 push도 필요 없습니다. 아직 올리지 않은 커밋은 amend로 고치는 편이 깔끔합니다.'**
   String get helpRevertWhy;
 
+  /// No description provided for @helpCaptionBeforeReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'전: main이 D를 가리킴'**
+  String get helpCaptionBeforeReset;
+
+  /// No description provided for @helpCaptionAfterReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'후: main이 B로 옮겨짐. C·D는 사라진 것 같지만 reflog에 남아 있음'**
+  String get helpCaptionAfterReset;
+
+  /// No description provided for @helpCaptionReflog.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD가 지나온 자리가 순서대로 적혀 있어, D로 다시 돌아갈 수 있음'**
+  String get helpCaptionReflog;
+
+  /// No description provided for @helpResetTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Reset (브랜치 옮기기)'**
+  String get helpResetTitle;
+
+  /// No description provided for @helpResetWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'reset은 \'처음 자리로 되돌려 놓다\'.'**
+  String get helpResetWord;
+
+  /// No description provided for @helpResetInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치가 가리키는 커밋을 뒤로 옮깁니다. 커밋이 지워진 것처럼 보이지만 reflog에 남아 있어 한동안 되살릴 수 있습니다. --soft는 변경을 스테이징한 채 남기고, --keep은 작업 중인 변경을 지키며, --hard는 작업 중인 변경까지 버립니다.'**
+  String get helpResetInGit;
+
+  /// No description provided for @helpResetWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 올리지 않은 커밋을 취소할 때 씁니다. 이미 올린 커밋에는 쓰지 마세요. 다른 사람의 기록과 어긋나니 revert를 쓰세요. 이 앱은 안전한 --soft와 --keep만 씁니다.'**
+  String get helpResetWhy;
+
+  /// No description provided for @helpReflogTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'Reflog (실수 복구 기록)'**
+  String get helpReflogTitle;
+
+  /// No description provided for @helpReflogWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'reflog는 \'reference log\', 가리키던 자리의 기록.'**
+  String get helpReflogWord;
+
+  /// No description provided for @helpReflogInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD와 브랜치가 어디를 가리켰는지 이 컴퓨터에만 적어 둔 기록입니다. 커밋을 취소하거나 브랜치를 지워도 보통 90일 동안은 그 시점을 찾아 되돌아갈 수 있습니다.'**
+  String get helpReflogInGit;
+
+  /// No description provided for @helpReflogWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'실수했다\' 싶으면 먼저 reflog를 보세요. 이 컴퓨터에만 있는 기록이라 다른 컴퓨터나 원격에서는 볼 수 없고, 오래된 항목은 git이 정리합니다.'**
+  String get helpReflogWhy;
+
+  /// No description provided for @historyGraph.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래프'**
+  String get historyGraph;
+
+  /// No description provided for @historyAllBranches.
+  ///
+  /// In ko, this message translates to:
+  /// **'모든 브랜치'**
+  String get historyAllBranches;
+
+  /// No description provided for @helpCaptionGraphMerged.
+  ///
+  /// In ko, this message translates to:
+  /// **'main과 feature가 갈라졌다가 M에서 합쳐진 기록 (속이 빈 점이 병합 커밋)'**
+  String get helpCaptionGraphMerged;
+
+  /// No description provided for @helpCommitGraphTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 그래프 읽는 법'**
+  String get helpCommitGraphTitle;
+
+  /// No description provided for @helpCommitGraphWord.
+  ///
+  /// In ko, this message translates to:
+  /// **'graph는 \'점과 선으로 그린 그림\'.'**
+  String get helpCommitGraphWord;
+
+  /// No description provided for @helpCommitGraphInGit.
+  ///
+  /// In ko, this message translates to:
+  /// **'점은 커밋, 선은 부모와의 이음입니다. 위가 최신입니다. 선이 둘로 갈라지면 브랜치가 갈라진 곳, 두 선이 하나로 합쳐지면 병합입니다. 속이 빈 점은 병합 커밋, 고리가 둘러진 점은 지금 있는 자리(HEAD)입니다.'**
+  String get helpCommitGraphInGit;
+
+  /// No description provided for @helpCommitGraphWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'내 브랜치가 main과 어디서 갈라졌는지\', \'병합이 어디서 일어났는지\'를 한눈에 봅니다. 좁은 창에서는 선을 6줄까지만 그립니다. 그보다 많으면 맨 오른쪽 줄에 겹쳐 보입니다.'**
+  String get helpCommitGraphWhy;
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'실수 복구'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoveryIntro.
+  ///
+  /// In ko, this message translates to:
+  /// **'실수했어도 대부분 되돌릴 수 있습니다. 상황에 맞는 것을 고르세요.'**
+  String get recoveryIntro;
+
+  /// No description provided for @recoveryUndoCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 커밋 취소'**
+  String get recoveryUndoCommit;
+
+  /// No description provided for @recoveryUndoCommitWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'{subject}\' 커밋만 취소합니다. 바꾼 내용은 스테이징된 채 남습니다.'**
+  String recoveryUndoCommitWhy(String subject);
+
+  /// No description provided for @recoveryUndoCommitMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'\'{subject}\' 커밋을 취소합니다. 그 커밋에서 바꾼 내용은 지워지지 않고 스테이징된 채 남아, 고쳐서 다시 커밋할 수 있습니다.'**
+  String recoveryUndoCommitMessage(String subject);
+
+  /// No description provided for @recoveryUndoCommitPushed.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 커밋은 이미 원격에 올라가 있습니다. 취소해도 원격에는 남아 있어 다시 올리려면 강제 push가 필요하고, 다른 사람의 기록과 어긋납니다. 올린 커밋은 기록 탭의 \'되돌리기(revert)\'가 더 안전합니다.'**
+  String get recoveryUndoCommitPushed;
+
+  /// No description provided for @recoveryUndoCommitConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 취소'**
+  String get recoveryUndoCommitConfirm;
+
+  /// No description provided for @recoveryNoParent.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 커밋은 취소할 수 없습니다.'**
+  String get recoveryNoParent;
+
+  /// No description provided for @recoveryStash.
+  ///
+  /// In ko, this message translates to:
+  /// **'작업 중인 변경을 잠시 치우기'**
+  String get recoveryStash;
+
+  /// No description provided for @recoveryStashWhy.
+  ///
+  /// In ko, this message translates to:
+  /// **'임시 저장(stash)에 보관했다가 나중에 다시 꺼냅니다.'**
+  String get recoveryStashWhy;
+
+  /// No description provided for @recoveryHistory.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 상태로 돌아가기'**
+  String get recoveryHistory;
+
+  /// No description provided for @recoveryHistoryHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'HEAD가 지나온 자리입니다. 커밋을 취소하거나 브랜치를 지운 뒤에도 보통 90일 동안 남아 있습니다.'**
+  String get recoveryHistoryHint;
+
+  /// No description provided for @recoveryNow.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금'**
+  String get recoveryNow;
+
+  /// No description provided for @recoveryEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 기록이 없습니다.'**
+  String get recoveryEmpty;
+
+  /// No description provided for @recoveryKindCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋'**
+  String get recoveryKindCommit;
+
+  /// No description provided for @recoveryKindAmend.
+  ///
+  /// In ko, this message translates to:
+  /// **'커밋 고침'**
+  String get recoveryKindAmend;
+
+  /// No description provided for @recoveryKindCheckout.
+  ///
+  /// In ko, this message translates to:
+  /// **'전환'**
+  String get recoveryKindCheckout;
+
+  /// No description provided for @recoveryKindReset.
+  ///
+  /// In ko, this message translates to:
+  /// **'되돌림'**
+  String get recoveryKindReset;
+
+  /// No description provided for @recoveryKindMerge.
+  ///
+  /// In ko, this message translates to:
+  /// **'병합'**
+  String get recoveryKindMerge;
+
+  /// No description provided for @recoveryKindPull.
+  ///
+  /// In ko, this message translates to:
+  /// **'pull'**
+  String get recoveryKindPull;
+
+  /// No description provided for @recoveryKindRebase.
+  ///
+  /// In ko, this message translates to:
+  /// **'rebase'**
+  String get recoveryKindRebase;
+
+  /// No description provided for @recoveryKindCherryPick.
+  ///
+  /// In ko, this message translates to:
+  /// **'cherry-pick'**
+  String get recoveryKindCherryPick;
+
+  /// No description provided for @recoveryKindRevert.
+  ///
+  /// In ko, this message translates to:
+  /// **'revert'**
+  String get recoveryKindRevert;
+
+  /// No description provided for @recoveryKindOther.
+  ///
+  /// In ko, this message translates to:
+  /// **'기타'**
+  String get recoveryKindOther;
+
+  /// No description provided for @recoveryGoBack.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기로 되돌리기'**
+  String get recoveryGoBack;
+
+  /// No description provided for @recoveryGoBackMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{branch}를 {target} 시점으로 되돌립니다. 그 뒤의 커밋은 브랜치에서 빠지지만 reflog에 남아 있습니다. 작업 중인 변경은 그대로 두며, 겹치는 파일이 있으면 아무것도 바꾸지 않고 멈춥니다.'**
+  String recoveryGoBackMessage(String branch, String target);
+
+  /// No description provided for @recoveryGoBackConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'되돌리기'**
+  String get recoveryGoBackConfirm;
+
+  /// No description provided for @recoveryRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'여기서 새 브랜치 만들기'**
+  String get recoveryRescue;
+
+  /// No description provided for @doneUndoCommit.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 커밋을 취소했습니다 (변경은 스테이징된 채 남음)'**
+  String get doneUndoCommit;
+
+  /// No description provided for @doneGoBack.
+  ///
+  /// In ko, this message translates to:
+  /// **'{target} 시점으로 되돌렸습니다'**
+  String doneGoBack(String target);
+
+  /// No description provided for @doneRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'브랜치 {name}을 만들었습니다'**
+  String doneRescue(String name);
+
   /// No description provided for @helpCherryPickTitle.
   ///
   /// In ko, this message translates to:
@@ -4633,6 +5059,192 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{tool}을(를) PATH에서 찾습니다'**
   String doneToolPathReset(String tool);
+
+  /// No description provided for @updateCheckMenuItem.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 확인'**
+  String get updateCheckMenuItem;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트를 확인하는 중…'**
+  String get updateChecking;
+
+  /// No description provided for @updateAvailableTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 버전이 있습니다'**
+  String get updateAvailableTitle;
+
+  /// No description provided for @updateAvailableBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} {latest} 버전이 나왔습니다. (현재 {current})'**
+  String updateAvailableBody(String appName, String current, String latest);
+
+  /// No description provided for @updateReleaseNotes.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경 내용'**
+  String get updateReleaseNotes;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금 업데이트'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In ko, this message translates to:
+  /// **'나중에'**
+  String get updateLater;
+
+  /// No description provided for @updateSkipVersion.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 버전 건너뛰기'**
+  String get updateSkipVersion;
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In ko, this message translates to:
+  /// **'내려받는 중…'**
+  String get updateDownloading;
+
+  /// No description provided for @updateVerifying.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일을 확인하는 중…'**
+  String get updateVerifying;
+
+  /// No description provided for @updateDownloadProgress.
+  ///
+  /// In ko, this message translates to:
+  /// **'{received} / {total}'**
+  String updateDownloadProgress(String received, String total);
+
+  /// No description provided for @updateCancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소'**
+  String get updateCancel;
+
+  /// No description provided for @updateFailedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트하지 못했습니다'**
+  String get updateFailedTitle;
+
+  /// No description provided for @updateCheckFailedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트를 확인하지 못했습니다'**
+  String get updateCheckFailedTitle;
+
+  /// No description provided for @updateErrorNetwork.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 서버에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.'**
+  String get updateErrorNetwork;
+
+  /// No description provided for @updateErrorChecksum.
+  ///
+  /// In ko, this message translates to:
+  /// **'내려받은 파일이 올바르지 않아 설치하지 않았습니다. 잠시 뒤에 다시 시도해 주세요.'**
+  String get updateErrorChecksum;
+
+  /// No description provided for @updateErrorInstall.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치를 시작하지 못했습니다.'**
+  String get updateErrorInstall;
+
+  /// No description provided for @updateErrorGeneric.
+  ///
+  /// In ko, this message translates to:
+  /// **'업데이트 서버에서 예상하지 못한 응답을 받았습니다. 잠시 뒤에 다시 시도해 주세요.'**
+  String get updateErrorGeneric;
+
+  /// No description provided for @updateUpToDateTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'최신 버전입니다'**
+  String get updateUpToDateTitle;
+
+  /// No description provided for @updateUpToDateBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{version} 버전을 사용 중입니다.'**
+  String updateUpToDateBody(String version);
+
+  /// No description provided for @updateUnavailableTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'직접 설치해 주세요'**
+  String get updateUnavailableTitle;
+
+  /// No description provided for @updateUnavailableBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{latest} 버전이 있지만 앱에서 자동으로 설치할 수 없습니다. 릴리스 페이지에서 받아 주세요.'**
+  String updateUnavailableBody(String latest);
+
+  /// No description provided for @updateOpenReleasePage.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 페이지 열기'**
+  String get updateOpenReleasePage;
+
+  /// No description provided for @updateMacosOpenedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치 창이 열렸습니다'**
+  String get updateMacosOpenedTitle;
+
+  /// No description provided for @updateMacosOpenedBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'열린 창에서 {appName} 을(를) Applications 폴더로 끌어다 놓아 주세요. 실행 중이면 종료한 뒤 덮어쓰세요.'**
+  String updateMacosOpenedBody(String appName);
+
+  /// No description provided for @updateWindowsInstallTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치 프로그램을 열었습니다'**
+  String get updateWindowsInstallTitle;
+
+  /// No description provided for @updateWindowsInstallBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치하려면 {appName} 을(를) 종료해야 합니다. 설치 프로그램의 안내를 따라 주세요.'**
+  String updateWindowsInstallBody(String appName);
+
+  /// No description provided for @updateQuitApp.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} 종료'**
+  String updateQuitApp(String appName);
+
+  /// No description provided for @updateLinuxInstallTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'설치를 준비했습니다'**
+  String get updateLinuxInstallTitle;
+
+  /// No description provided for @updateLinuxInstallBody.
+  ///
+  /// In ko, this message translates to:
+  /// **'{appName} 을(를) 종료하고 설치합니다. 설치가 끝나면 자동으로 다시 시작됩니다.'**
+  String updateLinuxInstallBody(String appName);
+
+  /// No description provided for @updateQuitAndInstall.
+  ///
+  /// In ko, this message translates to:
+  /// **'종료하고 설치'**
+  String get updateQuitAndInstall;
 }
 
 class _AppLocalizationsDelegate

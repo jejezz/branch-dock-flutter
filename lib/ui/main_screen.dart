@@ -23,6 +23,7 @@ import '../theme/app_theme.dart';
 import 'command_bar.dart';
 import 'command_palette.dart';
 import 'onboarding.dart';
+import 'recovery_sheet.dart';
 import 'repo_actions.dart';
 import 'repo_scope.dart';
 import 'services.dart';
@@ -39,6 +40,7 @@ import 'tabs/remotes_tab.dart';
 import 'tabs/tags_tab.dart';
 import 'widgets.dart';
 import 'shortcut_label.dart';
+import '../window/focus_tint.dart';
 
 /// 앱의 유일한 화면 (UI_UX.md §3): 앱 바 → 상태 헤더 → 추천 배너 → 섹션 탭 →
 /// 내용 → 명령 바. 저장소가 없으면 시작 화면.
@@ -220,6 +222,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
         PaletteItem(title: l10n.tagsNew, icon: Icons.sell_outlined, group: actions, shortcut: shortcutLabel('T'), onRun: () => showCreateTagSheet(context, repo, onOpenReleaseWizard: _openReleaseWizard), enabled: !repo.status.unborn, keywords: 'tag create'),
         PaletteItem(title: l10n.releaseStart, icon: Icons.rocket_launch_outlined, group: actions, shortcut: shortcutLabel('R', shift: true), onRun: _openReleaseWizard, keywords: 'release'),
         PaletteItem(title: l10n.stashSave, icon: Icons.inventory_2_outlined, group: actions, onRun: () => showStashSheet(context, repo), enabled: !repo.status.clean, keywords: 'stash'),
+        PaletteItem(title: l10n.recoveryTitle, icon: Icons.restore_rounded, group: actions, onRun: () => showRecoverySheet(context, repo), enabled: !repo.status.unborn, keywords: 'undo reset reflog recover mistake'),
         PaletteItem(title: l10n.branchesCleanup, icon: Icons.cleaning_services_outlined, group: actions, onRun: () => showCleanupSheet(context, repo), keywords: 'cleanup prune'),
         if (repo.githubRemote != null && _env.ghReady && !repo.status.detached && repo.status.head != repo.defaultBranch)
           PaletteItem(title: l10n.prCreate, icon: Icons.merge_rounded, group: actions, onRun: () => showCreatePrSheet(context, repo), keywords: 'pr pull request'),
@@ -446,7 +449,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
   PreferredSizeWidget _appBar(BuildContext context, AppLocalizations l10n) {
     final repo = _repo;
     return AppBar(
-      toolbarHeight: 44,
+      flexibleSpace: const FocusTint(),
       titleSpacing: AppSpacing.sm,
       title: repo == null
           ? const Text(AppIdentity.displayName)
@@ -468,8 +471,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
             selectedIcon: const Icon(Icons.push_pin_rounded),
             onPressed: _togglePin,
           ),
-        const ThemeMenuButton(),
-        const LanguageMenuButton(),
+        // 테마·언어 버튼은 크기를 지정하지 않아 24로 남으므로, 다른 앱 바 버튼과 같은 18로 맞춘다.
+        IconButtonTheme(
+          data: IconButtonThemeData(style: IconButton.styleFrom(iconSize: 18)),
+          child: const Row(mainAxisSize: MainAxisSize.min, children: [ThemeMenuButton(), LanguageMenuButton()]),
+        ),
         IconButton(
           tooltip: l10n.aboutTooltip,
           iconSize: 18,

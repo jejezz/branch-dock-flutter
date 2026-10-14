@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 
 import '../../core/command_log.dart';
 import '../../git/commands.dart';
+import '../../git/conflicts.dart';
 import '../../git/status.dart';
 import '../../git/history.dart';
 import '../../l10n/app_localizations.dart';
 import '../../repo/repo_controller.dart';
 import '../../theme/app_theme.dart';
 import '../action_sheet.dart';
+import '../conflict_sheet.dart';
 import '../diff_view.dart';
 import '../help/concepts.dart';
 import '../repo_actions.dart';
@@ -124,8 +126,9 @@ class _ChangesTabState extends State<ChangesTab> {
         if (s.clean)
           EmptyState(
             icon: Icons.check_circle_outline_rounded,
-            title: l10n.changesCleanTitle,
-            message: l10n.changesCleanMessage,
+            // 병합·rebase 중이면 "변경이 없다"가 아니라 "아직 끝나지 않았다"고 알려 준다.
+            title: repo.operation == RepoOperation.none ? l10n.changesCleanTitle : l10n.changesOperationTitle,
+            message: repo.operation == RepoOperation.none ? l10n.changesCleanMessage : l10n.changesOperationMessage,
           ),
         for (final (group, title, files, tone) in groups)
           if (files.isNotEmpty) ...[
@@ -278,12 +281,14 @@ class _FileRowState extends State<_FileRow> {
       _Group.unstaged => _kindLetter(f.unstagedKind),
     };
     final staging = widget.group != _Group.staged;
+    // 병합·rebase 중에 이미 해결한 충돌 파일은 다시 충돌 상태로 되돌릴 수 있다.
+    final reopenable = widget.group != _Group.conflicts && widget.group != _Group.untracked && repo.resolvedPaths.contains(f.path);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
-      onSecondaryTapDown: widget.group == _Group.staged ? null : (d) => _menu(context, d.globalPosition),
+      onSecondaryTapDown: widget.group == _Group.staged && !reopenable ? null : (d) => _menu(context, d.globalPosition),
       child: InkWell(
         splashFactory: NoSplash.splashFactory,
         onDoubleTap: () => RepoActions.openInEditor(context, repo, f),
@@ -333,7 +338,7 @@ class _FileRowState extends State<_FileRow> {
                 ),
                 if (widget.group == _Group.conflicts)
                   TextButton(
-                    onPressed: repo.busy ? null : () => repo.stage(f),
+                    onPressed: repo.busy ? null : () => _markResolved(),
                     child: Text(l10n.changesMarkResolved),
                   )
                 else
@@ -344,7 +349,7 @@ class _FileRowState extends State<_FileRow> {
                     icon: Icon(staging ? Icons.add_rounded : Icons.remove_rounded),
                     onPressed: repo.busy ? null : () => staging ? repo.stage(f) : repo.unstage(f),
                   ),
-                if (widget.group != _Group.staged)
+                if (widget.group != _Group.staged || reopenable)
                   Builder(
                     builder: (context) => IconButton(
                       tooltip: l10n.commonMore,
@@ -361,6 +366,27 @@ class _FileRowState extends State<_FileRow> {
       ),
       ),
     );
+  }
+
+  /// "해결됨 표시": 파일에 충돌 표시가 남아 있으면, 그대로 커밋되기 전에 한 번 묻는다.
+  Future<void> _markResolved() async {
+    final l10n = AppLocalizations.of(context);
+    final repo = widget.repo;
+    final f = widget.file;
+    final text = await readConflictFile(conflictFilePath(repo, f));
+    final left = text == null ? 0 : ConflictFile.countMarkers(text);
+    if (!mounted) return;
+    if (left > 0) {
+      final ok = await confirmDanger(
+        context,
+        title: l10n.conflictMarkersLeftTitle,
+        message: l10n.conflictMarkersLeftMessage(f.path, left),
+        confirm: l10n.conflictMarkersLeftConfirm,
+        commands: [GitCommands.stage(f.path)],
+      );
+      if (!ok || !mounted) return;
+    }
+    await RepoActions.report(context, repo.stage(f), done: l10n.doneConflictResolved(f.fileName));
   }
 
   Future<void> _showDiff(BuildContext context) async {
@@ -390,7 +416,10 @@ class _FileRowState extends State<_FileRow> {
   }
 
   /// 파일 메뉴 (PLAN.md 3.2·3.5 P1): 변경 취소, 추적 안 된 파일 삭제, 충돌에서 한쪽 고르기.
-  Future<void> _menu(BuildContext context, Offset? position) async {
+  ///
+  /// [anchor]는 메뉴를 연 버튼의 context로 위치를 잡는 데만 쓴다. 호버 때만 보이는 버튼은 메뉴가
+  /// 열리면(마우스가 행을 벗어나) 사라지므로, 메뉴를 고른 뒤에는 행 자체의 context와 [mounted]를 쓴다.
+  Future<void> _menu(BuildContext anchor, Offset? position) async {
     final l10n = AppLocalizations.of(context);
     final repo = widget.repo;
     final f = widget.file;
@@ -398,37 +427,52 @@ class _FileRowState extends State<_FileRow> {
     // rebase 중에는 git의 ours/theirs가 뒤바뀐다: ours = 옮겨 붙일 바탕, theirs = 내 커밋.
     final mine = GitCommands.checkoutSide(f.path, ours: !rebasing);
     final incoming = GitCommands.checkoutSide(f.path, ours: rebasing);
+    final reopen = GitCommands.reconflict(f.path);
+    final reopenable = widget.group != _Group.conflicts &&
+        widget.group != _Group.untracked &&
+        repo.resolvedPaths.contains(f.path);
     final items = <PopupMenuEntry<List<List<String>>>>[
       if (widget.group == _Group.conflicts) ...[
+        PopupMenuItem(value: const [], child: Text(l10n.conflictByBlock)),
         PopupMenuItem(value: [mine, GitCommands.stage(f.path)], child: Text(l10n.conflictUseMine)),
         PopupMenuItem(value: [incoming, GitCommands.stage(f.path)], child: Text(l10n.conflictUseIncoming)),
       ],
       if (widget.group == _Group.unstaged)
         PopupMenuItem(value: [GitCommands.discard(f.path)], child: Text(l10n.changesDiscard)),
+      if (reopenable) PopupMenuItem(value: [reopen], child: Text(l10n.conflictReopen)),
       if (widget.group == _Group.untracked)
         PopupMenuItem(value: [GitCommands.removeUntracked(f.path)], child: Text(l10n.changesDeleteUntracked)),
     ];
     if (items.isEmpty) return;
-    final box = context.findRenderObject() as RenderBox;
+    final box = anchor.findRenderObject() as RenderBox;
     final origin = position ?? box.localToGlobal(Offset(box.size.width - 40, box.size.height));
     final commands = await showMenu<List<List<String>>>(
       context: context,
       position: RelativeRect.fromLTRB(origin.dx, origin.dy, origin.dx, origin.dy),
       items: items,
     );
-    if (commands == null || !context.mounted) return;
+    if (commands == null || !mounted) return;
+    // 빈 목록은 "구간별로 해결": 명령을 바로 실행하지 않고 해결 시트를 연다.
+    if (commands.isEmpty) {
+      await showConflictSheet(context, repo, f);
+      return;
+    }
     // 변경 취소·삭제는 되돌릴 수 없으므로 확인한다 (ui-ux.md §6).
     if (widget.group != _Group.conflicts) {
+      final reopening = commands.first.contains('-m');
+      final untracked = widget.group == _Group.untracked;
       final ok = await confirmDanger(
         context,
-        title: widget.group == _Group.untracked ? l10n.changesDeleteUntracked : l10n.changesDiscard,
-        message: widget.group == _Group.untracked
-            ? l10n.changesDeleteUntrackedMessage(f.path)
-            : l10n.changesDiscardMessage(f.path),
-        confirm: widget.group == _Group.untracked ? l10n.changesDeleteUntracked : l10n.changesDiscard,
+        title: reopening ? l10n.conflictReopen : (untracked ? l10n.changesDeleteUntracked : l10n.changesDiscard),
+        message: reopening
+            ? l10n.conflictReopenMessage(f.path)
+            : (untracked ? l10n.changesDeleteUntrackedMessage(f.path) : l10n.changesDiscardMessage(f.path)),
+        confirm: reopening
+            ? l10n.conflictReopenConfirm
+            : (untracked ? l10n.changesDeleteUntracked : l10n.changesDiscard),
         commands: commands,
       );
-      if (!ok || !context.mounted) return;
+      if (!ok || !mounted) return;
     }
     await RepoActions.report(context, repo.executeAll(commands), done: l10n.doneFileAction(f.fileName));
   }

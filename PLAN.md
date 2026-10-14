@@ -209,6 +209,9 @@ branch … used by worktree at …`)도 거부된다. Claude Code 같은 도구�
   상단에 "병합 중" 상태를 계속 표시한다.
 - `P1` 충돌 파일에 "내 것 사용 / 들어오는 것 사용"
   (`git checkout --ours/--theirs`).
+- `P1` 충돌 파일을 **구간별로 해결**: `<<<<<<<` 구간마다 "내 것 / 들어오는 것 / 둘 다"를
+  고르면 파일을 다시 쓰고 `git add` 한다 (`lib/git/conflicts.dart`, `lib/ui/conflict_sheet.dart`).
+  직접 고쳐 쓰는 편집은 여전히 편집기에 맡긴다. 표시가 깨진 파일은 편집기로 넘긴다.
 - `P1` rebase 중 상태도 같은 방식으로 표시 (계속 / 건너뛰기 / 중단).
   대화형 rebase는 범위 밖.
 - `P1` GitHub에서 병합하기: 3.9 PR 병합으로 연결.
@@ -392,6 +395,13 @@ branch … used by worktree at …`)도 거부된다. Claude Code 같은 도구�
 - `P1` 현재 브랜치의 커밋 목록 (한 줄 요약, 태그·브랜치 표시, ahead 커밋 강조).
   태그·브랜치를 만들 때 대상 커밋 고르기에 쓴다.
 - `P2` 커밋 되돌리기(`git revert`), cherry-pick.
+- `P2` **커밋 그래프**: 기록 줄 왼쪽에 점(커밋)과 선(부모와의 이음)을 그린다. 위가 최신이고
+  `git log --topo-order`로 받아 부모가 항상 자식 뒤에 오게 한다.
+  - 줄(lane) 배치는 `lib/git/graph_layout.dart`(순수 Dart), 그리는 일은 `lib/ui/commit_graph_gutter.dart`.
+  - 줄기는 왼쪽에 머문다: 이미 오른쪽 줄이 기다리는 부모를 만나면 그 줄을 왼쪽으로 끌어온다.
+  - 병합 커밋은 속이 빈 점, HEAD는 고리가 둘러진 점. 좁은 창에서는 6줄까지만 그린다(넘는 줄은 맨 오른쪽에 겹침).
+  - "그래프" 칩으로 켜고 끄고(끄면 이전 목록), "모든 브랜치" 칩으로 `--all`을 함께 본다.
+  - 개념 카드 "커밋 그래프 읽는 법".
 
 ### 3.12 명령 로그와 도움말
 
@@ -482,6 +492,21 @@ fast-forward, squash처럼 **낱말의 사전 뜻만으로는 git에서 무엇�
 - [Pro Git — Stashing과 Cleaning](https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-Stashing%EA%B3%BC-Cleaning)
 - [Pro Git — 태그](https://git-scm.com/book/ko/v2/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%ED%83%9C%EA%B7%B8)
 - [Learn Git Branching](https://learngitbranching.js.org/?locale=ko) — 브라우저에서 그래프를 직접 움직여 보는 연습 (도움말 목록 맨 아래 "연습하기"로)
+
+### 3.15 실수 복구 (P1)
+
+초보가 가장 무서워하는 일 — "커밋을 잘못했다", "되돌렸더니 사라졌다" — 을 한 곳에서 풀어 준다.
+명령 팔레트("실수 복구")와 기록 탭 머리글의 버튼으로 연다.
+
+- `P1` **마지막 커밋 취소**: `git reset --soft HEAD~1`. 변경은 스테이징된 채 남는다. 이미 원격에
+  올라간 커밋이면 "강제 push가 필요하고 기록이 어긋난다, 기록 탭의 revert가 안전하다"고 경고한다.
+- `P1` **변경 잠시 치우기**: 기존 stash 시트(3.2)로 연결한다.
+- `P1` **이전 상태로 돌아가기**: reflog(`git reflog`)에서 HEAD가 지나온 자리를 보여 준다. 줄마다
+  - "여기로 되돌리기": `git reset --keep <커밋>`. 작업 중인 변경은 지키고, 겹치면 아무것도 바꾸지
+    않고 멈춘다 → "임시 저장하고 다시"를 제안한다 (기존 `withStashRetry`).
+  - "여기서 새 브랜치 만들기": `git branch rescue/<해시> <커밋>`. 전환하지 않으므로 아무것도 잃지 않는다.
+- `--hard`는 쓰지 않는다. 작업 중인 변경을 버리는 일은 stash(되살릴 수 있음)로 대신한다.
+- 개념 카드: reset, reflog (3.13).
 
 ### 3.14 실행 환경과 설정 (v0.9.0)
 
