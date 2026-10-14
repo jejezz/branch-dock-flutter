@@ -71,7 +71,11 @@ class RepoController extends ChangeNotifier {
 
   /// 지금 실행 중인 명령 (진행 표시줄·취소용).
   CancelToken? _running;
-  bool get busy => _running != null;
+  // 명령이 끝난 뒤 상태를 다시 읽는 동안, 그리고 여러 명령을 이어 실행하는 동안에도 바쁘다 —
+  // 느린 PC(Windows)에서 결과가 나오기 전에 같은 버튼이 한 번 더 눌리지 않게 한다.
+  bool _settling = false;
+  bool _holding = false;
+  bool get busy => _running != null || _settling || _holding;
 
   StreamSubscription<FileSystemEvent>? _watch;
   Timer? _debounce;
@@ -267,7 +271,7 @@ class RepoController extends ChangeNotifier {
 
   /// 명령을 실행하고 상태를 다시 읽는다. 한 번에 하나만 실행한다.
   Future<CommandResult> execute(List<String> args, {String? stdin}) async {
-    if (busy) return const CommandResult(1, '', 'busy');
+    if (_running != null || _settling) return const CommandResult(1, '', 'busy');
     final token = CancelToken();
     _running = token;
     notifyListeners();
@@ -275,7 +279,26 @@ class RepoController extends ChangeNotifier {
       return await runner.run(args, workingDirectory: root, cancel: token, stdin: stdin);
     } finally {
       _running = null;
-      await refresh();
+      _settling = true;
+      try {
+        await refresh();
+      } finally {
+        _settling = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  /// 여러 단계로 이뤄진 작업을 처음부터 끝까지 바쁜 상태로 묶는다. 이미 바쁘면 실행하지 않는다.
+  Future<CommandResult> hold(Future<CommandResult> Function() body) async {
+    if (busy) return const CommandResult(1, '', 'busy');
+    _holding = true;
+    notifyListeners();
+    try {
+      return await body();
+    } finally {
+      _holding = false;
+      notifyListeners();
     }
   }
 
