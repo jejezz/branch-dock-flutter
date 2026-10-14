@@ -2346,6 +2346,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No remote to release to. Publish it from Remotes first.';
 
   @override
+  String releaseNeedsFiles(String files) {
+    return 'Can\'t release: files the release workflow uses are missing: $files. CI could not build the packages after tagging.';
+  }
+
+  @override
   String get releaseDirectOnlyNotGitHub =>
       'Not a GitHub repository, so this uses direct commit (check → version → tag). Do PRs, release notes and CI on your host\'s website.';
 

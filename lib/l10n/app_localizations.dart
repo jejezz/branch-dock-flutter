@@ -3842,6 +3842,12 @@ abstract class AppLocalizations {
   /// **'원격이 없어 릴리스할 수 없습니다. 원격 탭에서 먼저 올리세요.'**
   String get releaseNeedsRemote;
 
+  /// No description provided for @releaseNeedsFiles.
+  ///
+  /// In ko, this message translates to:
+  /// **'릴리스 워크플로가 쓰는 파일이 없어 릴리스할 수 없습니다: {files}. 태그를 달아도 CI가 패키지를 만들지 못합니다.'**
+  String releaseNeedsFiles(String files);
+
   /// No description provided for @releaseDirectOnlyNotGitHub.
   ///
   /// In ko, this message translates to:

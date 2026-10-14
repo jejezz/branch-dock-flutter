@@ -17,6 +17,7 @@ import '../l10n/app_localizations.dart';
 import '../repo/environment.dart';
 import '../repo/next_action.dart';
 import '../release/release_flow.dart';
+import '../release/repo_release_info.dart';
 import '../repo/repo_controller.dart';
 import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
@@ -274,7 +275,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin, 
     final flow = _flow;
     if (repo == null || flow == null) return;
     _tabs.animateTo(_tabRelease);
-    if (flow.checks.isEmpty && flow.step == ReleaseStep.check && repo.githubRemote != null && _env.ghReady) {
+    if (flow.checks.isEmpty &&
+        flow.step == ReleaseStep.check &&
+        repo.githubRemote != null &&
+        _env.ghReady &&
+        missingReleaseFiles(repo.root).isEmpty) {
       flow.ghReady = _env.ghReady;
       flow.runChecks();
     }

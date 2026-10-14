@@ -87,6 +87,52 @@ List<String> detectDispatchWorkflows(String root) {
   return (tags, dispatch);
 }
 
+/// 태그 push로 도는 릴리스 워크플로가 읽는 저장소 파일 (conventions `release.yml`).
+/// 워크플로 본문에 이 경로가 나올 때만 필요한 파일로 본다.
+const _workflowInputs = [
+  'macos/Runner/Configs/AppInfo.xcconfig',
+  'macos/Runner/Release.entitlements',
+  'windows/CMakeLists.txt',
+  'linux/CMakeLists.txt',
+  'linux/install.sh',
+  'linux/runner/resources/app_icon.png',
+  'installer/windows/app.iss',
+];
+
+/// 태그를 push해도 CI가 릴리스를 만들지 못하게 하는 빠진 파일 (PLAN.md 3.8.1).
+/// 태그 push 워크플로가 없으면 앱이 직접 릴리스를 만들므로 비어 있다.
+/// 앱이 하위 폴더에 있으면(`gui/macos/...`) 한 단계 아래도 찾는다.
+List<String> missingReleaseFiles(String root) {
+  final dir = Directory('$root/.github/workflows');
+  if (!dir.existsSync()) return const [];
+  final missing = <String>{};
+  for (final f in dir.listSync().whereType<File>()) {
+    final name = f.uri.pathSegments.last;
+    if (!name.endsWith('.yml') && !name.endsWith('.yaml')) continue;
+    final yaml = f.readAsStringSync();
+    if (!parseWorkflowTriggers(yaml).$1) continue;
+    final bases = [
+      root,
+      for (final d in Directory(root).listSync().whereType<Directory>())
+        if (!d.uri.pathSegments.where((s) => s.isNotEmpty).last.startsWith('.')) d.path,
+    ];
+    bool has(String rel) => bases.any((b) => File('$b/$rel').existsSync());
+    for (final rel in _workflowInputs) {
+      if (yaml.contains(rel) && !has(rel)) missing.add(rel);
+    }
+    // Linux 패키지는 APPLICATION_ID가 기본값(com.example.*)이면 CI가 실패한다.
+    if (yaml.contains('linux/CMakeLists.txt')) {
+      for (final b in bases) {
+        final cmake = File('$b/linux/CMakeLists.txt');
+        if (cmake.existsSync() && RegExp(r'APPLICATION_ID\s+"com\.example\.').hasMatch(cmake.readAsStringSync())) {
+          missing.add('linux/CMakeLists.txt (APPLICATION_ID)');
+        }
+      }
+    }
+  }
+  return missing.toList()..sort();
+}
+
 /// 태그 전 수동 빌드를 권할 변경 (PLAN.md 3.8.1): 워크플로, 의존성 잠금,
 /// 플랫폼 폴더. [changedFiles]는 `git diff --name-only <마지막 태그>..HEAD`.
 List<String> buildRiskFiles(List<String> changedFiles) => changedFiles

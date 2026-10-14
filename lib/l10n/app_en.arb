@@ -672,6 +672,14 @@
   "remotesGhDefaultNone": "Not set",
   "doneGhDefault": "gh now uses {repo}",
   "releaseNeedsRemote": "No remote to release to. Publish it from Remotes first.",
+  "releaseNeedsFiles": "Can't release: files the release workflow uses are missing: {files}. CI could not build the packages after tagging.",
+  "@releaseNeedsFiles": {
+    "placeholders": {
+      "files": {
+        "type": "String"
+      }
+    }
+  },
   "releaseDirectOnlyNotGitHub": "Not a GitHub repository, so this uses direct commit (check → version → tag). Do PRs, release notes and CI on your host's website.",
   "releaseDirectOnly": "Without gh, only direct commit is available.",
   "releaseDirectMode": "Direct commit",
