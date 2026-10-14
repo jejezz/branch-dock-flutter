@@ -291,6 +291,77 @@ void main() {
     expect(find.text('이 PR 브랜치로 체크아웃'), findsOneWidget);
   });
 
+  // 릴리스 마법사가 막혀 rc.7 태그를 버전 올림 전 커밋에 달아 push한 일의 재발 방지:
+  // 로컬에 있는 태그를 나중에 올릴 때도 버전 파일과 맞는지 점검한다.
+  testWidgets('pushing an existing tag warns when it does not match the version file', (tester) async {
+    await tester.runAsync(() async {
+      File('${repo.root}/pubspec.yaml').writeAsStringSync('name: x\nversion: 0.1.0-rc.6+6\n');
+      await git(repo.root, ['add', 'pubspec.yaml']);
+      await git(repo.root, ['commit', '-q', '-m', 'chore: pubspec']);
+      await git(repo.root, ['tag', '-a', 'v0.1.0-rc.7', '-m', 'rc7']);
+      await git(repo.root, ['tag', '-a', 'v0.1.0-rc.6', '-m', 'rc6']);
+      await repo.refresh();
+    });
+    late BuildContext ctx;
+    await pump(tester, Builder(builder: (context) {
+      ctx = context;
+      return const SizedBox();
+    }));
+
+    // git show는 실제 프로세스라 runAsync에서 시작하고, 실제 시간을 흘려 보내며 기다린다.
+    Future<bool>? result;
+    Future<void> push(String tag) async {
+      await tester.runAsync(() async {
+        result = confirmTagPush(ctx, repo, [tag]);
+      });
+    }
+
+    Future<void> settleReal() async {
+      for (var i = 0; i < 30; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+        await tester.pump();
+      }
+    }
+
+    await push('v0.1.0-rc.7');
+    await settleReal();
+    expect(find.textContaining('커밋의 pubspec.yaml 버전이 태그와 다릅니다'), findsOneWidget);
+    expect(find.textContaining('v0.1.0-rc.7 → 0.1.0-rc.6'), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+    expect(await tester.runAsync(() => result!), isFalse);
+
+    // 버전이 맞으면 (CI 워크플로가 없으니) 묻지 않고 진행한다.
+    await push('v0.1.0-rc.6');
+    await settleReal();
+    expect(find.textContaining('다릅니다'), findsNothing);
+    expect(await tester.runAsync(() => result!), isTrue);
+  });
+
+  testWidgets('CI failure for a version mismatch offers retagging instead of re-running', (tester) async {
+    final flow = ReleaseFlow(repo, ghReady: true);
+    addTearDown(flow.dispose);
+    flow.step = ReleaseStep.ci;
+    flow.next = SemVer.tryParse('0.1.0-rc.7+7');
+    flow.run = WorkflowRun.parse('{"databaseId":2,"workflowName":"Release","status":"completed","conclusion":"failure",'
+        '"url":"u","jobs":[{"name":"check","status":"completed","conclusion":"failure",'
+        '"startedAt":"2026-09-25T03:38:38Z","completedAt":"2026-09-25T03:38:50Z","steps":[]}]}');
+    flow.failedLog = 'Error: Tag v0.1.0-rc.7 does not match pubspec.yaml version 0.1.0-rc.6';
+    expect(flow.failedForVersionMismatch, isTrue);
+    await pump(tester, ReleaseTab(flow: flow, onShowChanges: () {}));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('태그 지우고 다시 달기'), findsOneWidget);
+    expect(find.text('실패한 잡 다시 실행'), findsNothing);
+
+    // 다른 이유로 실패했으면 지금처럼 다시 실행을 권한다.
+    flow.failedLog = 'error: something failed';
+    expect(flow.failedForVersionMismatch, isFalse);
+    flow.notifyListeners();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('태그 지우고 다시 달기'), findsNothing);
+    expect(find.text('실패한 잡 다시 실행'), findsOneWidget);
+  });
+
   // v0.3.0 사고 재현: 버전 올림 없이 태그 탭에서 v0.3.0을 push하려 함.
   testWidgets('new tag is blocked from pushing when it does not match the version file', (tester) async {
     late SemVer? head;

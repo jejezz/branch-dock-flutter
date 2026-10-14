@@ -20,6 +20,7 @@ import '../markdown_editor.dart';
 import 'pr_tab.dart';
 import 'release_list.dart';
 import 'remotes_tab.dart';
+import 'tags_tab.dart' show deleteRemoteTag;
 
 /// 릴리스 탭과 마법사 (UI_UX.md §4.5, PLAN.md 3.8). PR 경유가 기본.
 class ReleaseTab extends StatefulWidget {
@@ -863,6 +864,21 @@ class _CiStep extends StatelessWidget {
 
   final ReleaseFlow flow;
 
+  /// 버전이 다른 태그를 원격과 로컬에서 지우고 태그 단계로 돌아간다.
+  /// 원격 태그는 확인을 받고 지운다 — 지워지지 않았으면 여기서 멈춘다.
+  Future<void> _deleteWrongTag(BuildContext context) async {
+    final tag = flow.tag;
+    final repo = flow.repo;
+    if (tag == null) return;
+    await deleteRemoteTag(context, repo, tag);
+    if (!context.mounted) return;
+    await repo.loadRemoteTags();
+    final remoteNames = repo.remoteTagNames;
+    if (remoteNames == null || remoteNames.contains(tag)) return;
+    if (repo.tags.any((t) => t.name == tag)) await repo.execute(GitCommands.deleteTag(tag));
+    await flow.backToTagStep();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -890,14 +906,26 @@ class _CiStep extends StatelessWidget {
             child: SelectableText(flow.failedLog, style: AppFonts.mono.copyWith(fontSize: 10.5)),
           ),
         const SizedBox(height: AppSpacing.sm),
-        Align(
-          alignment: Alignment.centerRight,
-          child: FilledButton.icon(
-            onPressed: flow.repo.busy ? null : () => _report(context, flow.rerunFailed(), l10n.doneRerun),
-            icon: const Icon(Icons.replay_rounded, size: 16),
-            label: Text(l10n.ciRerunFailed),
+        if (flow.failedForVersionMismatch) ...[
+          Text(l10n.ciVersionMismatchMessage(flow.tag ?? ''), style: theme.textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              onPressed: flow.repo.busy ? null : () => _deleteWrongTag(context),
+              icon: const Icon(Icons.restart_alt_rounded, size: 16),
+              label: Text(l10n.ciRetag),
+            ),
           ),
-        ),
+        ] else
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              onPressed: flow.repo.busy ? null : () => _report(context, flow.rerunFailed(), l10n.doneRerun),
+              icon: const Icon(Icons.replay_rounded, size: 16),
+              label: Text(l10n.ciRerunFailed),
+            ),
+          ),
       ],
     ]);
   }

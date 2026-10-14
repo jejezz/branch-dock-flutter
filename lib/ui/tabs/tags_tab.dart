@@ -95,9 +95,30 @@ class _TagsTabState extends State<TagsTab> {
 /// 먼저 알린다. 확인했으면(또는 경고가 필요 없으면) true.
 Future<bool> confirmTagPush(BuildContext context, RepoController repo, List<String> names) async {
   final versions = names.where((n) => SemVer.tryParse(n) != null).toList();
-  final workflow = detectReleaseWorkflows(repo.root).where((w) => w.onTags).firstOrNull;
-  if (workflow == null || versions.isEmpty) return true;
+  if (versions.isEmpty) return true;
+
+  // 태그가 가리키는 커밋의 버전 파일 버전이 태그와 다르면 먼저 알린다. 버전 올림
+  // 커밋보다 앞선 커밋에 단 태그를 올리면 CI의 버전 검사에서 멈춘다.
+  final files = detectVersionFiles(repo.root);
+  final mismatched = <String>[];
+  for (final n in versions) {
+    final committed = await loadCommittedVersion(repo, n);
+    if (committed != null && committed.name != SemVer.tryParse(n)!.name) mismatched.add('$n → ${committed.name}');
+  }
+  if (!context.mounted) return false;
   final l10n = AppLocalizations.of(context);
+  if (mismatched.isNotEmpty) {
+    return confirmDanger(
+      context,
+      title: l10n.tagsPushMismatchTitle(mismatched.length),
+      message: l10n.tagsPushMismatchMessage(files.first.path, mismatched.join(', ')),
+      confirm: l10n.tagsPushAnyway,
+      commands: [GitCommands.pushTags(repo.defaultRemote ?? 'origin', names)],
+    );
+  }
+
+  final workflow = detectReleaseWorkflows(repo.root).where((w) => w.onTags).firstOrNull;
+  if (workflow == null) return true;
   return confirmDanger(
     context,
     title: l10n.tagsPushCiTitle(versions.length),
