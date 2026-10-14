@@ -2788,6 +2788,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagsPushAnyway => 'Push anyway';
 
   @override
+  String tagsPushMismatchTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'These $count tags\' versions differ',
+      one: 'This tag\'s version differs',
+    );
+    return '$_temp0 from the version file';
+  }
+
+  @override
+  String tagsPushMismatchMessage(String file, String tags) {
+    return 'The $file on the commit the tag points to has a different version (tag → file version): $tags. The tag may be on a commit from before the version bump. Pushing it makes the tag-triggered release CI stop at its version check. Bump the version first with the release wizard.';
+  }
+
+  @override
+  String ciVersionMismatchMessage(String tag) {
+    return 'CI stopped because tag $tag does not match the version file. The tag is on a commit before the version bump. Re-running gives the same result: make sure the version bump is on the default branch, then delete the tag and tag again.';
+  }
+
+  @override
+  String get ciRetag => 'Delete the tag and tag again';
+
+  @override
   String get commonDelete => 'Delete';
 
   @override

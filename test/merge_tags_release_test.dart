@@ -8,6 +8,7 @@ import 'package:branch_dock/core/command_runner.dart';
 import 'package:branch_dock/git/commands.dart';
 import 'package:branch_dock/git/commits.dart';
 import 'package:branch_dock/git/tags.dart';
+import 'package:branch_dock/github/models.dart';
 import 'package:branch_dock/release/release_flow.dart';
 import 'package:branch_dock/release/version_files.dart';
 import 'package:branch_dock/repo/repo_controller.dart';
@@ -197,6 +198,31 @@ void main() {
     expect(repo.status.head, flow.releaseBranch);
     expect(flow.step, ReleaseStep.pr);
     expect((await repo.read(['git', 'rev-list', '--count', 'HEAD'])).stdout.trim(), count);
+
+    flow.dispose();
+    repo.dispose();
+  });
+
+  test('CI version mismatch failure: detected, and backToTagStep returns to the tag step', () async {
+    final repo = await setUpRepo();
+    final flow = ReleaseFlow(repo, ghReady: false);
+    flow.next = SemVer.tryParse('0.2.0+4');
+    flow.step = ReleaseStep.ci;
+    flow.run = WorkflowRun.parse('{"databaseId":2,"workflowName":"Release","status":"completed","conclusion":"failure",'
+        '"url":"u","jobs":[]}');
+
+    flow.failedLog = 'Error: something else failed';
+    expect(flow.failedForVersionMismatch, isFalse);
+    flow.failedLog = 'Error: Tag v0.2.0 does not match pubspec.yaml version 0.1.0';
+    expect(flow.failedForVersionMismatch, isTrue);
+
+    await flow.backToTagStep();
+    expect(flow.step, ReleaseStep.tag);
+    expect(flow.run, isNull);
+    expect(flow.failedLog, isEmpty);
+    expect(flow.failedForVersionMismatch, isFalse);
+    // 태그 단계의 점검이 다시 돌았다 — 이 저장소의 버전은 0.1.0이라 맞지 않는다.
+    expect(flow.tagChecks[TagCheck.versionMatches], isFalse);
 
     flow.dispose();
     repo.dispose();

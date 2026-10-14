@@ -580,6 +580,20 @@ class ReleaseFlow extends ChangeNotifier {
     release = r.ok ? GitHubRelease.parse(r.stdout) : null;
   }
 
+  /// CI가 "태그와 버전 파일의 버전이 다르다"며 멈췄는가. 태그가 버전 올림 커밋
+  /// 이전 커밋에 달렸을 때 난다. 다시 실행해도 같은 결과라 태그를 다시 달아야 한다.
+  bool get failedForVersionMismatch => RegExp(r'does not match.*version', caseSensitive: false).hasMatch(failedLog);
+
+  /// 잘못 달린 태그를 지운 뒤 태그 단계로 돌아가 버전이 맞는지부터 다시 점검한다.
+  Future<void> backToTagStep() async {
+    run = null;
+    failedLog = '';
+    step = ReleaseStep.tag;
+    await _save();
+    await runTagChecks();
+    notifyListeners();
+  }
+
   Future<CommandResult> rerunFailed() async {
     final id = run?.id;
     if (id == null) return const CommandResult(1, '', '');

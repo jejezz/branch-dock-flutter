@@ -4526,6 +4526,30 @@ abstract class AppLocalizations {
   /// **'그래도 push'**
   String get tagsPushAnyway;
 
+  /// No description provided for @tagsPushMismatchTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 {count}개의 버전이 버전 파일과 다릅니다'**
+  String tagsPushMismatchTitle(int count);
+
+  /// No description provided for @tagsPushMismatchMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그가 가리키는 커밋의 {file} 버전이 태그와 다릅니다 (태그 → 파일의 버전): {tags}. 버전을 올리기 전의 커밋에 단 태그일 수 있습니다. 이대로 올리면 태그로 릴리스를 만드는 CI가 버전 검사에서 멈춥니다. 릴리스 마법사로 버전 올림부터 하세요.'**
+  String tagsPushMismatchMessage(String file, String tags);
+
+  /// No description provided for @ciVersionMismatchMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'CI가 {tag} 태그와 버전 파일의 버전이 다르다며 멈췄습니다. 태그가 버전 올림 커밋보다 앞선 커밋에 달린 것입니다. 다시 실행해도 같은 결과이니, 버전 올림 커밋이 기본 브랜치에 들어갔는지 확인한 뒤 태그를 지우고 다시 다세요.'**
+  String ciVersionMismatchMessage(String tag);
+
+  /// No description provided for @ciRetag.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그 지우고 다시 달기'**
+  String get ciRetag;
+
   /// No description provided for @commonDelete.
   ///
   /// In ko, this message translates to:
