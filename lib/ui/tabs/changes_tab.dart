@@ -281,14 +281,12 @@ class _FileRowState extends State<_FileRow> {
       _Group.unstaged => _kindLetter(f.unstagedKind),
     };
     final staging = widget.group != _Group.staged;
-    // 병합·rebase 중에 이미 해결한 충돌 파일은 다시 충돌 상태로 되돌릴 수 있다.
-    final reopenable = widget.group != _Group.conflicts && widget.group != _Group.untracked && repo.resolvedPaths.contains(f.path);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
-      onSecondaryTapDown: widget.group == _Group.staged && !reopenable ? null : (d) => _menu(context, d.globalPosition),
+      onSecondaryTapDown: (d) => _menu(context, d.globalPosition),
       child: InkWell(
         splashFactory: NoSplash.splashFactory,
         onDoubleTap: () => RepoActions.openInEditor(context, repo, f),
@@ -349,7 +347,7 @@ class _FileRowState extends State<_FileRow> {
                     icon: Icon(staging ? Icons.add_rounded : Icons.remove_rounded),
                     onPressed: repo.busy ? null : () => staging ? repo.stage(f) : repo.unstage(f),
                   ),
-                if (widget.group != _Group.staged || reopenable)
+                if (widget.group != _Group.conflicts)
                   Builder(
                     builder: (context) => IconButton(
                       tooltip: l10n.commonMore,
@@ -428,6 +426,7 @@ class _FileRowState extends State<_FileRow> {
     final mine = GitCommands.checkoutSide(f.path, ours: !rebasing);
     final incoming = GitCommands.checkoutSide(f.path, ours: rebasing);
     final reopen = GitCommands.reconflict(f.path);
+    final stash = GitCommands.stashPushPaths(f.path, [if (f.originalPath != null) f.originalPath!, f.path]);
     final reopenable = widget.group != _Group.conflicts &&
         widget.group != _Group.untracked &&
         repo.resolvedPaths.contains(f.path);
@@ -442,6 +441,8 @@ class _FileRowState extends State<_FileRow> {
       if (reopenable) PopupMenuItem(value: [reopen], child: Text(l10n.conflictReopen)),
       if (widget.group == _Group.untracked)
         PopupMenuItem(value: [GitCommands.removeUntracked(f.path)], child: Text(l10n.changesDeleteUntracked)),
+      if (widget.group != _Group.conflicts)
+        PopupMenuItem(value: [stash], child: Text(l10n.stashSaveFile)),
     ];
     if (items.isEmpty) return;
     final box = anchor.findRenderObject() as RenderBox;
@@ -455,6 +456,11 @@ class _FileRowState extends State<_FileRow> {
     // 빈 목록은 "구간별로 해결": 명령을 바로 실행하지 않고 해결 시트를 연다.
     if (commands.isEmpty) {
       await showConflictSheet(context, repo, f);
+      return;
+    }
+    // 임시 저장은 되살릴 수 있으므로 바로 실행한다.
+    if (commands.first.contains('stash')) {
+      await RepoActions.report(context, repo.executeAll(commands), done: l10n.doneStashSaved);
       return;
     }
     // 변경 취소·삭제는 되돌릴 수 없으므로 확인한다 (ui-ux.md §6).
