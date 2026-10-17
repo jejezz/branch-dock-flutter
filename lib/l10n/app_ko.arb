@@ -1327,6 +1327,16 @@
   "stashTitle": "임시 저장 (stash)",
   "stashSave": "임시 저장",
   "stashSaveFile": "이 파일만 임시 저장",
+  "stashFileToStage": "스테이징으로 꺼내기",
+  "stashFileOverwriteMessage": "{path}에 이미 변경이 있습니다. 임시 저장한 내용으로 덮어씁니다.",
+  "@stashFileOverwriteMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "stashEmpty": "파일 목록을 불러오지 못했습니다.",
   "stashWhy": "변경 {count}개를 커밋하지 않고 따로 치워 둡니다. 추적하지 않는 파일도 함께 저장합니다. 나중에 '다시 적용'으로 되살립니다.",
   "@stashWhy": {
     "placeholders": {

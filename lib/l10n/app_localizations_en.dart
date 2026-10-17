@@ -1921,6 +1921,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stashSaveFile => 'Stash this file only';
 
   @override
+  String get stashFileToStage => 'Move to staged';
+
+  @override
+  String stashFileOverwriteMessage(String path) {
+    return '$path already has changes. They will be overwritten with the stashed version.';
+  }
+
+  @override
+  String get stashEmpty => 'Couldn\'t load the file list.';
+
+  @override
   String stashWhy(int count) {
     return 'Puts your $count changes aside without committing, including untracked files. Bring them back later with Apply.';
   }
