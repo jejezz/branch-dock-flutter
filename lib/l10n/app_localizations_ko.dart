@@ -1806,6 +1806,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get stashSaveFile => '이 파일만 임시 저장';
 
   @override
+  String get stashFileToStage => '스테이징으로 꺼내기';
+
+  @override
+  String stashFileOverwriteMessage(String path) {
+    return '$path에 이미 변경이 있습니다. 임시 저장한 내용으로 덮어씁니다.';
+  }
+
+  @override
+  String get stashEmpty => '파일 목록을 불러오지 못했습니다.';
+
+  @override
   String stashWhy(int count) {
     return '변경 $count개를 커밋하지 않고 따로 치워 둡니다. 추적하지 않는 파일도 함께 저장합니다. 나중에 \'다시 적용\'으로 되살립니다.';
   }

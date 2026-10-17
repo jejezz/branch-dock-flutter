@@ -3158,6 +3158,24 @@ abstract class AppLocalizations {
   /// **'이 파일만 임시 저장'**
   String get stashSaveFile;
 
+  /// No description provided for @stashFileToStage.
+  ///
+  /// In ko, this message translates to:
+  /// **'스테이징으로 꺼내기'**
+  String get stashFileToStage;
+
+  /// No description provided for @stashFileOverwriteMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'{path}에 이미 변경이 있습니다. 임시 저장한 내용으로 덮어씁니다.'**
+  String stashFileOverwriteMessage(String path);
+
+  /// No description provided for @stashEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'파일 목록을 불러오지 못했습니다.'**
+  String get stashEmpty;
+
   /// No description provided for @stashWhy.
   ///
   /// In ko, this message translates to:

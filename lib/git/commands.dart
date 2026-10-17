@@ -96,10 +96,21 @@ abstract final class GitCommands {
 
   static List<String> stashPush(String message) =>
       ['git', 'stash', 'push', '--include-untracked', if (message.trim().isNotEmpty) ...['-m', message.trim()]];
+
   /// 고른 파일만 임시 저장한다 (추적 안 된 파일 포함).
   static List<String> stashPushPaths(String message, List<String> paths) =>
       ['git', 'stash', 'push', '--include-untracked', '-m', message, '--', ...paths];
-  static const stashList =['git', 'stash', 'list', '--format=$stashFormat'];
+
+  /// stash에 든 추적 파일 (이름만).
+  static List<String> stashFiles(String ref) => ['git', 'stash', 'show', '--name-only', ref];
+
+  /// stash에 든 추적 안 된 파일. stash의 세 번째 부모에 들어 있다.
+  static List<String> stashUntrackedFiles(String ref) => ['git', 'ls-tree', '-r', '--name-only', '$ref^3'];
+
+  /// stash의 파일 하나를 꺼내 스테이징한다. 항목은 그대로 남는다.
+  static List<String> stashRestoreFile(String ref, String path, {bool untracked = false}) =>
+      ['git', 'checkout', untracked ? '$ref^3' : ref, '--', path];
+  static const stashList = ['git', 'stash', 'list', '--format=$stashFormat'];
   static List<String> stashApply(String ref) => ['git', 'stash', 'apply', ref];
   static List<String> stashPop(String ref) => ['git', 'stash', 'pop', ref];
   static List<String> stashDrop(String ref) => ['git', 'stash', 'drop', ref];

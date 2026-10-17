@@ -496,11 +496,72 @@ class _FileRowState extends State<_FileRow> {
 
 
 /// stash 한 줄 (PLAN.md 3.2 P1): 다시 적용 / 적용하고 지우기 / 삭제.
-class _StashRow extends StatelessWidget {
+class _StashRow extends StatefulWidget {
   const _StashRow({required this.stash, required this.repo});
 
   final Stash stash;
   final RepoController repo;
+
+  @override
+  State<_StashRow> createState() => _StashRowState();
+}
+
+class _StashRowState extends State<_StashRow> {
+  bool _open = false;
+
+  /// (경로, 추적 안 된 파일인지). null이면 아직 불러오지 않았다.
+  List<(String, bool)>? _files;
+
+  Stash get stash => widget.stash;
+  RepoController get repo => widget.repo;
+
+  @override
+  void didUpdateWidget(_StashRow old) {
+    super.didUpdateWidget(old);
+    // 목록이 바뀌면 stash@{n} 번호가 다른 항목을 가리킬 수 있다.
+    if (old.stash.ref != stash.ref || old.stash.message != stash.message) {
+      _files = null;
+      if (_open) _load();
+    }
+  }
+
+  Future<void> _load() async {
+    final ref = stash.ref;
+    final tracked = await repo.read(GitCommands.stashFiles(ref));
+    final untracked = await repo.read(GitCommands.stashUntrackedFiles(ref));
+    if (!mounted || ref != stash.ref) return;
+    List<String> lines(String s) => s.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+    setState(() => _files = tracked.ok
+        ? [
+            for (final p in lines(tracked.stdout)) (p, false),
+            // 세 번째 부모가 없으면(추적 안 된 파일이 없으면) 이 명령이 실패한다.
+            if (untracked.ok) for (final p in lines(untracked.stdout)) (p, true),
+          ]
+        : const []);
+  }
+
+  void _toggle() {
+    setState(() => _open = !_open);
+    if (_open && _files == null) _load();
+  }
+
+  Future<void> _restore(String path, bool untracked) async {
+    final l10n = AppLocalizations.of(context);
+    final command = GitCommands.stashRestoreFile(stash.ref, path, untracked: untracked);
+    final s = repo.status;
+    final exists = [...s.staged, ...s.unstaged, ...s.untracked].any((f) => f.path == path);
+    if (exists) {
+      final ok = await confirmDanger(
+        context,
+        title: l10n.stashFileToStage,
+        message: l10n.stashFileOverwriteMessage(path),
+        confirm: l10n.stashFileToStage,
+        commands: [command],
+      );
+      if (!ok || !mounted) return;
+    }
+    await RepoActions.report(context, repo.execute(command), done: l10n.doneFileAction(path.split('/').last));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -508,16 +569,22 @@ class _StashRow extends StatelessWidget {
     final theme = Theme.of(context);
     final (:branch, :text) = stash.parts;
     Future<void> run(List<String> command, String done) => RepoActions.report(context, repo.execute(command), done: done);
-    return Padding(
+    final row = Padding(
       padding: const EdgeInsets.only(left: AppSpacing.lg, right: 4),
       child: Row(children: [
+        Icon(_open ? Icons.expand_more_rounded : Icons.chevron_right_rounded,
+            size: 16, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: 2),
         Icon(Icons.inventory_2_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppFonts.userContent.copyWith(fontSize: 13)),
-            Text('${stash.ref} · $branch · ${relativeTime(l10n, stash.date)}', style: theme.textTheme.labelSmall),
-          ]),
+          child: InkWell(
+            onTap: _toggle,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppFonts.userContent.copyWith(fontSize: 13)),
+              Text('${stash.ref} · $branch · ${relativeTime(l10n, stash.date)}', style: theme.textTheme.labelSmall),
+            ]),
+          ),
         ),
         PopupMenuButton<String>(
           tooltip: l10n.commonMore,
@@ -552,6 +619,43 @@ class _StashRow extends StatelessWidget {
         ),
       ]),
     );
+    if (!_open) return row;
+    final files = _files;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      row,
+      if (files == null)
+        const Padding(
+          padding: EdgeInsets.all(AppSpacing.sm),
+          child: Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))),
+        )
+      else if (files.isEmpty)
+        Padding(
+          padding: const EdgeInsets.only(left: AppSpacing.xl, top: 4, bottom: 4),
+          child: Text(l10n.stashEmpty, style: theme.textTheme.bodySmall),
+        )
+      else
+        for (final (path, untracked) in files)
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.xl, right: 4),
+            child: Row(children: [
+              Expanded(
+                child: Tooltip(
+                  message: path,
+                  waitDuration: const Duration(milliseconds: 600),
+                  child: Text(path,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: AppFonts.userContent.copyWith(fontSize: 12.5)),
+                ),
+              ),
+              IconButton(
+                tooltip: l10n.stashFileToStage,
+                visualDensity: VisualDensity.compact,
+                iconSize: 18,
+                icon: const Icon(Icons.add_rounded),
+                onPressed: repo.busy ? null : () => _restore(path, untracked),
+              ),
+            ]),
+          ),
+    ]);
   }
 }
 
