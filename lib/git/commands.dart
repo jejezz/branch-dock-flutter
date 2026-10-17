@@ -96,7 +96,10 @@ abstract final class GitCommands {
 
   static List<String> stashPush(String message) =>
       ['git', 'stash', 'push', '--include-untracked', if (message.trim().isNotEmpty) ...['-m', message.trim()]];
-  static const stashList = ['git', 'stash', 'list', '--format=$stashFormat'];
+  /// 고른 파일만 임시 저장한다 (추적 안 된 파일 포함).
+  static List<String> stashPushPaths(String message, List<String> paths) =>
+      ['git', 'stash', 'push', '--include-untracked', '-m', message, '--', ...paths];
+  static const stashList =['git', 'stash', 'list', '--format=$stashFormat'];
   static List<String> stashApply(String ref) => ['git', 'stash', 'apply', ref];
   static List<String> stashPop(String ref) => ['git', 'stash', 'pop', ref];
   static List<String> stashDrop(String ref) => ['git', 'stash', 'drop', ref];

@@ -557,6 +557,7 @@
   "doneFileAction": "{name}: done",
   "stashTitle": "Stashes",
   "stashSave": "Stash changes",
+  "stashSaveFile": "Stash this file only",
   "stashWhy": "Puts your {count} changes aside without committing, including untracked files. Bring them back later with Apply.",
   "stashMessageLabel": "Note (optional)",
   "stashPop": "Apply and remove (pop)",
